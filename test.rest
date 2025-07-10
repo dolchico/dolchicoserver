@@ -1,0 +1,120 @@
+##Below is the Test Cases for the SIGN IN SIGN UP
+
+### Sign Up (Register)
+POST http://localhost:4000/api/user/register
+Content-Type: application/json
+
+{
+  "name": "John Doe 2",
+  "email": "johndoe2@example.com",
+  "password": "securePassword1234"
+}
+
+### Sign In (Login)
+POST http://localhost:4000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "johndoe@example.com",
+  "password": "securePassword123"
+}
+
+
+
+### Set global token variable (edit YOUR_JWT_TOKEN below)
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzUxMjcxOTA3LCJleHAiOjE3NTE4NzY3MDd9.fWN-mnwVA8HXd8fsYy2EZDmCP0kiB40Y4IfScL6MzXM
+
+@baseUrl = http://localhost:4000/api/cart
+
+### ✅ Get User Cart
+GET {{baseUrl}}/get
+Authorization: Bearer {{token}}
+
+###
+
+### ✅ Add to Cart
+POST {{baseUrl}}/add
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "itemId": 1,
+  "size": "M"
+}
+
+###
+
+### ✅ Update Cart
+POST {{baseUrl}}/update
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "itemId": 1,
+  "size": "M",
+  "quantity": 3
+}
+
+
+###Below is the test cases for Placing Order
+
+/api/order/place         (user, needs auth header)
+/api/order/userorders    (user, needs auth header)
+/api/order/list          (admin, needs admin auth header)
+/api/order/status        (admin, needs admin auth header)
+
+### Place Order (User)
+POST http://localhost:4000/api/order/place
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzUxMjcxOTA3LCJleHAiOjE3NTE4NzY3MDd9.fWN-mnwVA8HXd8fsYy2EZDmCP0kiB40Y4IfScL6MzXM
+
+
+{
+  "items": [
+    { "productId": 1, "quantity": 2, "size": "M" },
+    { "productId": 2, "quantity": 1, "size": "L" }
+  ],
+  "amount": 450.5,
+  "address": {
+    "street": "123 Main Street",
+    "city": "City",
+    "country": "Country"
+  }
+}
+
+
+### Get User Orders
+POST http://localhost:4000/api/order/userorders
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzUxMjcxOTA3LCJleHAiOjE3NTE4NzY3MDd9.fWN-mnwVA8HXd8fsYy2EZDmCP0kiB40Y4IfScL6MzXM
+
+
+### Sign in as Admin
+
+POST http://localhost:4000/api/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "greatstack123"
+}
+
+
+
+
+### Get All Orders (Admin)
+POST http://localhost:4000/api/order/list
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUxMzQ5NTk4LCJleHAiOjE3NTE5NTQzOTh9.jza-tLtOpnIXMviDTaNK1iW8ayH_75uKE82k6jInXWM
+
+
+### Update Order Status (Admin)
+POST http://localhost:4000/api/order/status
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUxMzQ5NTk4LCJleHAiOjE3NTE5NTQzOTh9.jza-tLtOpnIXMviDTaNK1iW8ayH_75uKE82k6jInXWM
+
+{
+  "orderId": 2,
+  "status": "Delivered"
+}
+

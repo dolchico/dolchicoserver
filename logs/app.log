@@ -1,0 +1,47 @@
+2025-07-03T04:54:33.534Z [INFO]: GET /
+2025-07-03T04:54:41.149Z [INFO]: GET /
+2025-07-03T04:54:44.823Z [INFO]: GET /
+2025-07-03T04:54:59.110Z [INFO]: GET /
+2025-07-03T04:54:59.339Z [INFO]: GET /favicon.ico
+2025-07-03T04:55:06.980Z [INFO]: GET /
+2025-07-03T04:55:08.937Z [INFO]: GET /
+2025-07-03T04:56:39.465Z [INFO]: POST /api/register
+2025-07-03T04:56:46.254Z [INFO]: POST /api/user/register
+2025-07-03T04:58:35.378Z [INFO]: POST /api/user/register
+2025-07-03T05:09:05.603Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:12:19.442Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:12:34.093Z [INFO]: POST /api/user/login
+2025-07-03T05:12:36.882Z [INFO]: ::1 - - [03/Jul/2025:05:12:36 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:38.568Z [INFO]: POST /api/user/login
+2025-07-03T05:12:38.930Z [INFO]: ::1 - - [03/Jul/2025:05:12:38 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:39.754Z [INFO]: POST /api/user/login
+2025-07-03T05:12:40.106Z [INFO]: ::1 - - [03/Jul/2025:05:12:40 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:41.027Z [INFO]: POST /api/user/login
+2025-07-03T05:12:41.379Z [INFO]: ::1 - - [03/Jul/2025:05:12:41 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:41.973Z [INFO]: POST /api/user/login
+2025-07-03T05:12:42.329Z [INFO]: ::1 - - [03/Jul/2025:05:12:42 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:43.160Z [INFO]: POST /api/user/login
+2025-07-03T05:12:43.508Z [INFO]: ::1 - - [03/Jul/2025:05:12:43 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:44.294Z [INFO]: POST /api/user/login
+2025-07-03T05:12:44.643Z [INFO]: ::1 - - [03/Jul/2025:05:12:44 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:45.376Z [INFO]: POST /api/user/login
+2025-07-03T05:12:45.729Z [INFO]: ::1 - - [03/Jul/2025:05:12:45 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:46.327Z [INFO]: POST /api/user/login
+2025-07-03T05:12:46.678Z [INFO]: ::1 - - [03/Jul/2025:05:12:46 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:12:47.735Z [INFO]: POST /api/user/login
+2025-07-03T05:12:48.083Z [INFO]: ::1 - - [03/Jul/2025:05:12:48 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-03T05:14:41.686Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:14:44.535Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:14:46.363Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:14:51.938Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:32:28.442Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:35:04.651Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:54:22.617Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T05:54:36.479Z [INFO]: POST /api/user/login
+2025-07-03T05:54:36.483Z [INFO]: ::ffff:127.0.0.1 - - [03/Jul/2025:05:54:36 +0000] "POST /api/user/login HTTP/1.1" 500 1273 "-" "vscode-restclient"
+2025-07-03T06:10:50.585Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T06:22:04.785Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T06:23:45.263Z [INFO]: GET /
+2025-07-03T06:23:45.277Z [INFO]: ::1 - - [03/Jul/2025:06:23:45 +0000] "GET / HTTP/1.1" 500 1273 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-03T06:24:29.219Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-03T06:24:32.800Z [INFO]: ::1 - - [03/Jul/2025:06:24:32 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"

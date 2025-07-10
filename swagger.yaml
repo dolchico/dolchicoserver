@@ -1,0 +1,311 @@
+openapi: 3.0.3
+info:
+  title: Example E-commerce API
+  version: 1.0.0
+  description: |
+    REST API for user authentication, cart management, orders, and products.
+
+servers:
+  - url: https://dolchico.up.railway.app/api
+  - url: http://localhost:4000/api
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AddToCartRequest:
+      type: object
+      required: [itemId, size]
+      properties:
+        itemId:
+          type: integer
+        size:
+          type: string
+
+    UpdateCartRequest:
+      type: object
+      required: [itemId, size, quantity]
+      properties:
+        itemId:
+          type: integer
+        size:
+          type: string
+        quantity:
+          type: integer
+
+    Address:
+      type: object
+      required: [street, city, country]
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+
+    PlaceOrderItem:
+      type: object
+      required: [productId, quantity, size]
+      properties:
+        productId:
+          type: integer
+        quantity:
+          type: integer
+        size:
+          type: string
+
+    PlaceOrderRequest:
+      type: object
+      required: [items, amount, address]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlaceOrderItem'
+        amount:
+          type: number
+          format: float
+        address:
+          $ref: '#/components/schemas/Address'
+
+    UpdateOrderStatusRequest:
+      type: object
+      required: [orderId, status]
+      properties:
+        orderId:
+          type: integer
+        status:
+          type: string
+
+paths:
+
+  /user/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration successful
+
+  /user/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful, returns token
+
+  /admin/login:
+    post:
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful, returns token
+
+  /cart/get:
+    get:
+      summary: Get user cart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's cart
+
+  /cart/add:
+    post:
+      summary: Add item to cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '200':
+          description: Item added to cart
+
+  /cart/update:
+    post:
+      summary: Update cart item quantity
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCartRequest'
+      responses:
+        '200':
+          description: Cart updated
+
+  /order/place:
+    post:
+      summary: Place a new order
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaceOrderRequest'
+      responses:
+        '200':
+          description: Order placed
+
+  /order/userorders:
+    post:
+      summary: Get orders for logged-in user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's orders
+
+  /order/list:
+    post:
+      summary: Admin - Get all orders
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All orders (admin)
+
+  /order/status:
+    post:
+      summary: Admin - Update order status
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrderStatusRequest'
+      responses:
+        '200':
+          description: Order status updated
+
+  /product/add:
+    post:
+      summary: Add a new product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - category
+                - subCategory
+                - sizes
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                category:
+                  type: string
+                subCategory:
+                  type: string
+                bestseller:
+                  type: boolean
+                sizes:
+                  type: string
+                  example: '["S", "M", "L"]'
+                image1:
+                  type: string
+                  format: binary
+                image2:
+                  type: string
+                  format: binary
+                image3:
+                  type: string
+                  format: binary
+                image4:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Product added
+
+  /product/list:
+    get:
+      summary: List all products
+      responses:
+        '200':
+          description: List of products
+
+  /product/remove:
+    post:
+      summary: Remove a product by ID
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: integer
+      responses:
+        '200':
+          description: Product removed
