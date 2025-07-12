@@ -49,8 +49,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-// ✅ List Products
-// ✅ List Products with BigInt Fix
+
 const listProducts = async (req, res) => {
   try {
     const products = await getAllProducts();
@@ -87,20 +86,18 @@ const removeProduct = async (req, res) => {
   }
 };
 
-// ✅ Single Product Info
-// ✅ Single Product Info (POST version)
-// controllers/productController.js (or wherever singleProduct is defined)
+
 
 const singleProduct = async (req, res) => {
   try {
-    // Assuming your route is productRouter.get('/single/:productId', singleProduct);
+    
     const { productId } = req.params; 
 
     // CHANGE START: Explicitly check if productId is the string "undefined" or not a valid number
     if (!productId || productId === "undefined" || isNaN(Number(productId))) {
       return res.status(400).json({ success: false, message: 'Invalid or missing product ID provided.' });
     }
-    // CHANGE END
+
 
     const product = await getProductById(Number(productId)); // Number("undefined") would result in NaN
 
@@ -108,7 +105,7 @@ const singleProduct = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // ✅ Safely convert BigInt to string for JSON
+    
     const safeProduct = {
       ...product,
       date: product.date?.toString() || null,

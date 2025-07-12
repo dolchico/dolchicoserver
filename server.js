@@ -10,6 +10,9 @@ import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import yaml from 'yaml';
 import morgan from 'morgan';
+import session from 'express-session';
+import passport from 'passport';
+import { ensureAuth } from './middleware/authMiddleware.js';
 
 /**
  * ================================
@@ -24,7 +27,9 @@ import cartRouter from './routes/cartRoute.js';
 import orderRouter from './routes/orderRoute.js';
 import adminRouter from './routes/adminRoute.js';
 import helmet from './middleware/helmet.js';
-import { apiLimiter} from './middleware/rateLimit.js';
+import { apiLimiter } from './middleware/rateLimit.js';
+import authRouter from './routes/authRoute.js';
+import './config/passport-setup.js';
 
 /**
  * ================================
@@ -49,6 +54,7 @@ const swaggerDocument = yaml.parse(file);
  * ================================
  */
 connectCloudinary();
+
 /**
  * ================================
  * Middleware
@@ -63,6 +69,19 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Session and Passport.js for OAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true
+  }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Winston + Morgan integration
 app.use(morgan('combined', {
   stream: {
@@ -70,11 +89,6 @@ app.use(morgan('combined', {
   }
 }));
 
-// Log every request with Winston
-// app.use((req,next) => {
-//   logger.info(`${req.method} ${req.url}`);
-//   next();
-// });
 /**
  * ================================
  * Error Testing Route
@@ -90,12 +104,13 @@ app.get('/error', (req, res) => {
  * API Routes
  * ================================
  */
+app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/product', productRouter);
-app.use('/api/cart', cartRouter);
-app.use('/api/order', orderRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/order', ensureAuth, orderRouter);
+app.use('/api/cart', ensureAuth, cartRouter);
 
 /**
  * ================================

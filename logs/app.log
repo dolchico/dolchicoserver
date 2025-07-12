@@ -50,3 +50,93 @@
 2025-07-10T08:20:13.985Z [INFO]: ::1 - - [10/Jul/2025:08:20:13 +0000] "POST /api/user/register HTTP/1.1" 200 49 "-" "PostmanRuntime/7.44.1"
 2025-07-10T08:20:20.562Z [INFO]: ::1 - - [10/Jul/2025:08:20:20 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "PostmanRuntime/7.44.1"
 2025-07-12T05:21:03.622Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T05:34:25.202Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T05:34:42.831Z [INFO]: ::1 - - [12/Jul/2025:05:34:42 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "PostmanRuntime/7.44.1"
+2025-07-12T05:35:07.208Z [INFO]: ::1 - - [12/Jul/2025:05:35:07 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "PostmanRuntime/7.44.1"
+2025-07-12T05:35:10.579Z [INFO]: ::1 - - [12/Jul/2025:05:35:10 +0000] "POST /api/user/register HTTP/1.1" 200 49 "-" "PostmanRuntime/7.44.1"
+2025-07-12T05:35:14.699Z [INFO]: ::1 - - [12/Jul/2025:05:35:14 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "PostmanRuntime/7.44.1"
+2025-07-12T05:35:39.818Z [INFO]: ::1 - - [12/Jul/2025:05:35:39 +0000] "POST /api/admin/login HTTP/1.1" 200 192 "-" "PostmanRuntime/7.44.1"
+2025-07-12T06:14:13.577Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T06:14:28.662Z [INFO]: ::ffff:127.0.0.1 - - [12/Jul/2025:06:14:28 +0000] "GET /api/auth/profile HTTP/1.1" 404 155 "-" "vscode-restclient"
+2025-07-12T06:14:40.170Z [INFO]: ::ffff:127.0.0.1 - - [12/Jul/2025:06:14:40 +0000] "GET /api/auth/profile HTTP/1.1" 404 155 "-" "vscode-restclient"
+2025-07-12T06:15:41.288Z [INFO]: ::1 - - [12/Jul/2025:06:15:41 +0000] "POST /api/auth/google%0A HTTP/1.1" 404 158 "-" "PostmanRuntime/7.44.1"
+2025-07-12T06:15:54.259Z [INFO]: ::1 - - [12/Jul/2025:06:15:54 +0000] "GET /api/auth/profile%60 HTTP/1.1" 404 158 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T06:16:01.560Z [INFO]: ::1 - - [12/Jul/2025:06:16:01 +0000] "POST /api/auth/profile HTTP/1.1" 404 156 "-" "PostmanRuntime/7.44.1"
+2025-07-12T06:18:03.280Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T06:18:04.059Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T06:19:15.892Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:04:03.198Z [INFO]: ::1 - - [12/Jul/2025:07:04:03 +0000] "POST /api/auth/profile HTTP/1.1" 404 156 "-" "PostmanRuntime/7.44.1"
+2025-07-12T07:26:09.516Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/ HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:26:09.578Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 200 13339 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:26:09.582Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 200 154994 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:26:09.586Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 200 229223 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:26:09.590Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 200 1485334 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:26:09.736Z [INFO]: ::1 - - [12/Jul/2025:07:26:09 +0000] "GET /api-docs/favicon-32x32.png HTTP/1.1" 200 628 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:27:03.355Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:27:29.299Z [INFO]: ::1 - - [12/Jul/2025:07:27:29 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:29:56.515Z [INFO]: ::1 - - [12/Jul/2025:07:29:56 +0000] "GET /api/auth/profile HTTP/1.1" 401 31 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:29:56.612Z [INFO]: ::1 - - [12/Jul/2025:07:29:56 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:30:15.750Z [INFO]: ::1 - - [12/Jul/2025:07:30:15 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:31:52.238Z [INFO]: ::1 - - [12/Jul/2025:07:31:52 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:32:18.517Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:32:21.292Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:32:49.680Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:32:58.960Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:00.753Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:04.413Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:05.781Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:11.382Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:12.834Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:33:22.057Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:40:01.204Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:41:44.797Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:42:08.854Z [INFO]: ::1 - - [12/Jul/2025:07:42:08 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:44:55.360Z [INFO]: ::1 - - [12/Jul/2025:07:44:55 +0000] "GET /api/auth/google/callback%60 HTTP/1.1" 404 166 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:48:12.600Z [INFO]: ::1 - - [12/Jul/2025:07:48:12 +0000] "GET /auth/google/callback HTTP/1.1" 404 159 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:48:38.707Z [INFO]: ::1 - - [12/Jul/2025:07:48:38 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:48:52.898Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:51:45.110Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:51:46.135Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:55:11.190Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:55:13.183Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:55:49.868Z [INFO]: ::1 - - [12/Jul/2025:07:55:49 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:55:53.915Z [INFO]: ::1 - - [12/Jul/2025:07:55:53 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T07:58:55.808Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:59:02.426Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:59:07.597Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T07:59:25.652Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:00:17.897Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:00:20.395Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:10:07.964Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:10:43.525Z [INFO]: ::1 - - [12/Jul/2025:08:10:43 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:10:52.664Z [INFO]: ::1 - - [12/Jul/2025:08:10:52 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJiu4l7DWNdc4he8mGQk7MPysThPuTuyiXBHxyrUz_EYVuobw5tEgwbw8b_TKizKng&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 500 909 "https://accounts.google.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:14:33.115Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:14:39.217Z [INFO]: ::1 - - [12/Jul/2025:08:14:39 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJjf5I3j2DosZnROlfLC-gsRgl8EohbL4XzZDXtZmo_aiaVVAyTtU5SLZrpLThecTw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 500 1328 "https://accounts.google.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:15:55.423Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-12T08:16:02.115Z [INFO]: ::1 - - [12/Jul/2025:08:16:02 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJgo_NSSly1IjVm3HGfPp5XFX7q2US9tIZzsIon8q1kw-Pwcsuj5KPjCHZ_t9avPaA&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 302 30 "https://accounts.google.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:16:02.212Z [INFO]: ::1 - - [12/Jul/2025:08:16:02 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:37.467Z [INFO]: ::1 - - [12/Jul/2025:08:17:37 +0000] "GET /api-docs/ HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:37.585Z [INFO]: ::1 - - [12/Jul/2025:08:17:37 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:38.298Z [INFO]: ::1 - - [12/Jul/2025:08:17:38 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 200 15137 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:38.317Z [INFO]: ::1 - - [12/Jul/2025:08:17:38 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:38.320Z [INFO]: ::1 - - [12/Jul/2025:08:17:38 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:38.569Z [INFO]: ::1 - - [12/Jul/2025:08:17:38 +0000] "GET /api-docs/favicon-32x32.png HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:17:59.444Z [INFO]: ::1 - - [12/Jul/2025:08:17:59 +0000] "GET /api/auth/google/callback HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:18:03.874Z [INFO]: ::1 - - [12/Jul/2025:08:18:03 +0000] "GET /api/auth/google/callback HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:18:15.974Z [INFO]: ::1 - - [12/Jul/2025:08:18:15 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:18:19.188Z [INFO]: ::1 - - [12/Jul/2025:08:18:19 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:08.707Z [INFO]: ::1 - - [12/Jul/2025:08:27:08 +0000] "GET /api-docs/ HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:08.858Z [INFO]: ::1 - - [12/Jul/2025:08:27:08 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:09.554Z [INFO]: ::1 - - [12/Jul/2025:08:27:09 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:09.598Z [INFO]: ::1 - - [12/Jul/2025:08:27:09 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:09.839Z [INFO]: ::1 - - [12/Jul/2025:08:27:09 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:10.110Z [INFO]: ::1 - - [12/Jul/2025:08:27:10 +0000] "GET /api-docs/favicon-32x32.png HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:17.863Z [INFO]: ::1 - - [12/Jul/2025:08:27:17 +0000] "GET /api-docs/ HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:17.969Z [INFO]: ::1 - - [12/Jul/2025:08:27:17 +0000] "GET /api-docs/swagger-ui-init.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:17.971Z [INFO]: ::1 - - [12/Jul/2025:08:27:17 +0000] "GET /api-docs/swagger-ui.css HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:17.972Z [INFO]: ::1 - - [12/Jul/2025:08:27:17 +0000] "GET /api-docs/swagger-ui-standalone-preset.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:17.986Z [INFO]: ::1 - - [12/Jul/2025:08:27:17 +0000] "GET /api-docs/swagger-ui-bundle.js HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:27:47.162Z [INFO]: ::1 - - [12/Jul/2025:08:27:47 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:28:01.786Z [INFO]: ::1 - - [12/Jul/2025:08:28:01 +0000] "POST /api/user/register HTTP/1.1" 200 68 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:28:15.022Z [INFO]: ::1 - - [12/Jul/2025:08:28:15 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-12T08:29:01.030Z [INFO]: ::1 - - [12/Jul/2025:08:29:01 +0000] "GET /api/auth/logout HTTP/1.1" 302 23 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
