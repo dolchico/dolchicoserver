@@ -45,3 +45,8 @@
 2025-07-03T06:23:45.277Z [INFO]: ::1 - - [03/Jul/2025:06:23:45 +0000] "GET / HTTP/1.1" 500 1273 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-03T06:24:29.219Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-03T06:24:32.800Z [INFO]: ::1 - - [03/Jul/2025:06:24:32 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-10T08:16:33.303Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-10T08:19:30.572Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-10T08:20:13.985Z [INFO]: ::1 - - [10/Jul/2025:08:20:13 +0000] "POST /api/user/register HTTP/1.1" 200 49 "-" "PostmanRuntime/7.44.1"
+2025-07-10T08:20:20.562Z [INFO]: ::1 - - [10/Jul/2025:08:20:20 +0000] "POST /api/user/register HTTP/1.1" 200 164 "-" "PostmanRuntime/7.44.1"
+2025-07-12T05:21:03.622Z [INFO]: 🚀 Server started on PORT: 4000
