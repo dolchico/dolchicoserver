@@ -1,4 +1,5 @@
 // controllers/userController.js
+import { sendWelcomeEmail } from '../services/mailService.js';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -57,6 +58,9 @@ export const registerUser = async (req, res) => {
       cartData: {},
     });
 
+    // Send welcome email
+    await sendWelcomeEmail(user.email, user.name);
+
     const token = createToken(user.id);
     res.json({ success: true, token });
   } catch (error) {
@@ -64,3 +68,4 @@ export const registerUser = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
+

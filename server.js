@@ -63,11 +63,18 @@ connectCloudinary();
 app.use('/api', apiLimiter);
 app.use(helmet);
 app.use(express.json());
+// app.use(cors({
+//   origin: 'http://localhost:5175',
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false // Note: credentials must be false when origin is '*'
 }));
+
 
 // Session and Passport.js for OAuth
 app.use(session({

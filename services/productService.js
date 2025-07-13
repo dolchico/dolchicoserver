@@ -1,4 +1,3 @@
-// services/productService.js
 import prisma from '../lib/prisma.js';
 
 export const createProduct = async (data) => {
