@@ -62,7 +62,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
 
 // Email verification email
 export const sendVerificationEmail = async (toEmail, userName, token) => {
-  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verify-email?token=${token}`;
+  const verificationUrl = `${'https://dolchico.com'}/verify-email?token=${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_USER,

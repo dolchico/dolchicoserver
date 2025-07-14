@@ -561,3 +561,10 @@
 2025-07-14T05:11:50.575Z [INFO]: ::1 - - [14/Jul/2025:05:11:50 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
 2025-07-14T05:12:23.716Z [INFO]: ::1 - - [14/Jul/2025:05:12:23 +0000] "POST /api/user/register HTTP/1.1" 409 57 "-" "PostmanRuntime/7.44.1"
 2025-07-14T05:12:48.160Z [INFO]: ::1 - - [14/Jul/2025:05:12:48 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:52:23.504Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T05:52:35.406Z [INFO]: ::1 - - [14/Jul/2025:05:52:35 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:55:42.773Z [INFO]: ::1 - - [14/Jul/2025:05:55:42 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:56:47.616Z [INFO]: ::1 - - [14/Jul/2025:05:56:47 +0000] "GET /verify-email?token=2b47248e662cf45a9b5bac0314dd467588f2162881b52655d3dec7085d0de587 HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T05:57:34.551Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T05:57:35.260Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T05:57:37.344Z [INFO]: 🚀 Server started on PORT: 4000
