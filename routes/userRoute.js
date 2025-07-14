@@ -17,7 +17,7 @@ const router = express.Router();
 router.post('/login', validateLogin, loginUser);
 
 // Registration
-router.post('/register', authLimiter, validateRegister, registerUser);
+router.post('/register', validateRegister, registerUser);
 
 // Email verification (supports both POST and GET)
 router.post('/verify-email', verifyEmail);
