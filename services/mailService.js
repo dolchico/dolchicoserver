@@ -1,3 +1,5 @@
+// services/mailService.js
+
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';
@@ -5,11 +7,12 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   service: 'gmail', // or use your SMTP provider
   auth: {
-    user: process.env.EMAIL_USER,      // your email address
-    pass: process.env.EMAIL_PASSWORD,  // your email password or app password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
+// Welcome email (optional, can be sent after verification)
 export const sendWelcomeEmail = async (toEmail, userName) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -50,6 +53,43 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
             <a href="https://facebook.com/" style="color:#4f46e5;">Facebook</a>
           </p>
         </div>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Email verification email
+export const sendVerificationEmail = async (toEmail, userName, token) => {
+  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verify-email?token=${token}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: toEmail,
+    subject: 'Verify Your Email – Dolchi Co',
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto; background: #faf9f6; padding: 32px; border-radius: 12px;">
+        <h1 style="color: #1a202c;">Verify your email, ${userName}!</h1>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          Thank you for registering with <strong>Dolchi Co</strong>!
+        </p>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          Please verify your email address to activate your account:
+        </p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${verificationUrl}" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-size:1.1em;">
+            Verify Email
+          </a>
+        </div>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          Or copy and paste this link into your browser:<br>
+          <a href="${verificationUrl}" style="color:#4f46e5;">${verificationUrl}</a>
+        </p>
+        <hr style="margin: 32px 0;" />
+        <p style="font-size: 1em; color: #555;">
+          If you did not create this account, you can safely ignore this email.
+        </p>
       </div>
     `,
   };

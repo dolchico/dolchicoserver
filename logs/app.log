@@ -552,3 +552,12 @@
 2025-07-13T12:51:48.715Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-13T12:51:49.621Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-13T12:51:52.389Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T04:29:52.788Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T05:09:50.660Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T05:10:39.450Z [INFO]: ::1 - - [14/Jul/2025:05:10:39 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:11:15.862Z [INFO]: ::1 - - [14/Jul/2025:05:11:15 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:11:21.867Z [INFO]: ::1 - - [14/Jul/2025:05:11:21 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:11:35.287Z [INFO]: ::1 - - [14/Jul/2025:05:11:35 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:11:50.575Z [INFO]: ::1 - - [14/Jul/2025:05:11:50 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:12:23.716Z [INFO]: ::1 - - [14/Jul/2025:05:12:23 +0000] "POST /api/user/register HTTP/1.1" 409 57 "-" "PostmanRuntime/7.44.1"
+2025-07-14T05:12:48.160Z [INFO]: ::1 - - [14/Jul/2025:05:12:48 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
