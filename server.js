@@ -129,6 +129,6 @@ app.get('/', (req, res) => {
  * =============================
  */
 app.listen(port, () => {
-  console.log(`🚀  Server started on PORT: ${port}`);
-  logger.info(`🚀  Server started on PORT: ${port}`);
+  console.log(`🚀 Server started: http://localhost:${port}`);
+  logger.info(`🚀 Server started on PORT: ${port}`);
 });
