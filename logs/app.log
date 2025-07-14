@@ -633,3 +633,4 @@
 2025-07-14T11:36:11.924Z [INFO]: ::1 - - [14/Jul/2025:11:36:11 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:45:54.158Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:45:54.224Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T14:56:11.546Z [INFO]: 🚀 Server started on PORT: 4000
