@@ -24,8 +24,8 @@ router.post('/verify-email', verifyEmail);
 router.get('/verify-email', verifyEmail);
 
 // Phone OTP login routes
-router.post('/login/request-otp', otpRateLimiter, requestPhoneLoginOTP);
-router.post('/login/resend-otp', otpRateLimiter, resendPhoneLoginOTP);
+router.post('/login/request-otp', requestPhoneLoginOTP);
+router.post('/login/resend-otp', resendPhoneLoginOTP);
 router.post('/login/verify-otp', verifyPhoneLoginOTP);
 
 // (Optional) Add more routes as needed

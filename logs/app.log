@@ -634,3 +634,16 @@
 2025-07-14T14:45:54.158Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:45:54.224Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:56:11.546Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:15:26.473Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:15:45.850Z [INFO]: ::1 - - [14/Jul/2025:15:15:45 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:16:24.695Z [INFO]: ::1 - - [14/Jul/2025:15:16:24 +0000] "POST /api/user/register HTTP/1.1" 409 58 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:16:47.389Z [INFO]: ::1 - - [14/Jul/2025:15:16:47 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:17:04.686Z [INFO]: ::1 - - [14/Jul/2025:15:17:04 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:17:13.938Z [INFO]: ::1 - - [14/Jul/2025:15:17:13 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:19:48.106Z [INFO]: ::1 - - [14/Jul/2025:15:19:48 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:19:48.204Z [INFO]: ::1 - - [14/Jul/2025:15:19:48 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:20:22.744Z [INFO]: ::1 - - [14/Jul/2025:15:20:22 +0000] "POST /api/user/register HTTP/1.1" 429 61 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:20:32.551Z [INFO]: ::1 - - [14/Jul/2025:15:20:32 +0000] "POST /api/user/register HTTP/1.1" 429 61 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:22:04.394Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:22:07.456Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:22:20.960Z [INFO]: ::1 - - [14/Jul/2025:15:22:20 +0000] "POST /api/user/register HTTP/1.1" 201 95 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
