@@ -108,33 +108,23 @@ export const loginUser = async (req, res) => {
 // Email Verification Endpoint
 export const verifyEmail = async (req, res) => {
   try {
-    // Accept token from POST body or GET query
     const token = req.body.token || req.query.token;
     if (!token) {
       return res.status(400).json({ success: false, message: 'Verification token is required.' });
     }
 
-    // Find the token in DB
     const record = await findEmailVerificationToken(token);
     if (!record) {
       return res.status(400).json({ success: false, message: 'Invalid or expired verification token.' });
     }
 
-    // Check expiry
     if (new Date() > record.expiresAt) {
       await deleteEmailVerificationToken(token);
       return res.status(410).json({ success: false, message: 'Verification token has expired.' });
     }
 
-    // Mark user as verified
     await verifyUserEmail(record.userId);
-
-    // Optionally: delete the token after use
     await deleteEmailVerificationToken(token);
-
-    // Optionally: send welcome email
-    // const user = await findUserById(record.userId);
-    // await sendWelcomeEmail(user.email, user.name);
 
     return res.status(200).json({ success: true, message: 'Email verified successfully. You may now log in.' });
   } catch (error) {
@@ -142,3 +132,4 @@ export const verifyEmail = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+

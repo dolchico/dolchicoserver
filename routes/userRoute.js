@@ -20,6 +20,8 @@ router.post('/register', authLimiter, validateRegister, registerUser);
 
 // Email verification endpoint (user clicks link in email)
 router.post('/verify-email', verifyEmail);
+router.get('/verify-email', verifyEmail);
+
 
 // You can add more routes here, e.g.:
 // router.post('/verify-phone', verifyPhone);

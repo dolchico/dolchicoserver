@@ -568,3 +568,21 @@
 2025-07-14T05:57:34.551Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-14T05:57:35.260Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-14T05:57:37.344Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:09:14.281Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:09:21.866Z [INFO]: ::1 - - [14/Jul/2025:06:09:21 +0000] "POST /api/user/register HTTP/1.1" 409 49 "-" "PostmanRuntime/7.44.1"
+2025-07-14T06:09:37.249Z [INFO]: ::1 - - [14/Jul/2025:06:09:37 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T06:09:49.267Z [INFO]: ::1 - - [14/Jul/2025:06:09:49 +0000] "GET /verify-email?token=209de15ffce1aab01ac55da51235200da5dbc3276757f199a61fd0d4cd663eda HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T06:09:52.575Z [INFO]: ::1 - - [14/Jul/2025:06:09:52 +0000] "GET /verify-email?token=209de15ffce1aab01ac55da51235200da5dbc3276757f199a61fd0d4cd663eda HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T06:10:03.448Z [INFO]: ::1 - - [14/Jul/2025:06:10:03 +0000] "GET /verify-email?token=209de15ffce1aab01ac55da51235200da5dbc3276757f199a61fd0d4cd663eda HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T06:12:15.026Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:12:17.539Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:12:23.831Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:12:51.212Z [INFO]: ::1 - - [14/Jul/2025:06:12:51 +0000] "GET /verify-email?token=209de15ffce1aab01ac55da51235200da5dbc3276757f199a61fd0d4cd663eda HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T06:20:29.291Z [INFO]: ::1 - - [14/Jul/2025:06:20:29 +0000] "GET /verify-email?token=209de15ffce1aab01ac55da51235200da5dbc3276757f199a61fd0d4cd663eda HTTP/1.1" 404 151 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T06:21:03.840Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:22:22.822Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:22:25.378Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T06:25:05.714Z [INFO]: ::1 - - [14/Jul/2025:06:25:05 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T06:25:46.414Z [INFO]: ::1 - - [14/Jul/2025:06:25:46 +0000] "POST /api/verify-email HTTP/1.1" 404 156 "-" "PostmanRuntime/7.44.1"
+2025-07-14T06:25:58.384Z [INFO]: ::1 - - [14/Jul/2025:06:25:58 +0000] "POST /api/user/verify-email HTTP/1.1" 200 77 "-" "PostmanRuntime/7.44.1"
+2025-07-14T06:28:38.245Z [INFO]: ::1 - - [14/Jul/2025:06:28:38 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
