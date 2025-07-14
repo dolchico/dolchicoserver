@@ -1,29 +1,34 @@
-// routes/userRoute.js
-
 import express from 'express';
 import {
   loginUser,
   registerUser,
-  verifyEmail,       // <-- Add this controller for email verification
-  // Add more controllers as needed (e.g., verifyPhone, resendVerification, etc.)
+  verifyEmail,
+  requestPhoneLoginOTP,
+  verifyPhoneLoginOTP,
+  resendPhoneLoginOTP
+  // Add more controllers as needed (e.g., verifyPhone, resendVerification)
 } from '../controllers/userController.js';
 import { validateRegister, validateLogin } from '../validators/userValidator.js';
-import { authLimiter } from '../middleware/rateLimit.js';
+import { authLimiter, otpRateLimiter } from '../middleware/otpRateLimiter.js';
 
 const router = express.Router();
 
-// User login
+// Email/password login
 router.post('/login', validateLogin, loginUser);
 
-// User registration with rate limiting and validation
+// Registration
 router.post('/register', authLimiter, validateRegister, registerUser);
 
-// Email verification endpoint (user clicks link in email)
+// Email verification (supports both POST and GET)
 router.post('/verify-email', verifyEmail);
 router.get('/verify-email', verifyEmail);
 
+// Phone OTP login routes
+router.post('/login/request-otp', otpRateLimiter, requestPhoneLoginOTP);
+router.post('/login/resend-otp', otpRateLimiter, resendPhoneLoginOTP);
+router.post('/login/verify-otp', verifyPhoneLoginOTP);
 
-// You can add more routes here, e.g.:
+// (Optional) Add more routes as needed
 // router.post('/verify-phone', verifyPhone);
 // router.post('/resend-verification', resendVerification);
 

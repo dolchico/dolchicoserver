@@ -1,82 +1,87 @@
 /**
- * ================================
+ * =============================
  * External Packages
- * ================================
+ * =============================
  */
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import swaggerUi from 'swagger-ui-express';
-import fs from 'fs';
-import yaml from 'yaml';
-import morgan from 'morgan';
-import session from 'express-session';
-import passport from 'passport';
-import { ensureAuth } from './middleware/authMiddleware.js';
+import express       from 'express';
+import cors          from 'cors';
+import dotenv        from 'dotenv';
+import swaggerUi     from 'swagger-ui-express';
+import path          from 'path';
+import fs            from 'fs';
+import yaml          from 'yaml';           // <- one parser, one name
+import morgan        from 'morgan';
+import session       from 'express-session';
+import passport      from 'passport';
 
 /**
- * ================================
+ * =============================
  * Internal Imports
- * ================================
+ * =============================
  */
-import logger from './logger.js';
-import connectCloudinary from './config/cloudinary.js';
-import userRouter from './routes/userRoute.js';
-import productRouter from './routes/productRoute.js';
-import cartRouter from './routes/cartRoute.js';
-import orderRouter from './routes/orderRoute.js';
-import adminRouter from './routes/adminRoute.js';
-import helmet from './middleware/helmet.js';
-import { apiLimiter } from './middleware/rateLimit.js';
-import authRouter from './routes/authRoute.js';
+import logger              from './logger.js';
+import connectCloudinary   from './config/cloudinary.js';
+import helmet              from './middleware/helmet.js';
+import { apiLimiter }      from './middleware/rateLimit.js';
+import { ensureAuth }      from './middleware/authMiddleware.js';
+
+import userRouter          from './routes/userRoute.js';
+import productRouter       from './routes/productRoute.js';
+import cartRouter          from './routes/cartRoute.js';
+import orderRouter         from './routes/orderRoute.js';
+import adminRouter         from './routes/adminRoute.js';
+import authRouter          from './routes/authRoute.js';
+
 import './config/passport-setup.js';
 
 /**
- * ================================
- * Config
- * ================================
+ * =============================
+ * Config & App Init
+ * =============================
  */
 dotenv.config();
-const app = express();
+const app  = express();
 const port = process.env.PORT || 4000;
 
 /**
- * ================================
- * Swagger Setup
- * ================================
+ * =============================
+ * Swagger – Specs & Routes
+ * =============================
  */
-const file = fs.readFileSync('./swagger.yaml', 'utf8');
-const swaggerDocument = yaml.parse(file);
+const coreSpecRaw  = fs.readFileSync('./swagger.yaml', 'utf8');
+const coreSpec     = yaml.parse(coreSpecRaw);
+
+const authSpecPath = path.resolve('docs', 'swagger-auth.yaml'); // absolute
+
+const authSpec = yaml.parse(fs.readFileSync(authSpecPath, 'utf8'));
+
+app.use('/api-docs-auth', swaggerUi.serve, swaggerUi.setup(authSpec));
+app.use('/api-docs',      swaggerUi.serve, swaggerUi.setup(coreSpec));
 
 /**
- * ================================
- * Connect External Services
- * ================================
+ * =============================
+ * External Service Connections
+ * =============================
  */
 connectCloudinary();
 
 /**
- * ================================
+ * =============================
  * Middleware
- * ================================
+ * =============================
  */
 app.use('/api', apiLimiter);
 app.use(helmet);
 app.use(express.json());
-// app.use(cors({
-//   origin: 'http://localhost:5175',
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization']
-// }));
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false // Note: credentials must be false when origin is '*'
+  credentials: false
 }));
 
-
-// Session and Passport.js for OAuth
+// Sessions & OAuth
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -89,52 +94,41 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Winston + Morgan integration
+// Logging
 app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
-  }
+  stream: { write: (msg) => logger.info(msg.trim()) }
 }));
 
 /**
- * ================================
- * Error Testing Route
- * ================================
+ * =============================
+ * Routes
+ * =============================
  */
+app.use('/api/auth',    authRouter);
+app.use('/api/user',    userRouter);
+app.use('/api/admin',   adminRouter);
+app.use('/api/product', productRouter);
+app.use('/api/order',   ensureAuth, orderRouter);
+app.use('/api/cart',    ensureAuth, cartRouter);
+
+// Simple error-test route
 app.get('/error', (req, res) => {
   logger.error('This is an error log!');
   res.status(500).send('Error logged');
 });
 
-/**
- * ================================
- * API Routes
- * ================================
- */
-app.use('/api/auth', authRouter);
-app.use('/api/user', userRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/product', productRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use('/api/order', ensureAuth, orderRouter);
-app.use('/api/cart', ensureAuth, cartRouter);
-
-/**
- * ================================
- * Root Route
- * ================================
- */
+// Root
 app.get('/', (req, res) => {
   res.send('API Working');
   console.log('DATABASE_URL at runtime:', process.env.DATABASE_URL);
 });
 
 /**
- * ================================
- * Start Server
- * ================================
+ * =============================
+ * Server Start
+ * =============================
  */
 app.listen(port, () => {
-  console.log(`🚀 Server started on PORT: ${port}`);
-  logger.info(`🚀 Server started on PORT: ${port}`);
+  console.log(`🚀  Server started on PORT: ${port}`);
+  logger.info(`🚀  Server started on PORT: ${port}`);
 });

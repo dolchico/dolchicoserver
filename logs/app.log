@@ -586,3 +586,50 @@
 2025-07-14T06:25:46.414Z [INFO]: ::1 - - [14/Jul/2025:06:25:46 +0000] "POST /api/verify-email HTTP/1.1" 404 156 "-" "PostmanRuntime/7.44.1"
 2025-07-14T06:25:58.384Z [INFO]: ::1 - - [14/Jul/2025:06:25:58 +0000] "POST /api/user/verify-email HTTP/1.1" 200 77 "-" "PostmanRuntime/7.44.1"
 2025-07-14T06:28:38.245Z [INFO]: ::1 - - [14/Jul/2025:06:28:38 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-14T09:31:31.255Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T09:31:35.264Z [INFO]: ::1 - - [14/Jul/2025:09:31:35 +0000] "POST /api/user/register HTTP/1.1" 400 59 "-" "PostmanRuntime/7.44.1"
+2025-07-14T09:31:53.823Z [INFO]: ::1 - - [14/Jul/2025:09:31:53 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T09:32:50.034Z [INFO]: ::1 - - [14/Jul/2025:09:32:50 +0000] "POST /api/user/verify-email HTTP/1.1" 200 77 "-" "PostmanRuntime/7.44.1"
+2025-07-14T09:33:05.473Z [INFO]: ::1 - - [14/Jul/2025:09:33:05 +0000] "POST /api/user/login HTTP/1.1" 400 66 "-" "PostmanRuntime/7.44.1"
+2025-07-14T09:33:18.244Z [INFO]: ::1 - - [14/Jul/2025:09:33:18 +0000] "POST /api/user/login HTTP/1.1" 400 66 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:02:04.962Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:02:16.674Z [INFO]: ::1 - - [14/Jul/2025:10:02:16 +0000] "POST /api/user/register HTTP/1.1" 400 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:02:25.283Z [INFO]: ::1 - - [14/Jul/2025:10:02:25 +0000] "POST /api/user/register HTTP/1.1" 409 57 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:03:05.268Z [INFO]: ::1 - - [14/Jul/2025:10:03:05 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:03:07.997Z [INFO]: ::1 - - [14/Jul/2025:10:03:07 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:05:48.029Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:05:53.256Z [INFO]: ::1 - - [14/Jul/2025:10:05:53 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:08:55.503Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:08:59.282Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:09:04.882Z [INFO]: ::1 - - [14/Jul/2025:10:09:04 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:09:29.861Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:09:31.692Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:09:36.566Z [INFO]: ::1 - - [14/Jul/2025:10:09:36 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:10:15.683Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:10:26.922Z [INFO]: ::1 - - [14/Jul/2025:10:10:26 +0000] "POST /api/user/register HTTP/1.1" 201 101 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:11:52.588Z [INFO]: ::1 - - [14/Jul/2025:10:11:52 +0000] "POST /api/user/login HTTP/1.1" 400 66 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:12:07.527Z [INFO]: ::1 - - [14/Jul/2025:10:12:07 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:19:56.838Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:22:29.994Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:22:39.742Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T10:26:44.389Z [INFO]: ::1 - - [14/Jul/2025:10:26:44 +0000] "GET /api/user%60 HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T10:34:40.416Z [INFO]: ::1 - - [14/Jul/2025:10:34:40 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T10:34:40.494Z [INFO]: ::1 - - [14/Jul/2025:10:34:40 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T10:34:55.853Z [INFO]: ::1 - - [14/Jul/2025:10:34:55 +0000] "POST /api/user/register HTTP/1.1" 400 66 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:35:14.887Z [INFO]: ::1 - - [14/Jul/2025:10:35:14 +0000] "POST /api/user/register HTTP/1.1" 400 66 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:35:42.915Z [INFO]: ::1 - - [14/Jul/2025:10:35:42 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:37:27.657Z [INFO]: ::1 - - [14/Jul/2025:10:37:27 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:38:56.540Z [INFO]: ::1 - - [14/Jul/2025:10:38:56 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:39:50.996Z [INFO]: ::1 - - [14/Jul/2025:10:39:50 +0000] "GET /api/user/login/request-otp HTTP/1.1" 404 165 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:39:57.254Z [INFO]: ::1 - - [14/Jul/2025:10:39:57 +0000] "POST /api/user/login/request-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:41:08.574Z [INFO]: ::1 - - [14/Jul/2025:10:41:08 +0000] "POST /api/user/login/verify-otp HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:50:14.494Z [INFO]: ::1 - - [14/Jul/2025:10:50:14 +0000] "POST /api/user/login/resend-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:50:35.302Z [INFO]: ::1 - - [14/Jul/2025:10:50:35 +0000] "POST /api/user/login/resend-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:50:38.040Z [INFO]: ::1 - - [14/Jul/2025:10:50:38 +0000] "POST /api/user/login/resend-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:50:40.444Z [INFO]: ::1 - - [14/Jul/2025:10:50:40 +0000] "POST /api/user/login/resend-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-14T10:50:41.118Z [INFO]: ::1 - - [14/Jul/2025:10:50:41 +0000] "POST /api/user/login/resend-otp HTTP/1.1" 429 76 "-" "PostmanRuntime/7.44.1"
+2025-07-14T11:02:11.048Z [INFO]: 🚀  Server started on PORT: 4000
+2025-07-14T11:07:04.250Z [INFO]: 🚀  Server started on PORT: 4000
+2025-07-14T11:36:11.924Z [INFO]: ::1 - - [14/Jul/2025:11:36:11 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T14:45:54.158Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T14:45:54.224Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
