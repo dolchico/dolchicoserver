@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: Dolchi Co Authentication API
+  description: Endpoints for registration, email verification, email/password login, and phone-OTP login.
+  version: "1.0.0"
+servers:
+  - url: /api/user
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+      responses:
+        "201":
+          description: Registered – e-mail sent
+        "400":
+          description: Validation error
+        "409":
+          description: Duplicate e-mail or phone
+  /login:
+    post:
+      summary: Login with e-mail & password
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWTResponse'
+        "401":
+          description: Invalid credentials
+        "403":
+          description: E-mail not verified
+  /verify-email:
+    post:
+      summary: Verify user e-mail (token in body)
+      tags: [Verification]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmailBody'
+      responses:
+        "200": { description: Verified }
+        "400": { description: Invalid/expired token }
+        "410": { description: Token expired }
+    get:
+      summary: Verify user e-mail (token in query)
+      tags: [Verification]
+      parameters:
+        - in: query
+          name: token
+          schema: { type: string }
+          required: true
+      responses:
+        "200": { description: Verified }
+        "400": { description: Invalid/expired token }
+        "410": { description: Token expired }
+  /login/request-otp:
+    post:
+      summary: Request phone login OTP
+      tags: [OTP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneBody'
+      responses:
+        "200": { description: OTP sent }
+        "404": { description: Phone not found }
+        "429": { description: Rate-limit hit }
+  /login/resend-otp:
+    post:
+      summary: Resend phone login OTP
+      tags: [OTP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneBody'
+      responses:
+        "200": { description: OTP resent }
+        "404": { description: Phone not found }
+        "429": { description: Rate-limit hit }
+  /login/verify-otp:
+    post:
+      summary: Verify OTP and log in
+      tags: [OTP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOTPBody'
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWTResponse'
+        "401": { description: Invalid/expired OTP }
+        "404": { description: Phone not found }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterBody:
+      type: object
+      required: [name, email, password]
+      properties:
+        name:        { type: string, example: Test User }
+        email:       { type: string, format: email, example: test@example.com }
+        password:    { type: string, minLength: 8, example: StrongPass123! }
+        phoneNumber: { type: string, example: "+911234567890" }
+    LoginBody:
+      type: object
+      required: [email, password]
+      properties:
+        email:    { type: string, format: email }
+        password: { type: string }
+    VerifyEmailBody:
+      type: object
+      required: [token]
+      properties:
+        token: { type: string, example: abcdef123456 }
+    PhoneBody:
+      type: object
+      required: [phoneNumber]
+      properties:
+        phoneNumber: { type: string, example: "+911234567890" }
+    VerifyOTPBody:
+      allOf:
+        - $ref: '#/components/schemas/PhoneBody'
+        - type: object
+          required: [otp]
+          properties:
+            otp: { type: string, example: "123456" }
+    JWTResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Signed JWT valid for 7 days
+security: []   # public endpoints; add bearerAuth per-route if needed

@@ -1,21 +1,22 @@
 openapi: 3.0.3
+
 info:
   title: Example E-commerce API
-  version: 1.1.0
+  version: 1.2.0
   description: |
     REST API for user authentication, cart management, orders, and products.
     
     ## Authentication
-    This API supports two authentication methods:
-    - **JWT Bearer Token**: For API access with traditional login
-    - **Google OAuth 2.0**: For social login integration
+    Supported methods  
+      • **JWT Bearer Token** – traditional login  
+      • **Google OAuth 2.0** – social login
     
     ## Base URLs
-    - Production: https://dolchico.up.railway.app/api
-    - Development: http://localhost:4000/api
+      • **Production:** https://famefash-backend.onrender.com/api  
+      • **Development:** http://localhost:4000/api
 
 servers:
-  - url: https://dolchico.up.railway.app/api
+  - url: https://famefash-backend.onrender.com/api
     description: Production server
   - url: http://localhost:4000/api
     description: Development server
@@ -26,27 +27,27 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT token obtained from login endpoints
-    
+      description: JWT obtained from login endpoints
+
     sessionAuth:
       type: apiKey
       in: cookie
       name: connect.sid
-      description: Session-based authentication for OAuth flows
-    
+      description: Session cookie set after OAuth login
+
     googleOAuth2:
       type: oauth2
       flows:
         authorizationCode:
           authorizationUrl: https://accounts.google.com/o/oauth2/auth
-          tokenUrl: https://oauth2.googleapis.com/token
+          tokenUrl:         https://oauth2.googleapis.com/token
           scopes:
-            openid: OpenID Connect scope
-            profile: Access to your profile info
-            email: Access to your email address
+            openid:  OpenID Connect
+            profile: Profile information
+            email:   Email address
 
   schemas:
-    # Request Schemas
+    # ───── Request Objects ─────
     RegisterRequest:
       type: object
       required: [name, email, password]
@@ -55,15 +56,15 @@ components:
           type: string
           minLength: 2
           maxLength: 100
-          example: "John Doe"
+          example: John Doe
         email:
           type: string
           format: email
-          example: "john.doe@example.com"
+          example: john.doe@example.com
         password:
           type: string
-          minLength: 6
-          example: "securePassword123"
+          minLength: 8
+          example: securePassword123
 
     LoginRequest:
       type: object
@@ -72,10 +73,36 @@ components:
         email:
           type: string
           format: email
-          example: "john.doe@example.com"
+          example: john.doe@example.com
         password:
           type: string
-          example: "securePassword123"
+          example: securePassword123
+
+    VerifyEmailBody:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          example: abcdef123456
+
+    PhoneBody:
+      type: object
+      required: [phoneNumber]
+      properties:
+        phoneNumber:
+          type: string
+          example: "+911234567890"
+
+    VerifyOTPBody:
+      allOf:
+        - $ref: '#/components/schemas/PhoneBody'
+        - type: object
+          required: [otp]
+          properties:
+            otp:
+              type: string
+              example: "123456"
 
     AddToCartRequest:
       type: object
@@ -86,7 +113,7 @@ components:
           example: 1
         size:
           type: string
-          example: "M"
+          example: M
 
     UpdateCartRequest:
       type: object
@@ -97,7 +124,7 @@ components:
           example: 1
         size:
           type: string
-          example: "M"
+          example: M
         quantity:
           type: integer
           minimum: 0
@@ -107,36 +134,19 @@ components:
       type: object
       required: [street, city, country]
       properties:
-        street:
-          type: string
-          example: "123 Main Street"
-        city:
-          type: string
-          example: "New York"
-        country:
-          type: string
-          example: "USA"
-        zipCode:
-          type: string
-          example: "10001"
-        state:
-          type: string
-          example: "NY"
+        street:   { type: string, example: 123 Main Street }
+        city:     { type: string, example: New York }
+        country:  { type: string, example: USA }
+        zipCode:  { type: string, example: "10001" }
+        state:    { type: string, example: NY }
 
     PlaceOrderItem:
       type: object
       required: [productId, quantity, size]
       properties:
-        productId:
-          type: integer
-          example: 1
-        quantity:
-          type: integer
-          minimum: 1
-          example: 2
-        size:
-          type: string
-          example: "M"
+        productId: { type: integer, example: 1 }
+        quantity:  { type: integer, minimum: 1, example: 2 }
+        size:      { type: string, example: M }
 
     PlaceOrderRequest:
       type: object
@@ -146,165 +156,96 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlaceOrderItem'
-        amount:
-          type: number
-          format: float
-          example: 99.99
-        address:
-          $ref: '#/components/schemas/Address'
+        amount:  { type: number, format: float, example: 99.99 }
+        address: { $ref: '#/components/schemas/Address' }
         paymentMethod:
           type: string
           enum: [stripe, razorpay, cod]
-          example: "stripe"
+          example: stripe
 
     UpdateOrderStatusRequest:
       type: object
       required: [orderId, status]
       properties:
-        orderId:
-          type: integer
-          example: 1
+        orderId: { type: integer, example: 1 }
         status:
           type: string
           enum: [ORDER_PLACED, CONFIRMED, SHIPPED, DELIVERED, CANCELLED]
-          example: "SHIPPED"
+          example: SHIPPED
 
-    # Response Schemas
+    # ───── Response Objects ─────
     User:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: "John Doe"
-        email:
-          type: string
-          example: "john.doe@example.com"
+        id:        { type: integer, example: 1 }
+        name:      { type: string,  example: John Doe }
+        email:     { type: string,  example: john.doe@example.com }
         role:
           type: string
           enum: [USER, ADMIN, MODERATOR]
-          example: "USER"
-        createdAt:
-          type: string
-          format: date-time
+          example: USER
+        createdAt: { type: string, format: date-time }
 
     Product:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: "Cotton T-Shirt"
-        description:
-          type: string
-          example: "Comfortable cotton t-shirt"
-        price:
-          type: number
-          format: float
-          example: 29.99
+        id:          { type: integer, example: 1 }
+        name:        { type: string,  example: Cotton T-Shirt }
+        description: { type: string,  example: Comfortable cotton t-shirt }
+        price:       { type: number,  format: float, example: 29.99 }
         image:
           type: array
-          items:
-            type: string
-        category:
-          type: string
-          example: "Clothing"
-        subCategory:
-          type: string
-          example: "T-Shirts"
+          items: { type: string }
+        category:    { type: string,  example: Clothing }
+        subCategory: { type: string,  example: T-Shirts }
         sizes:
           type: array
-          items:
-            type: string
-          example: ["S", "M", "L", "XL"]
-        bestseller:
-          type: boolean
-          example: false
-        stock:
-          type: integer
-          example: 100
-
-    Order:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        userId:
-          type: integer
-          example: 1
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-        amount:
-          type: number
-          format: float
-          example: 99.99
-        address:
-          $ref: '#/components/schemas/Address'
-        status:
-          type: string
-          example: "ORDER_PLACED"
-        paymentMethod:
-          type: string
-          example: "stripe"
-        payment:
-          type: boolean
-          example: false
-        createdAt:
-          type: string
-          format: date-time
+          items: { type: string }
+          example: [S, M, L, XL]
+        bestseller:  { type: boolean, example: false }
+        stock:       { type: integer, example: 100 }
 
     OrderItem:
       type: object
       properties:
-        id:
-          type: integer
-        productId:
-          type: integer
-        quantity:
-          type: integer
-        size:
-          type: string
-        price:
-          type: number
-          format: float
+        id:        { type: integer }
+        productId: { type: integer }
+        quantity:  { type: integer }
+        size:      { type: string }
+        price:     { type: number, format: float }
+
+    Order:
+      type: object
+      properties:
+        id:           { type: integer, example: 1 }
+        userId:       { type: integer, example: 1 }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/OrderItem' }
+        amount:        { type: number, format: float, example: 99.99 }
+        address:       { $ref: '#/components/schemas/Address' }
+        status:        { type: string, example: ORDER_PLACED }
+        paymentMethod: { type: string, example: stripe }
+        payment:       { type: boolean, example: false }
+        createdAt:     { type: string, format: date-time }
 
     AuthResponse:
       type: object
       properties:
-        success:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "Login successful"
-        token:
-          type: string
-          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        user:
-          $ref: '#/components/schemas/User'
+        success: { type: boolean, example: true }
+        message: { type: string,  example: Login successful }
+        token:   { type: string,  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... }
+        user:    { $ref: '#/components/schemas/User' }
 
     ErrorResponse:
       type: object
       properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: "Invalid credentials"
-        error:
-          type: string
-          example: "INVALID_CREDENTIALS"
+        success: { type: boolean, example: false }
+        message: { type: string,  example: Invalid credentials }
+        error:   { type: string,  example: INVALID_CREDENTIALS }
 
 paths:
-  # Authentication Endpoints
+  # ───────── Authentication ─────────
   /user/register:
     post:
       tags: [Authentication]
@@ -313,46 +254,90 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
       responses:
-        '201':
-          description: Registration successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        "201": { description: Registration successful, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResponse' } } } }
+        "400": { description: Bad request,             content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
   /user/login:
     post:
       tags: [Authentication]
-      summary: User login
+      summary: Login with e-mail & password
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
+            schema: { $ref: '#/components/schemas/LoginRequest' }
       responses:
-        '200':
-          description: Login successful, returns token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        "200": { description: Login successful, token returned, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResponse' } } } }
+        "401": { description: Invalid credentials,             content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
+  /verify-email:
+    post:
+      tags: [Authentication]
+      summary: Verify user e-mail (token in body)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VerifyEmailBody' }
+      responses:
+        "200": { description: E-mail verified }
+        "400": { description: Invalid / expired token }
+
+    get:
+      tags: [Authentication]
+      summary: Verify user e-mail (token in query)
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+          description: Verification token
+      responses:
+        "200": { description: E-mail verified }
+        "400": { description: Invalid / expired token }
+
+  # ───────── Phone-OTP Login ─────────
+  /login/request-otp:
+    post:
+      tags: [OTP]
+      summary: Request phone login OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PhoneBody' }
+      responses:
+        "200": { description: OTP sent }
+
+  /login/resend-otp:
+    post:
+      tags: [OTP]
+      summary: Resend phone login OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PhoneBody' }
+      responses:
+        "200": { description: OTP resent }
+        "429": { description: Too many requests }
+
+  /login/verify-otp:
+    post:
+      tags: [OTP]
+      summary: Verify OTP & login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VerifyOTPBody' }
+      responses:
+        "200": { description: Login successful, token returned, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResponse' } } } }
+        "401": { description: Invalid / expired OTP,            content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
+
+  # ───────── Admin Login ─────────
   /admin/login:
     post:
       tags: [Admin]
@@ -361,396 +346,272 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
+            schema: { $ref: '#/components/schemas/LoginRequest' }
       responses:
-        '200':
-          description: Login successful, returns token
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        "200": { description: Login successful, token returned, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResponse' } } } }
+        "401": { description: Invalid credentials,             content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  # OAuth Endpoints
+  # ───────── OAuth ─────────
   /auth/google:
     get:
       tags: [OAuth]
       summary: Initiate Google OAuth 2.0 login
-      description: Redirects user to Google OAuth consent screen
       responses:
-        '302':
-          description: Redirect to Google OAuth consent screen
+        "302": { description: Redirect to Google consent screen }
 
   /auth/google/callback:
     get:
       tags: [OAuth]
-      summary: Google OAuth 2.0 callback endpoint
-      description: Handles the callback from Google after user authentication
+      summary: Google OAuth callback
       parameters:
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: string
-          description: Authorization code from Google
-        - name: state
-          in: query
-          schema:
-            type: string
-          description: State parameter for CSRF protection
+        - { name: code,  in: query, required: true, schema: { type: string } }
+        - { name: state, in: query, schema: { type: string } }
       responses:
-        '302':
-          description: Redirect after successful or failed login
+        "302": { description: Redirect after authentication }
 
   /auth/logout:
     get:
       tags: [OAuth]
-      summary: Logout the current user
-      description: Destroys the user session and redirects to home page
-      security:
-        - sessionAuth: []
+      summary: Logout current user
+      security: [ { sessionAuth: [] } ]
       responses:
-        '302':
-          description: Redirect after logout
+        "302": { description: Session destroyed, redirect home }
 
   /auth/profile:
     get:
       tags: [OAuth]
-      summary: Get current logged-in user profile
-      security:
-        - sessionAuth: []
-        - bearerAuth: []
+      summary: Get current user profile
+      security: [ { sessionAuth: [] }, { bearerAuth: [] } ]
       responses:
-        '200':
-          description: User profile information
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    $ref: '#/components/schemas/User'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+        "200": { description: User profile, content: { application/json: { schema: { type: object, properties: { user: { $ref: '#/components/schemas/User' } } } } } }
+        "401": { description: Unauthorized, content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  # Cart Endpoints
+  # ───────── Cart ─────────
   /cart/get:
     get:
       tags: [Cart]
       summary: Get user cart
-      security:
-        - bearerAuth: []
-        - sessionAuth: []
+      security: [ { bearerAuth: [] }, { sessionAuth: [] } ]
       responses:
-        '200':
-          description: User's cart
+        "200":
+          description: Cart data
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  cartData:
-                    type: object
+                  success: { type: boolean }
+                  cartData: { type: object }
 
   /cart/add:
     post:
       tags: [Cart]
       summary: Add item to cart
-      security:
-        - bearerAuth: []
-        - sessionAuth: []
+      security: [ { bearerAuth: [] }, { sessionAuth: [] } ]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/AddToCartRequest'
+            schema: { $ref: '#/components/schemas/AddToCartRequest' }
       responses:
-        '200':
-          description: Item added to cart
+        "200":
+          description: Item added
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                  success: { type: boolean }
+                  message: { type: string }
 
   /cart/update:
     post:
       tags: [Cart]
-      summary: Update cart item quantity
-      security:
-        - bearerAuth: []
-        - sessionAuth: []
+      summary: Update cart item
+      security: [ { bearerAuth: [] }, { sessionAuth: [] } ]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCartRequest'
+            schema: { $ref: '#/components/schemas/UpdateCartRequest' }
       responses:
-        '200':
+        "200":
           description: Cart updated
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                  success: { type: boolean }
+                  message: { type: string }
 
-  # Order Endpoints
+  # ───────── Orders ─────────
   /order/place:
     post:
       tags: [Orders]
-      summary: Place a new order
-      security:
-        - bearerAuth: []
-        - sessionAuth: []
+      summary: Place new order
+      security: [ { bearerAuth: [] }, { sessionAuth: [] } ]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/PlaceOrderRequest'
+            schema: { $ref: '#/components/schemas/PlaceOrderRequest' }
       responses:
-        '201':
-          description: Order placed successfully
+        "201":
+          description: Order placed
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  order:
-                    $ref: '#/components/schemas/Order'
+                  success: { type: boolean }
+                  order:   { $ref: '#/components/schemas/Order' }
 
   /order/userorders:
     post:
       tags: [Orders]
-      summary: Get orders for logged-in user
-      security:
-        - bearerAuth: []
-        - sessionAuth: []
+      summary: Get user orders
+      security: [ { bearerAuth: [] }, { sessionAuth: [] } ]
       responses:
-        '200':
-          description: User's orders
+        "200":
+          description: List of user orders
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
+                  success: { type: boolean }
                   orders:
                     type: array
-                    items:
-                      $ref: '#/components/schemas/Order'
+                    items: { $ref: '#/components/schemas/Order' }
 
   /order/list:
     post:
       tags: [Admin]
-      summary: Admin - Get all orders
-      security:
-        - bearerAuth: []
+      summary: Admin – list all orders
+      security: [ { bearerAuth: [] } ]
       responses:
-        '200':
-          description: All orders (admin)
+        "200":
+          description: All orders
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
+                  success: { type: boolean }
                   orders:
                     type: array
-                    items:
-                      $ref: '#/components/schemas/Order'
+                    items: { $ref: '#/components/schemas/Order' }
 
   /order/status:
     post:
       tags: [Admin]
-      summary: Admin - Update order status
-      security:
-        - bearerAuth: []
+      summary: Admin – update order status
+      security: [ { bearerAuth: [] } ]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateOrderStatusRequest'
+            schema: { $ref: '#/components/schemas/UpdateOrderStatusRequest' }
       responses:
-        '200':
-          description: Order status updated
+        "200":
+          description: Status updated
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                  success: { type: boolean }
+                  message: { type: string }
 
-  # Product Endpoints
+  # ───────── Products ─────────
   /product/add:
     post:
       tags: [Products]
-      summary: Add a new product
-      security:
-        - bearerAuth: []
+      summary: Add new product
+      security: [ { bearerAuth: [] } ]
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          multipart-form:
             schema:
               type: object
-              required:
-                - name
-                - description
-                - price
-                - category
-                - subCategory
-                - sizes
+              required: [name, description, price, category, subCategory, sizes]
               properties:
-                name:
-                  type: string
-                  example: "Cotton T-Shirt"
-                description:
-                  type: string
-                  example: "Comfortable cotton t-shirt"
-                price:
-                  type: number
-                  example: 29.99
-                category:
-                  type: string
-                  example: "Clothing"
-                subCategory:
-                  type: string
-                  example: "T-Shirts"
-                bestseller:
-                  type: boolean
-                  example: false
-                sizes:
-                  type: string
-                  example: '["S", "M", "L"]'
-                image1:
-                  type: string
-                  format: binary
-                image2:
-                  type: string
-                  format: binary
-                image3:
-                  type: string
-                  format: binary
-                image4:
-                  type: string
-                  format: binary
+                name:        { type: string,  example: Cotton T-Shirt }
+                description: { type: string,  example: Comfortable cotton t-shirt }
+                price:       { type: number,  example: 29.99 }
+                category:    { type: string,  example: Clothing }
+                subCategory: { type: string,  example: T-Shirts }
+                bestseller:  { type: boolean, example: false }
+                sizes:       { type: string,  example: '["S","M","L"]' }
+                image1:      { type: string,  format: binary }
+                image2:      { type: string,  format: binary }
+                image3:      { type: string,  format: binary }
+                image4:      { type: string,  format: binary }
       responses:
-        '201':
-          description: Product added successfully
+        "201":
+          description: Product added
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  product:
-                    $ref: '#/components/schemas/Product'
+                  success: { type: boolean }
+                  product: { $ref: '#/components/schemas/Product' }
 
   /product/list:
     get:
       tags: [Products]
-      summary: List all products
+      summary: List products
       parameters:
-        - name: category
-          in: query
-          schema:
-            type: string
-          description: Filter by category
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 20
-          description: Number of products to return
-        - name: offset
-          in: query
-          schema:
-            type: integer
-            default: 0
-          description: Number of products to skip
+        - { name: category, in: query, schema: { type: string },  description: Filter by category }
+        - { name: limit,    in: query, schema: { type: integer, default: 20 }, description: Items to return }
+        - { name: offset,   in: query, schema: { type: integer, default: 0  }, description: Items to skip }
       responses:
-        '200':
-          description: List of products
+        "200":
+          description: Product list
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
+                  success:  { type: boolean }
                   products:
                     type: array
-                    items:
-                      $ref: '#/components/schemas/Product'
-                  total:
-                    type: integer
+                    items: { $ref: '#/components/schemas/Product' }
+                  total:    { type: integer }
 
   /product/remove:
     post:
       tags: [Products]
-      summary: Remove a product by ID
-      security:
-        - bearerAuth: []
+      summary: Remove product
+      security: [ { bearerAuth: [] } ]
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required:
-                - id
+              required: [id]
               properties:
-                id:
-                  type: integer
-                  example: 1
+                id: { type: integer, example: 1 }
       responses:
-        '200':
-          description: Product removed successfully
+        "200":
+          description: Product removed
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
+                  success: { type: boolean }
+                  message: { type: string }
 
 tags:
   - name: Authentication
-    description: User registration and login
+    description: User registration, login, e-mail verification
+  - name: OTP
+    description: Phone number OTP login
   - name: OAuth
     description: Google OAuth 2.0 authentication
   - name: Cart
@@ -758,9 +619,9 @@ tags:
   - name: Orders
     description: Order management
   - name: Products
-    description: Product management
+    description: Product catalogue maintenance
   - name: Admin
-    description: Administrative functions
+    description: Administrative endpoints
 
 security:
   - bearerAuth: []
