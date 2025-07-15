@@ -88,11 +88,13 @@ export const loginUser = async (req, res) => {
 
     /* ── lookup ──────────────────────────────────────────── */
     const user = await findUserByEmail(cleanEmail);
+
     if (!user)
       return res.status(401).json({ success: false, message: 'User not found.' });
-
+    console.log(`user.emailVerified: ${user.emailVerified}`)
     /* ── e-mail verified? ────────────────────────────────── */
     if (!user.emailVerified)
+      console.log("logging: user not verified")
       return res.status(403).json({ success: false, message: 'Verify your e-mail before logging in.' });
 
     /* ── password check ─────────────────────────────────── */

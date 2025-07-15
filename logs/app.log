@@ -683,3 +683,37 @@
 2025-07-15T06:00:33.591Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-15T06:00:53.790Z [INFO]: ::1 - - [15/Jul/2025:06:00:53 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
 2025-07-15T06:02:57.241Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:11:49.612Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:11:56.812Z [INFO]: ::1 - - [15/Jul/2025:06:11:56 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:12:12.680Z [INFO]: ::1 - - [15/Jul/2025:06:12:12 +0000] "POST /api/user/login HTTP/1.1" 401 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:13:35.311Z [INFO]: ::1 - - [15/Jul/2025:06:13:35 +0000] "POST /api/user/login HTTP/1.1" 401 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:13:39.255Z [INFO]: ::1 - - [15/Jul/2025:06:13:39 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:14:00.594Z [INFO]: ::1 - - [15/Jul/2025:06:14:00 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:14:06.009Z [INFO]: ::1 - - [15/Jul/2025:06:14:06 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:15:13.726Z [INFO]: ::1 - - [15/Jul/2025:06:15:13 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:15:42.894Z [INFO]: ::1 - - [15/Jul/2025:06:15:42 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:16.290Z [INFO]: ::1 - - [15/Jul/2025:06:16:16 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:18.786Z [INFO]: ::1 - - [15/Jul/2025:06:16:18 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:19.621Z [INFO]: ::1 - - [15/Jul/2025:06:16:19 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:20.487Z [INFO]: ::1 - - [15/Jul/2025:06:16:20 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.106Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.539Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.857Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:22.924Z [INFO]: ::1 - - [15/Jul/2025:06:16:22 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:23.291Z [INFO]: ::1 - - [15/Jul/2025:06:16:23 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:23.690Z [INFO]: ::1 - - [15/Jul/2025:06:16:23 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:24.624Z [INFO]: ::1 - - [15/Jul/2025:06:16:24 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:25.496Z [INFO]: ::1 - - [15/Jul/2025:06:16:25 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:26.392Z [INFO]: ::1 - - [15/Jul/2025:06:16:26 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:27.177Z [INFO]: ::1 - - [15/Jul/2025:06:16:27 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:27.935Z [INFO]: ::1 - - [15/Jul/2025:06:16:27 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:17:33.986Z [INFO]: ::1 - - [15/Jul/2025:06:17:33 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:18:54.671Z [INFO]: ::1 - - [15/Jul/2025:06:18:54 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:23:16.966Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:22.117Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:49.407Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:55.976Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:14.980Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:19.386Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:20.801Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:23.917Z [INFO]: 🚀 Server started on PORT: 4000
