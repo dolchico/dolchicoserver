@@ -8,8 +8,10 @@ export const createUser = async (userData) => {
   if (userData.phoneNumber) {
     userData.phoneNumber = userData.phoneNumber.trim();
   }
-  return prisma.user.create({  userData });
+
+  return prisma.user.create({ data: userData }); // ✅ FIXED HERE
 };
+
 
 // Find user by email (always trimmed and lowercased)
 export const findUserByEmail = async (email) => {
