@@ -679,3 +679,7 @@
 2025-07-15T05:31:21.784Z [INFO]: ::1 - - [15/Jul/2025:05:31:21 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
 2025-07-15T05:33:29.271Z [INFO]: ::1 - - [15/Jul/2025:05:33:29 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
 2025-07-15T05:38:44.299Z [INFO]: ::1 - - [15/Jul/2025:05:38:44 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:59:35.270Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:00:33.591Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:00:53.790Z [INFO]: ::1 - - [15/Jul/2025:06:00:53 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:02:57.241Z [INFO]: 🚀 Server started on PORT: 4000

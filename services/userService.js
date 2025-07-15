@@ -26,13 +26,18 @@ export const findUserById = async (id) => {
   return await prisma.user.findUnique({ where: { id } });
 };
 
-// Update user's emailVerified status
 export const verifyUserEmail = async (userId) => {
-  return await prisma.user.update({
-    where: { id: userId },
-    data: { emailVerified: true },
-  });
+  try {
+    return await prisma.user.update({
+      where: { id: userId },
+      data: { emailVerified: true }
+    });
+  } catch (error) {
+    console.error('Error verifying user email:', error);
+    throw error;
+  }
 };
+
 
 // Update user's phoneVerified status
 export const verifyUserPhone = async (userId) => {

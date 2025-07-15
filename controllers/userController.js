@@ -82,19 +82,25 @@ export const registerUser = async (req, res) => {
 /* ===================================================================== */
 export const loginUser = async (req, res) => {
   try {
+    /* ── extract & normalise ─────────────────────────────── */
     const { email, password } = req.body;
+    const cleanEmail = email.trim().toLowerCase();
 
-    const user = await findUserByEmail(email);
+    /* ── lookup ──────────────────────────────────────────── */
+    const user = await findUserByEmail(cleanEmail);
     if (!user)
       return res.status(401).json({ success: false, message: 'User not found.' });
 
+    /* ── e-mail verified? ────────────────────────────────── */
     if (!user.emailVerified)
       return res.status(403).json({ success: false, message: 'Verify your e-mail before logging in.' });
 
+    /* ── password check ─────────────────────────────────── */
     const ok = await bcrypt.compare(password, user.password);
     if (!ok)
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
 
+    /* ── success ────────────────────────────────────────── */
     return res.status(200).json({ success: true, token: issueJwt(user.id) });
   } catch (err) {
     console.error(err);
