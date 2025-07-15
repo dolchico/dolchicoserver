@@ -113,28 +113,23 @@ export const loginUser = async (req, res) => {
 /* ===================================================================== */
 /* 3. EMAIL-VERIFICATION ENDPOINT                                        */
 /* ===================================================================== */
-export const verifyEmail = async (req, res) => {
+export const verifyUserEmail = async (userId) => {
   try {
-    const token = req.body.token || req.query.token;
-    if (!token)
-      return res.status(400).json({ success: false, message: 'Verification token required.' });
+    const result = await User.updateOne(
+      { _id: userId },
+      { $set: { emailVerified: true } }
+    );
 
-    const record = await findEmailVerificationToken(token);
-    if (!record)
-      return res.status(400).json({ success: false, message: 'Invalid or expired token.' });
-
-    if (new Date() > record.expiresAt) {
-      await deleteEmailVerificationToken(token);
-      return res.status(410).json({ success: false, message: 'Verification token expired.' });
+    if (result.modifiedCount === 0) {
+      console.warn(`Email verification update failed for userId: ${userId}`);
+    } else {
+      console.log(`Email verified successfully for userId: ${userId}`);
     }
 
-    await verifyUserEmail(record.userId);
-    await deleteEmailVerificationToken(token);
-
-    return res.status(200).json({ success: true, message: 'E-mail verified. You may now log in.' });
+    return result;
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error(`Error verifying email for userId: ${userId}`, err);
+    throw err;
   }
 };
 
