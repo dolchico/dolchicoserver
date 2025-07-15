@@ -16,7 +16,7 @@ info:
       • **Development:** http://localhost:4000/api
 
 servers:
-  - url: https://famefash-backend.onrender.com/api
+  - url: https://dolchico-backend.up.railway.app/api
     description: Production server
   - url: http://localhost:4000/api
     description: Development server
