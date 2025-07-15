@@ -191,3 +191,36 @@ export const verifyPhoneLoginOTP = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword)
+    return res.status(400).json({ message: 'Token and new password required.' });
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: { gte: new Date() },
+    },
+  });
+
+  if (!user)
+    return res.status(400).json({ message: 'Invalid or expired token.' });
+
+  if (newPassword.length < 8)
+    return res
+      .status(400)
+      .json({ message: 'Password must be at least 8 characters.' });
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashed,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+
+  return res.json({ success: true, message: 'Password reset successful.' });
+}; // ✅ Closing the function here

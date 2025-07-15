@@ -31,5 +31,8 @@ router.post('/login/request-otp', requestPhoneLoginOTP);
 router.post('/login/resend-otp',  resendPhoneLoginOTP);
 router.post('/login/verify-otp',  verifyPhoneLoginOTP);
 
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
+
 /* ───────── Export ───────────────── */
 export default router;

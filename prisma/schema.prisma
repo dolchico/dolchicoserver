@@ -38,6 +38,9 @@ model User {
   cartData       Json     @default("{}")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  resetToken        String?   // nullable
+resetTokenExpiry  DateTime? // nullable
+
 
   // New fields:
     phoneNumber    String?  @unique @db.VarChar(20)
@@ -51,6 +54,7 @@ model User {
   sessions       Session[]
   emailTokens    EmailVerificationToken[]
   phoneOtps      PhoneOTP[]
+  
 
   @@index([email])
   @@index([role])
