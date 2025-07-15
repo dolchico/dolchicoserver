@@ -12,7 +12,7 @@ info:
       • **Google OAuth 2.0** – social login
     
     ## Base URLs
-      • **Production:** https://famefash-backend.onrender.com/api  
+      • **Production:** https://dolchico-backend.up.railway.app/api  
       • **Development:** http://localhost:4000/api
 
 servers:
