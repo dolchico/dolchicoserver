@@ -299,7 +299,7 @@ paths:
         "400": { description: Invalid / expired token }
 
   # ───────── Phone-OTP Login ─────────
-  /login/request-otp:
+  /user/login/request-otp:
     post:
       tags: [OTP]
       summary: Request phone login OTP

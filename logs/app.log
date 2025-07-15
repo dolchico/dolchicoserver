@@ -733,3 +733,14 @@
 2025-07-15T07:51:46.746Z [INFO]: ::1 - - [15/Jul/2025:07:51:46 +0000] "POST /api/user/verify-email HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
 2025-07-15T07:53:02.469Z [INFO]: ::1 - - [15/Jul/2025:07:53:02 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
 2025-07-15T07:59:22.935Z [INFO]: 🚀 Server started at https://famefash-backend.onrender.com (PORT: 4000)
+2025-07-15T11:52:12.504Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T11:53:50.455Z [INFO]: ::1 - - [15/Jul/2025:11:53:50 +0000] "POST /api/user/register HTTP/1.1" 400 59 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:54:09.221Z [INFO]: ::1 - - [15/Jul/2025:11:54:09 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:00.271Z [INFO]: ::1 - - [15/Jul/2025:11:55:00 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:24.044Z [INFO]: ::1 - - [15/Jul/2025:11:55:24 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:36.662Z [INFO]: ::1 - - [15/Jul/2025:11:55:36 +0000] "POST /api/user/login/request-otp HTTP/1.1" 404 61 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:48.117Z [INFO]: ::1 - - [15/Jul/2025:11:55:48 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:57:48.153Z [INFO]: ::1 - - [15/Jul/2025:11:57:48 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:57:57.642Z [INFO]: ::1 - - [15/Jul/2025:11:57:57 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:58:56.062Z [INFO]: ::1 - - [15/Jul/2025:11:58:56 +0000] "POST /api/user/login/request-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:59:35.809Z [INFO]: ::1 - - [15/Jul/2025:11:59:35 +0000] "POST /api/user/login/verify-otp HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
