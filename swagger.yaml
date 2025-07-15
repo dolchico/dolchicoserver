@@ -324,7 +324,7 @@ paths:
         "200": { description: OTP resent }
         "429": { description: Too many requests }
 
-  /login/verify-otp:
+  /user/login/verify-otp:
     post:
       tags: [OTP]
       summary: Verify OTP & login
