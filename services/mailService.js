@@ -1,18 +1,17 @@
-// services/mailService.js
-
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // or use your SMTP provider
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
+  family: 4,            // 👈 This line forces IPv4 instead of IPv6
 });
 
-// Welcome email (optional, can be sent after verification)
+// Welcome email
 export const sendWelcomeEmail = async (toEmail, userName) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
