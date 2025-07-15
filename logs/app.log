@@ -670,3 +670,12 @@
 2025-07-15T04:07:48.549Z [INFO]: ::1 - - [15/Jul/2025:04:07:48 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
 2025-07-15T04:08:17.533Z [INFO]: ::1 - - [15/Jul/2025:04:08:17 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
 2025-07-15T04:08:32.364Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:41:31.923Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:42:00.743Z [INFO]: ::1 - - [15/Jul/2025:04:42:00 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:47:55.810Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T05:30:10.477Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T05:30:22.502Z [INFO]: ::1 - - [15/Jul/2025:05:30:22 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:31:11.897Z [INFO]: ::1 - - [15/Jul/2025:05:31:11 +0000] "POST /verify-email HTTP/1.1" 404 152 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:31:21.784Z [INFO]: ::1 - - [15/Jul/2025:05:31:21 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:33:29.271Z [INFO]: ::1 - - [15/Jul/2025:05:33:29 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:38:44.299Z [INFO]: ::1 - - [15/Jul/2025:05:38:44 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
