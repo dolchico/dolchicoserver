@@ -1,18 +1,17 @@
-// services/mailService.js
-
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // or use your SMTP provider
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
+  family: 4,            // 👈 This line forces IPv4 instead of IPv6
 });
 
-// Welcome email (optional, can be sent after verification)
+// Welcome email
 export const sendWelcomeEmail = async (toEmail, userName) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -89,6 +88,45 @@ export const sendVerificationEmail = async (toEmail, userName, token) => {
         <hr style="margin: 32px 0;" />
         <p style="font-size: 1em; color: #555;">
           If you did not create this account, you can safely ignore this email.
+        </p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+// Reset password email
+export const sendResetPasswordEmail = async (toEmail, userName, token) => {
+  const resetUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/reset-password?token=${token}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: toEmail,
+    subject: 'Reset Your Password – Dolchi Co',
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto; background: #faf9f6; padding: 32px; border-radius: 12px;">
+        <h1 style="color: #1a202c;">Reset your password, ${userName}</h1>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          We received a request to reset your Dolchi Co password.
+        </p>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          Click the button below to set a new password for your account:
+        </p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${resetUrl}" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-size:1.1em;">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 1.1em; line-height: 1.6;">
+          Or copy and paste this link into your browser:<br>
+          <a href="${resetUrl}" style="color:#4f46e5;">${resetUrl}</a>
+        </p>
+        <hr style="margin: 32px 0;" />
+        <p style="font-size: 1em; color: #555;">
+          This link will expire for security reasons. If you did not request a password reset, you can safely ignore this email—your account will remain secure.
+        </p>
+        <p style="font-size: 1em; color: #555;">
+          Need help? Contact our support team any time.
         </p>
       </div>
     `,

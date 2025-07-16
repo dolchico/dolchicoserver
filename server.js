@@ -13,12 +13,6 @@ import yaml          from 'yaml';           // <- one parser, one name
 import morgan        from 'morgan';
 import session       from 'express-session';
 import passport      from 'passport';
-
-/**
- * =============================
- * Internal Imports
- * =============================
- */
 import logger              from './logger.js';
 import connectCloudinary   from './config/cloudinary.js';
 import helmet              from './middleware/helmet.js';
@@ -71,7 +65,7 @@ connectCloudinary();
  * =============================
  */
 app.use('/api', apiLimiter);
-app.use(helmet);
+app.use(helmet());
 app.use(express.json());
 
 app.use(cors({

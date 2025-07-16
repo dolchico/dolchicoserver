@@ -12,11 +12,11 @@ info:
       • **Google OAuth 2.0** – social login
     
     ## Base URLs
-      • **Production:** https://famefash-backend.onrender.com/api  
+      • **Production:** https://dolchico-backend.up.railway.app/api  
       • **Development:** http://localhost:4000/api
 
 servers:
-  - url: https://famefash-backend.onrender.com/api
+  - url: https://dolchico-backend.up.railway.app/api
     description: Production server
   - url: http://localhost:4000/api
     description: Development server
@@ -245,7 +245,6 @@ components:
         error:   { type: string,  example: INVALID_CREDENTIALS }
 
 paths:
-  # ───────── Authentication ─────────
   /user/register:
     post:
       tags: [Authentication]
@@ -298,8 +297,85 @@ paths:
         "200": { description: E-mail verified }
         "400": { description: Invalid / expired token }
 
+  /auth/forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Request password reset link
+      description: Send a password reset email to the user if the account exists.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+      responses:
+        "200":
+          description: Reset email sent (whether or not user exists, for privacy).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+        "400":
+          description: Invalid request (missing/invalid email).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+
+  /auth/reset-password:
+    post:
+      tags: [Authentication]
+      summary: Reset user password
+      description: Set a new password for the user account using a valid reset token from the email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword]
+              properties:
+                token:
+                  type: string
+                  description: Reset token sent to user’s email
+                  example: abc123tokenvalue
+                newPassword:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: StrongPassword123
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+        "400":
+          description: Invalid or expired token / password validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+
   # ───────── Phone-OTP Login ─────────
-  /login/request-otp:
+  /user/login/request-otp:
     post:
       tags: [OTP]
       summary: Request phone login OTP
@@ -324,7 +400,7 @@ paths:
         "200": { description: OTP resent }
         "429": { description: Too many requests }
 
-  /login/verify-otp:
+  /user/login/verify-otp:
     post:
       tags: [OTP]
       summary: Verify OTP & login
@@ -606,10 +682,56 @@ paths:
                 properties:
                   success: { type: boolean }
                   message: { type: string }
+  /user/update-profile:
+    patch:
+      tags: [Authentication]
+      summary: Update user profile (partial, authenticated)
+      description: |
+        Update any combination of user's name, email, or phone number.
+        If email or phone number is changed, emailVerified/phoneVerified are set to false and the user must re-verify.
+      security: [ { bearerAuth: [] } ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:        { type: string, example: "Jane Doe" }
+                email:       { type: string, example: "jane.doe@example.com", format: email }
+                phoneNumber: { type: string, example: "+919876543210" }
+              minProperties: 1
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  user:    { $ref: '#/components/schemas/User' }
+        "400":
+          description: Invalid input / No fields provided / Unique constraint error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
 
 tags:
   - name: Authentication
-    description: User registration, login, e-mail verification
+    description: User registration, login, e-mail verification, password reset
   - name: OTP
     description: Phone number OTP login
   - name: OAuth

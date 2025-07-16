@@ -2,6 +2,7 @@ import express from 'express';
 import {
   loginUser,
   registerUser,
+  resetPassword,
   verifyEmail,
   requestPhoneLoginOTP,
   verifyPhoneLoginOTP,
@@ -9,27 +10,28 @@ import {
   // Add more controllers as needed (e.g., verifyPhone, resendVerification)
 } from '../controllers/userController.js';
 import { validateRegister, validateLogin } from '../validators/userValidator.js';
-import { authLimiter, otpRateLimiter } from '../middleware/otpRateLimiter.js';
+import { updateUserProfile } from '../controllers/userController.js';
+import {ensureAuth} from "../middleware/authMiddleware.js"
+// ⬅ authLimiter and otpRateLimiter deliberately NOT imported
 
 const router = express.Router();
 
-// Email/password login
-router.post('/login', validateLogin, loginUser);
+/* ───────── Authentication ───────── */
+router.post('/login',                 validateLogin,    loginUser);
+router.post('/register',              validateRegister, registerUser);
 
-// Registration
-router.post('/register', authLimiter, validateRegister, registerUser);
-
-// Email verification (supports both POST and GET)
+/* ───────── Email verification ───── */
 router.post('/verify-email', verifyEmail);
-router.get('/verify-email', verifyEmail);
+router.get ('/verify-email', verifyEmail);
 
-// Phone OTP login routes
-router.post('/login/request-otp', otpRateLimiter, requestPhoneLoginOTP);
-router.post('/login/resend-otp', otpRateLimiter, resendPhoneLoginOTP);
-router.post('/login/verify-otp', verifyPhoneLoginOTP);
+/* ───────── Phone-OTP login ──────── */
+router.post('/login/request-otp', requestPhoneLoginOTP);
+router.post('/login/resend-otp',  resendPhoneLoginOTP);
+router.post('/login/verify-otp',  verifyPhoneLoginOTP);
 
-// (Optional) Add more routes as needed
-// router.post('/verify-phone', verifyPhone);
-// router.post('/resend-verification', resendVerification);
+// router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
+router.patch('/update-profile', ensureAuth, updateUserProfile);
+
 
 export default router;

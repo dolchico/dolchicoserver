@@ -633,3 +633,194 @@
 2025-07-14T11:36:11.924Z [INFO]: ::1 - - [14/Jul/2025:11:36:11 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:45:54.158Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-14T14:45:54.224Z [INFO]: ::1 - - [14/Jul/2025:14:45:54 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T14:56:11.546Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:15:26.473Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:15:45.850Z [INFO]: ::1 - - [14/Jul/2025:15:15:45 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:16:24.695Z [INFO]: ::1 - - [14/Jul/2025:15:16:24 +0000] "POST /api/user/register HTTP/1.1" 409 58 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:16:47.389Z [INFO]: ::1 - - [14/Jul/2025:15:16:47 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:17:04.686Z [INFO]: ::1 - - [14/Jul/2025:15:17:04 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:17:13.938Z [INFO]: ::1 - - [14/Jul/2025:15:17:13 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:19:48.106Z [INFO]: ::1 - - [14/Jul/2025:15:19:48 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:19:48.204Z [INFO]: ::1 - - [14/Jul/2025:15:19:48 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:20:22.744Z [INFO]: ::1 - - [14/Jul/2025:15:20:22 +0000] "POST /api/user/register HTTP/1.1" 429 61 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:20:32.551Z [INFO]: ::1 - - [14/Jul/2025:15:20:32 +0000] "POST /api/user/register HTTP/1.1" 429 61 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:22:04.394Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:22:07.456Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:22:20.960Z [INFO]: ::1 - - [14/Jul/2025:15:22:20 +0000] "POST /api/user/register HTTP/1.1" 201 95 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-14T15:43:31.266Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:44:32.008Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:45:11.208Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:45:13.128Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:45:39.143Z [INFO]: ::1 - - [14/Jul/2025:15:45:39 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-14T15:46:34.990Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:46:35.884Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-14T15:46:37.547Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T03:58:28.791Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T03:58:30.477Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:00:35.306Z [INFO]: ::1 - - [15/Jul/2025:04:00:35 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:01:25.462Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:04:06.568Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:04:10.613Z [INFO]: ::1 - - [15/Jul/2025:04:04:10 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:04:15.985Z [INFO]: ::1 - - [15/Jul/2025:04:04:15 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:05:07.229Z [INFO]: ::1 - - [15/Jul/2025:04:05:07 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:05:58.871Z [INFO]: ::1 - - [15/Jul/2025:04:05:58 +0000] "POST /api/user/verify-email HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:06:11.674Z [INFO]: ::1 - - [15/Jul/2025:04:06:11 +0000] "POST /api/user/verify-email HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:06:27.151Z [INFO]: ::1 - - [15/Jul/2025:04:06:27 +0000] "POST /api/user/verify-email HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:07:06.771Z [INFO]: ::1 - - [15/Jul/2025:04:07:06 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:07:48.549Z [INFO]: ::1 - - [15/Jul/2025:04:07:48 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:08:17.533Z [INFO]: ::1 - - [15/Jul/2025:04:08:17 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:08:32.364Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:41:31.923Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T04:42:00.743Z [INFO]: ::1 - - [15/Jul/2025:04:42:00 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T04:47:55.810Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T05:30:10.477Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T05:30:22.502Z [INFO]: ::1 - - [15/Jul/2025:05:30:22 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:31:11.897Z [INFO]: ::1 - - [15/Jul/2025:05:31:11 +0000] "POST /verify-email HTTP/1.1" 404 152 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:31:21.784Z [INFO]: ::1 - - [15/Jul/2025:05:31:21 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:33:29.271Z [INFO]: ::1 - - [15/Jul/2025:05:33:29 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:38:44.299Z [INFO]: ::1 - - [15/Jul/2025:05:38:44 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T05:59:35.270Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:00:33.591Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:00:53.790Z [INFO]: ::1 - - [15/Jul/2025:06:00:53 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:02:57.241Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:11:49.612Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:11:56.812Z [INFO]: ::1 - - [15/Jul/2025:06:11:56 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:12:12.680Z [INFO]: ::1 - - [15/Jul/2025:06:12:12 +0000] "POST /api/user/login HTTP/1.1" 401 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:13:35.311Z [INFO]: ::1 - - [15/Jul/2025:06:13:35 +0000] "POST /api/user/login HTTP/1.1" 401 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:13:39.255Z [INFO]: ::1 - - [15/Jul/2025:06:13:39 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:14:00.594Z [INFO]: ::1 - - [15/Jul/2025:06:14:00 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:14:06.009Z [INFO]: ::1 - - [15/Jul/2025:06:14:06 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:15:13.726Z [INFO]: ::1 - - [15/Jul/2025:06:15:13 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:15:42.894Z [INFO]: ::1 - - [15/Jul/2025:06:15:42 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:16.290Z [INFO]: ::1 - - [15/Jul/2025:06:16:16 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:18.786Z [INFO]: ::1 - - [15/Jul/2025:06:16:18 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:19.621Z [INFO]: ::1 - - [15/Jul/2025:06:16:19 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:20.487Z [INFO]: ::1 - - [15/Jul/2025:06:16:20 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.106Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.539Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:21.857Z [INFO]: ::1 - - [15/Jul/2025:06:16:21 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:22.924Z [INFO]: ::1 - - [15/Jul/2025:06:16:22 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:23.291Z [INFO]: ::1 - - [15/Jul/2025:06:16:23 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:23.690Z [INFO]: ::1 - - [15/Jul/2025:06:16:23 +0000] "POST /api/user/login HTTP/1.1" - - "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:24.624Z [INFO]: ::1 - - [15/Jul/2025:06:16:24 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:25.496Z [INFO]: ::1 - - [15/Jul/2025:06:16:25 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:26.392Z [INFO]: ::1 - - [15/Jul/2025:06:16:26 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:27.177Z [INFO]: ::1 - - [15/Jul/2025:06:16:27 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:16:27.935Z [INFO]: ::1 - - [15/Jul/2025:06:16:27 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:17:33.986Z [INFO]: ::1 - - [15/Jul/2025:06:17:33 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:18:54.671Z [INFO]: ::1 - - [15/Jul/2025:06:18:54 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T06:23:16.966Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:22.117Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:49.407Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:23:55.976Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:14.980Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:19.386Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:20.801Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T06:24:23.917Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T07:34:06.763Z [INFO]: 🚀 Server started at https://famefash-backend.onrender.com (PORT: 4000)
+2025-07-15T07:34:22.971Z [INFO]: 🚀 Server started at https://famefash-backend.onrender.com (PORT: 4000)
+2025-07-15T07:34:32.535Z [INFO]: 🚀 Server started at https://famefash-backend.onrender.com (PORT: 4000)
+2025-07-15T07:38:37.146Z [INFO]: ::1 - - [15/Jul/2025:07:38:37 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:38:43.131Z [INFO]: ::1 - - [15/Jul/2025:07:38:43 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:38:44.102Z [INFO]: ::1 - - [15/Jul/2025:07:38:44 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:40:32.629Z [INFO]: ::1 - - [15/Jul/2025:07:40:32 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:40:52.281Z [INFO]: ::1 - - [15/Jul/2025:07:40:52 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:42:24.946Z [INFO]: ::1 - - [15/Jul/2025:07:42:24 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:42:40.837Z [INFO]: ::1 - - [15/Jul/2025:07:42:40 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:42:57.004Z [INFO]: ::1 - - [15/Jul/2025:07:42:57 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:43:06.297Z [INFO]: ::1 - - [15/Jul/2025:07:43:06 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:43:11.031Z [INFO]: ::1 - - [15/Jul/2025:07:43:11 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:51:46.746Z [INFO]: ::1 - - [15/Jul/2025:07:51:46 +0000] "POST /api/user/verify-email HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:53:02.469Z [INFO]: ::1 - - [15/Jul/2025:07:53:02 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-15T07:59:22.935Z [INFO]: 🚀 Server started at https://famefash-backend.onrender.com (PORT: 4000)
+2025-07-15T11:52:12.504Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-15T11:53:50.455Z [INFO]: ::1 - - [15/Jul/2025:11:53:50 +0000] "POST /api/user/register HTTP/1.1" 400 59 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:54:09.221Z [INFO]: ::1 - - [15/Jul/2025:11:54:09 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:00.271Z [INFO]: ::1 - - [15/Jul/2025:11:55:00 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:24.044Z [INFO]: ::1 - - [15/Jul/2025:11:55:24 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:36.662Z [INFO]: ::1 - - [15/Jul/2025:11:55:36 +0000] "POST /api/user/login/request-otp HTTP/1.1" 404 61 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:55:48.117Z [INFO]: ::1 - - [15/Jul/2025:11:55:48 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:57:48.153Z [INFO]: ::1 - - [15/Jul/2025:11:57:48 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:57:57.642Z [INFO]: ::1 - - [15/Jul/2025:11:57:57 +0000] "POST /api/user/login/request-otp HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:58:56.062Z [INFO]: ::1 - - [15/Jul/2025:11:58:56 +0000] "POST /api/user/login/request-otp HTTP/1.1" 200 52 "-" "PostmanRuntime/7.44.1"
+2025-07-15T11:59:35.809Z [INFO]: ::1 - - [15/Jul/2025:11:59:35 +0000] "POST /api/user/login/verify-otp HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-15T15:03:13.616Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:20:50.118Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:20:57.468Z [INFO]: ::1 - - [16/Jul/2025:04:20:57 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-16T04:20:57.549Z [INFO]: ::1 - - [16/Jul/2025:04:20:57 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-16T04:22:38.575Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:23:03.381Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:23:07.681Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:23:11.885Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:28:22.038Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:21.304Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:27.919Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:29.546Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:31.209Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:34.150Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:30:54.482Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:33:11.543Z [INFO]: ::1 - - [16/Jul/2025:04:33:11 +0000] "GET /api/user/update-profile%60 HTTP/1.1" 404 165 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-16T04:33:11.683Z [INFO]: ::1 - - [16/Jul/2025:04:33:11 +0000] "GET /api/user/update-profile%60 HTTP/1.1" 404 165 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-16T04:33:49.853Z [INFO]: ::1 - - [16/Jul/2025:04:33:49 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:34:47.107Z [INFO]: ::1 - - [16/Jul/2025:04:34:47 +0000] "GET /api/user/update-profile HTTP/1.1" 404 162 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:34:51.505Z [INFO]: ::1 - - [16/Jul/2025:04:34:51 +0000] "POST /api/user/update-profile HTTP/1.1" 404 163 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:34:55.789Z [INFO]: ::1 - - [16/Jul/2025:04:34:55 +0000] "POST /api/user/update-profile HTTP/1.1" 404 163 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:35:12.461Z [INFO]: ::1 - - [16/Jul/2025:04:35:12 +0000] "POST /api/user/update-profile HTTP/1.1" 404 163 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:35:31.089Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:38:44.599Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:39:10.459Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:39:47.941Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:55:18.027Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:55:19.320Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T04:55:24.139Z [INFO]: ::1 - - [16/Jul/2025:04:55:24 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 80 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:56:26.632Z [INFO]: ::1 - - [16/Jul/2025:04:56:26 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-16T04:56:45.828Z [INFO]: ::1 - - [16/Jul/2025:04:56:45 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 80 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:00:42.867Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:00:47.716Z [INFO]: ::1 - - [16/Jul/2025:05:00:47 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 80 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:01:34.215Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:16:44.567Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:16:50.623Z [INFO]: ::1 - - [16/Jul/2025:05:16:50 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 67 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:17:01.771Z [INFO]: ::1 - - [16/Jul/2025:05:17:01 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 67 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:17:13.115Z [INFO]: ::1 - - [16/Jul/2025:05:17:13 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 417 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:24:34.881Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:24:59.472Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:25:03.861Z [INFO]: ::1 - - [16/Jul/2025:05:25:03 +0000] "PATCH /api/user/update-profile HTTP/1.1" 400 67 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:25:09.303Z [INFO]: ::1 - - [16/Jul/2025:05:25:09 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 418 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:25:14.137Z [INFO]: ::1 - - [16/Jul/2025:05:25:14 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 419 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:25:19.077Z [INFO]: ::1 - - [16/Jul/2025:05:25:19 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 421 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:26:31.358Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:26:39.399Z [INFO]: ::1 - - [16/Jul/2025:05:26:39 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 422 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:26:45.212Z [INFO]: ::1 - - [16/Jul/2025:05:26:45 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 420 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:26:49.763Z [INFO]: ::1 - - [16/Jul/2025:05:26:49 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 422 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:32:31.319Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:32:40.003Z [INFO]: ::1 - - [16/Jul/2025:05:32:40 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 424 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:32:48.545Z [INFO]: ::1 - - [16/Jul/2025:05:32:48 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 421 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:32:52.751Z [INFO]: ::1 - - [16/Jul/2025:05:32:52 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 421 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:32:54.981Z [INFO]: ::1 - - [16/Jul/2025:05:32:54 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 421 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:34:47.846Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:34:56.693Z [INFO]: ::1 - - [16/Jul/2025:05:34:56 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 422 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:35:06.550Z [INFO]: ::1 - - [16/Jul/2025:05:35:06 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 424 "-" "PostmanRuntime/7.44.1"
+2025-07-16T05:54:06.461Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:54:07.770Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:54:41.268Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:54:43.309Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:55:00.421Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:55:02.424Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:55:07.436Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:58:26.790Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:58:32.103Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:58:47.010Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:03.249Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:08.032Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:10.772Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:12.504Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:15.496Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T05:59:16.834Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T06:05:38.354Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T06:05:43.268Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T06:05:46.983Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T06:05:49.475Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T06:15:28.213Z [INFO]: ::1 - - [16/Jul/2025:06:15:28 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-16T06:20:06.395Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T15:20:22.992Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T15:20:46.408Z [INFO]: ::1 - - [16/Jul/2025:15:20:46 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"

@@ -1,119 +1,128 @@
-/* ----------  external deps  ---------- */
-import validator from 'validator';
-import bcrypt    from 'bcrypt';
-import jwt       from 'jsonwebtoken';
 
-/* ----------  internal services  ---------- */
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
+// --------- Internal services ----------
 import {
   findUserByEmail,
   findUserByPhone,
   createUser,
   verifyUserEmail,
-  verifyUserPhone,
+  verifyUserPhone
 } from '../services/userService.js';
 
 import {
   createEmailVerificationToken,
   findEmailVerificationToken,
-  deleteEmailVerificationToken,
+  deleteEmailVerificationToken
 } from '../services/tokenService.js';
 
 import { generateOTP, verifyOTP } from '../services/otpService.js';
-import { sendOTP }                from '../services/smsService.js';
-import { sendVerificationEmail }  from '../services/mailService.js';
+import { sendOTP } from '../services/smsService.js';
+import { sendVerificationEmail } from '../services/mailService.js';
+import { updateProfile, findUserById } from '../services/userService.js';
 
-/* ----------  helpers  ---------- */
-const issueJwt = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+// --------- Helper JWT issuer ----------
+const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
-/* ===================================================================== */
-/* 1. USER REGISTRATION – email is required, phone is optional           */
-/* ===================================================================== */
+/* ===========================================================================
+   1. User Registration (email required, phone optional) 
+============================================================================ */
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
 
-    /* duplicates ------------------------------------------------------ */
-    if (await findUserByEmail(email))
+    if (await findUserByEmail(email)) {
       return res.status(409).json({ success: false, message: 'User already exists.' });
+    }
 
-    if (phoneNumber && (await findUserByPhone(phoneNumber)))
+    if (phoneNumber && await findUserByPhone(phoneNumber)) {
       return res.status(409).json({ success: false, message: 'Phone number already in use.' });
+    }
 
-    /* validation ------------------------------------------------------ */
-    if (!validator.isEmail(email))
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ success: false, message: 'Invalid e-mail address.' });
+    }
 
-    if (!password || password.length < 8)
+    if (!password || password.length < 8) {
       return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+    }
 
-    if (phoneNumber && !validator.isMobilePhone(String(phoneNumber), 'any'))
+    if (phoneNumber && !validator.isMobilePhone(String(phoneNumber), 'any')) {
       return res.status(400).json({ success: false, message: 'Invalid phone number.' });
+    }
 
-    /* persistence ----------------------------------------------------- */
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await createUser({
       name,
       email,
       password: hashed,
-      phoneNumber: phoneNumber || null,
+      phoneNumber: phoneNumber ?? null,
       emailVerified: false,
       phoneVerified: false,
-      cartData: {},
+      cartData: {}
     });
 
-    /* e-mail verification -------------------------------------------- */
     const token = await createEmailVerificationToken(user.id);
     await sendVerificationEmail(user.email, user.name, token);
 
     return res.status(201).json({
       success: true,
-      message: 'Registration successful. Check your e-mail to verify your account.',
+      message: 'Registration successful. Check your e-mail to verify your account.'
     });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
-/* ===================================================================== */
-/* 2. EMAIL / PASSWORD LOGIN                                             */
-/* ===================================================================== */
+/* ===========================================================================
+   2. Email / Password Login
+============================================================================ */
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const cleanEmail = email.trim().toLowerCase();
 
-    const user = await findUserByEmail(email);
-    if (!user)
+    const user = await findUserByEmail(cleanEmail);
+    if (!user) {
       return res.status(401).json({ success: false, message: 'User not found.' });
+    }
 
-    if (!user.emailVerified)
+    if (!user.emailVerified) {
       return res.status(403).json({ success: false, message: 'Verify your e-mail before logging in.' });
+    }
 
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok)
+    if (!ok) {
       return res.status(401).json({ success: false, message: 'Invalid credentials.' });
+    }
 
     return res.status(200).json({ success: true, token: issueJwt(user.id) });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
-/* ===================================================================== */
-/* 3. EMAIL-VERIFICATION ENDPOINT                                        */
-/* ===================================================================== */
+/* ===========================================================================
+   3. Email Verification Endpoint
+============================================================================ */
 export const verifyEmail = async (req, res) => {
   try {
     const token = req.body.token || req.query.token;
-    if (!token)
+    if (!token) {
       return res.status(400).json({ success: false, message: 'Verification token required.' });
+    }
 
     const record = await findEmailVerificationToken(token);
-    if (!record)
+    if (!record) {
       return res.status(400).json({ success: false, message: 'Invalid or expired token.' });
+    }
 
     if (new Date() > record.expiresAt) {
       await deleteEmailVerificationToken(token);
@@ -124,24 +133,25 @@ export const verifyEmail = async (req, res) => {
     await deleteEmailVerificationToken(token);
 
     return res.status(200).json({ success: true, message: 'E-mail verified. You may now log in.' });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
-/* ===================================================================== */
-/* 4. PHONE-BASED OTP LOGIN                                              */
-/* ===================================================================== */
+/* ===========================================================================
+   4. Phone-based OTP Login
+============================================================================ */
 
-/* 4-a: request OTP (rate-limited in routes) */
+/* 4a: Request OTP (rate-limited in routes) */
 export const requestPhoneLoginOTP = async (req, res) => {
   try {
     const { phoneNumber } = req.body;
-
     const user = await findUserByPhone(phoneNumber);
-    if (!user)
+    if (!user) {
       return res.status(404).json({ success: false, message: 'No user with this phone number.' });
+    }
 
     const otp = await generateOTP(user.id);
     await sendOTP(phoneNumber, otp);
@@ -153,28 +163,102 @@ export const requestPhoneLoginOTP = async (req, res) => {
   }
 };
 
-/* 4-b: resend OTP (same logic as request) */
+/* 4b: Resend OTP */
 export const resendPhoneLoginOTP = requestPhoneLoginOTP;
 
-/* 4-c: verify OTP & log in */
+/* 4c: Verify OTP & login */
 export const verifyPhoneLoginOTP = async (req, res) => {
   try {
     const { phoneNumber, otp } = req.body;
-
     const user = await findUserByPhone(phoneNumber);
-    if (!user)
+
+    if (!user) {
       return res.status(404).json({ success: false, message: 'No user with this phone number.' });
+    }
 
     const ok = await verifyOTP(user.id, otp);
-    if (!ok)
+    if (!ok) {
       return res.status(401).json({ success: false, message: 'Invalid or expired OTP.' });
+    }
 
-    /* first-time phone login → mark verified */
-    if (!user.phoneVerified) await verifyUserPhone(user.id);
+    if (!user.phoneVerified) {
+      await verifyUserPhone(user.id);
+    }
 
     return res.status(200).json({ success: true, token: issueJwt(user.id) });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword)
+    return res.status(400).json({ message: 'Token and new password required.' });
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: { gte: new Date() },
+    },
+  });
+
+  if (!user)
+    return res.status(400).json({ message: 'Invalid or expired token.' });
+
+  if (newPassword.length < 8)
+    return res
+      .status(400)
+      .json({ message: 'Password must be at least 8 characters.' });
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashed,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+
+  return res.json({ success: true, message: 'Password reset successful.' });
+}; // ✅ Closing the function here
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ success: false, message: 'No update fields provided.' });
+    }
+
+    const userId = req.user.id;
+
+    // Prepare the update fields
+    const updateFields = { ...req.body };
+
+    if (updateFields.email !== undefined) {
+      updateFields.emailVerified = false;
+    }
+    if (updateFields.phoneNumber !== undefined) {
+      updateFields.phoneVerified = false;
+    }
+
+    await updateProfile(userId, updateFields);
+
+    const user = await findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    res.json({ success: true, message: 'Profile updated', user });
+  } catch (err) {
+    let msg = err.message || 'Profile update failed';
+    if (err.code === 'P2002') {
+      msg = 'Email or phone number already exists.';
+    }
+    res.status(400).json({ success: false, message: msg });
   }
 };
