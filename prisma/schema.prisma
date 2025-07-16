@@ -39,7 +39,7 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   resetToken        String?   // nullable
-resetTokenExpiry  DateTime? // nullable
+  resetTokenExpiry  DateTime? // nullable
 
 
   // New fields:
@@ -54,7 +54,6 @@ resetTokenExpiry  DateTime? // nullable
   sessions       Session[]
   emailTokens    EmailVerificationToken[]
   phoneOtps      PhoneOTP[]
-  
 
   @@index([email])
   @@index([role])
