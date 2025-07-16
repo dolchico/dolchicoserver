@@ -822,3 +822,5 @@
 2025-07-16T06:05:49.475Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-16T06:15:28.213Z [INFO]: ::1 - - [16/Jul/2025:06:15:28 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-16T06:20:06.395Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T15:20:22.992Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-16T15:20:46.408Z [INFO]: ::1 - - [16/Jul/2025:15:20:46 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
