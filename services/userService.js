@@ -62,3 +62,30 @@ export const verifyUserPhone = async (userId) => {
     throw error;
   }
 };
+export const updateProfile = async (userId, updateData) => {
+  // Allow these fields to be updated:
+  const allowedFields = ['name', 'email', 'phoneNumber', 'emailVerified', 'phoneVerified'];
+  const data = {};
+  for (const field of allowedFields) {
+    if (updateData[field] !== undefined) data[field] = updateData[field];
+  }
+  // Normalize inputs
+  if (data.email) data.email = data.email.trim().toLowerCase();
+  if (data.phoneNumber) data.phoneNumber = data.phoneNumber.trim();
+
+  if (Object.keys(data).length === 0) {
+    throw new Error('No fields provided for update.');
+  }
+
+  try {
+    return await prisma.user.update({
+      where: { id: Number(userId) }, // Remove Number() if using string IDs
+      data
+    });
+  } catch (err) {
+    if (err.code === 'P2002') {
+      throw new Error('Email or phone number already exists.');
+    }
+    throw err;
+  }
+};

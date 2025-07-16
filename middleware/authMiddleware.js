@@ -1,15 +1,16 @@
+import jwt from 'jsonwebtoken';
+
 export const ensureAuth = (req, res, next) => {
-  // Check for session-based auth first
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  
-  // Check for JWT token as fallback
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    // Let route-specific middleware handle JWT validation
-    return next();
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded; // 'id' should be a field in your JWT payload
+      return next();
+    } catch (err) {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
   }
-  
-  res.status(401).json({ message: 'Authentication required' });
+  return res.status(401).json({ message: 'Authentication required' });
 };

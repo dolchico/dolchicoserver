@@ -1,4 +1,4 @@
-// --------- External dependencies ----------
+
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -21,6 +21,7 @@ import {
 import { generateOTP, verifyOTP } from '../services/otpService.js';
 import { sendOTP } from '../services/smsService.js';
 import { sendVerificationEmail } from '../services/mailService.js';
+import { updateProfile, findUserById } from '../services/userService.js';
 
 // --------- Helper JWT issuer ----------
 const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -224,3 +225,40 @@ export const resetPassword = async (req, res) => {
 
   return res.json({ success: true, message: 'Password reset successful.' });
 }; // ✅ Closing the function here
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ success: false, message: 'No update fields provided.' });
+    }
+
+    const userId = req.user.id;
+
+    // Prepare the update fields
+    const updateFields = { ...req.body };
+
+    if (updateFields.email !== undefined) {
+      updateFields.emailVerified = false;
+    }
+    if (updateFields.phoneNumber !== undefined) {
+      updateFields.phoneVerified = false;
+    }
+
+    await updateProfile(userId, updateFields);
+
+    const user = await findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    res.json({ success: true, message: 'Profile updated', user });
+  } catch (err) {
+    let msg = err.message || 'Profile update failed';
+    if (err.code === 'P2002') {
+      msg = 'Email or phone number already exists.';
+    }
+    res.status(400).json({ success: false, message: msg });
+  }
+};
