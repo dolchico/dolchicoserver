@@ -824,3 +824,9 @@
 2025-07-16T06:20:06.395Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-16T15:20:22.992Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-16T15:20:46.408Z [INFO]: ::1 - - [16/Jul/2025:15:20:46 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-17T06:04:33.593Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-17T06:05:00.887Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-17T06:05:18.771Z [INFO]: ::1 - - [17/Jul/2025:06:05:18 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-17T06:05:55.251Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-17T06:07:08.774Z [INFO]: ::1 - - [17/Jul/2025:06:07:08 +0000] "POST /api/user/register HTTP/1.1" 409 58 "-" "PostmanRuntime/7.44.1"
+2025-07-17T06:07:20.628Z [INFO]: ::1 - - [17/Jul/2025:06:07:20 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"

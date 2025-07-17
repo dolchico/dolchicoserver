@@ -61,7 +61,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
 
 // Email verification email
 export const sendVerificationEmail = async (toEmail, userName, token) => {
-  const verificationUrl = `${'https://dolchico-backend.up.railway.app/'}/api/user/verify-email?token=${token}`;
+  const verificationUrl = `${'https://dolchico-backend.up.railway.app'}/api/user/verify-email?token=${token}`;
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -81,10 +81,6 @@ export const sendVerificationEmail = async (toEmail, userName, token) => {
             Verify Email
           </a>
         </div>
-        <p style="font-size: 1.1em; line-height: 1.6;">
-          Or copy and paste this link into your browser:<br>
-          <a href="${verificationUrl}" style="color:#4f46e5;">${verificationUrl}</a>
-        </p>
         <hr style="margin: 32px 0;" />
         <p style="font-size: 1em; color: #555;">
           If you did not create this account, you can safely ignore this email.

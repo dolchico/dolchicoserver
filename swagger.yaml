@@ -271,7 +271,7 @@ paths:
         "200": { description: Login successful, token returned, content: { application/json: { schema: { $ref: '#/components/schemas/AuthResponse' } } } }
         "401": { description: Invalid credentials,             content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } } }
 
-  /verify-email:
+  /user/verify-email:
     post:
       tags: [Authentication]
       summary: Verify user e-mail (token in body)
@@ -297,7 +297,7 @@ paths:
         "200": { description: E-mail verified }
         "400": { description: Invalid / expired token }
 
-  /auth/forgot-password:
+  /user/auth/forgot-password:
     post:
       tags: [Authentication]
       summary: Request password reset link
@@ -333,7 +333,7 @@ paths:
                 properties:
                   message: { type: string }
 
-  /auth/reset-password:
+  /user/auth/reset-password:
     post:
       tags: [Authentication]
       summary: Reset user password
@@ -387,7 +387,7 @@ paths:
       responses:
         "200": { description: OTP sent }
 
-  /login/resend-otp:
+  /user/login/resend-otp:
     post:
       tags: [OTP]
       summary: Resend phone login OTP
