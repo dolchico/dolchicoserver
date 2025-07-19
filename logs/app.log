@@ -942,3 +942,8 @@
 2025-07-19T11:24:10.895Z [INFO]: ::1 - - [19/Jul/2025:11:24:10 +0000] "POST /api/cart/items HTTP/1.1" 201 222 "-" "PostmanRuntime/7.44.1"
 2025-07-19T11:32:38.799Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-19T11:33:33.804Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:59:52.524Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T12:00:05.802Z [INFO]: ::1 - - [19/Jul/2025:12:00:05 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 94 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:01:40.429Z [INFO]: ::1 - - [19/Jul/2025:12:01:40 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 94 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:02:06.287Z [INFO]: ::1 - - [19/Jul/2025:12:02:06 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 66 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:02:24.357Z [INFO]: ::1 - - [19/Jul/2025:12:02:24 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
