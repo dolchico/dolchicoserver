@@ -51,7 +51,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
  * Sends an email with a verification link.
  */
 export const sendVerificationEmail = async (toEmail, userName, token) => {
-  const verificationUrl = `${'https://valyris-i.onrender.com/'}/api/user/verify-email?token=${token}`;
+  const verificationUrl = `${'https://valyris-i.onrender.com'}/api/user/verify-email?token=${token}`;
 
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,

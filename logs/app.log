@@ -915,3 +915,20 @@
 2025-07-19T09:44:34.039Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-19T09:45:19.958Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-19T09:45:25.614Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:48:19.048Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:53:01.225Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:55:43.132Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:56:10.093Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:56:22.548Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T09:56:40.069Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T10:51:28.023Z [INFO]: ::1 - - [19/Jul/2025:10:51:28 +0000] "POST /api/user/register HTTP/1.1" 500 51 "-" "PostmanRuntime/7.44.1"
+2025-07-19T10:54:35.739Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T10:54:43.906Z [INFO]: ::1 - - [19/Jul/2025:10:54:43 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:00:52.524Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:01:00.938Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:01:07.880Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:01:11.390Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:02:40.947Z [INFO]: ::1 - - [19/Jul/2025:11:02:40 +0000] "POST /api/user/verify-email HTTP/1.1" 400 58 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:03:50.355Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /api/user/verify-email?token=1d8dc9764c99c4f4b37b31c92b484d2beda19ffaab6faa7e3ad41984e4ae1679 HTTP/1.1" 200 65 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-19T11:03:50.466Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-19T11:03:50.509Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"

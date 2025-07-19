@@ -29,32 +29,33 @@ const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d
 /* ===========================================================================
    1. User Registration (email required, phone optional) 
 ============================================================================ */
+/* ===========================================================================
+   1. User Registration (email required, phone optional) 
+============================================================================ */
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
 
+    // --- All your validation logic remains the same ---
     if (await findUserByEmail(email)) {
       return res.status(409).json({ success: false, message: 'User already exists.' });
     }
-
     if (phoneNumber && await findUserByPhone(phoneNumber)) {
       return res.status(409).json({ success: false, message: 'Phone number already in use.' });
     }
-
     if (!validator.isEmail(email)) {
       return res.status(400).json({ success: false, message: 'Invalid e-mail address.' });
     }
-
     if (!password || password.length < 8) {
       return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
     }
-
     if (phoneNumber && !validator.isMobilePhone(String(phoneNumber), 'any')) {
       return res.status(400).json({ success: false, message: 'Invalid phone number.' });
     }
 
     const hashed = await bcrypt.hash(password, 10);
 
+    // --- THIS IS THE CORRECTED CODE BLOCK ---
     const user = await createUser({
       name,
       email,
@@ -62,8 +63,9 @@ export const registerUser = async (req, res) => {
       phoneNumber: phoneNumber ?? null,
       emailVerified: false,
       phoneVerified: false,
-      cartData: {}
+      // The `cartData: {}` line has been completely removed.
     });
+    // --- END OF CORRECTED BLOCK ---
 
     const token = await createEmailVerificationToken(user.id);
     await sendVerificationEmail(user.email, user.name, token);
@@ -115,6 +117,9 @@ export const loginUser = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const token = req.body.token || req.query.token;
+      console.log('--- VERIFYING TOKEN FROM REQUEST ---');
+    console.log(token); // Log the exact token your server receives
+    
     if (!token) {
       return res.status(400).json({ success: false, message: 'Verification token required.' });
     }
