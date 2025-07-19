@@ -947,3 +947,60 @@
 2025-07-19T12:01:40.429Z [INFO]: ::1 - - [19/Jul/2025:12:01:40 +0000] "POST /api/auth/forgot-password HTTP/1.1" 200 94 "-" "PostmanRuntime/7.44.1"
 2025-07-19T12:02:06.287Z [INFO]: ::1 - - [19/Jul/2025:12:02:06 +0000] "POST /api/auth/reset-password HTTP/1.1" 200 66 "-" "PostmanRuntime/7.44.1"
 2025-07-19T12:02:24.357Z [INFO]: ::1 - - [19/Jul/2025:12:02:24 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:18:11.192Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T12:18:36.055Z [INFO]: ::1 - - [19/Jul/2025:12:18:36 +0000] "POST /api/user/forgot-password HTTP/1.1" 404 164 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:18:44.758Z [INFO]: ::1 - - [19/Jul/2025:12:18:44 +0000] "POST /api/user/forgot-password HTTP/1.1" 404 164 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:18:45.733Z [INFO]: ::1 - - [19/Jul/2025:12:18:45 +0000] "POST /api/user/forgot-password HTTP/1.1" 404 164 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:36:19.556Z [INFO]: ::1 - - [19/Jul/2025:12:36:19 +0000] "POST /api/user/login HTTP/1.1" 401 45 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:36:33.877Z [INFO]: ::1 - - [19/Jul/2025:12:36:33 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:37:05.839Z [INFO]: ::1 - - [19/Jul/2025:12:37:05 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:42:08.668Z [INFO]: ::1 - - [19/Jul/2025:12:42:08 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-19T12:42:18.723Z [INFO]: ::1 - - [19/Jul/2025:12:42:18 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:20:12.553Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:21:56.033Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:22:16.941Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:23:04.549Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:24:10.202Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:24:18.676Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:25:38.835Z [INFO]: ::1 - - [19/Jul/2025:18:25:38 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:26:13.274Z [INFO]: ::1 - - [19/Jul/2025:18:26:13 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:27:45.022Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:27:47.624Z [INFO]: ::1 - - [19/Jul/2025:18:27:47 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:16.020Z [INFO]: ::1 - - [19/Jul/2025:18:28:16 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:16.970Z [INFO]: ::1 - - [19/Jul/2025:18:28:16 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:17.432Z [INFO]: ::1 - - [19/Jul/2025:18:28:17 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:17.744Z [INFO]: ::1 - - [19/Jul/2025:18:28:17 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:18.021Z [INFO]: ::1 - - [19/Jul/2025:18:28:18 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:28:32.029Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:28:47.937Z [INFO]: ::1 - - [19/Jul/2025:18:28:47 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:30:12.202Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:30:18.150Z [INFO]: ::1 - - [19/Jul/2025:18:30:18 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:30:23.103Z [INFO]: ::1 - - [19/Jul/2025:18:30:23 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:30:23.586Z [INFO]: ::1 - - [19/Jul/2025:18:30:23 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:30:30.065Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:31:02.648Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:31:04.735Z [INFO]: ::1 - - [19/Jul/2025:18:31:04 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:31:10.153Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:31:13.857Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:31:23.197Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:31:26.290Z [INFO]: ::1 - - [19/Jul/2025:18:31:26 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:31:32.871Z [INFO]: ::1 - - [19/Jul/2025:18:31:32 +0000] "POST /api/user/login HTTP/1.1" 403 67 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:31:39.042Z [INFO]: ::1 - - [19/Jul/2025:18:31:39 +0000] "POST /api/user/resend-verification%0A HTTP/1.1" 404 171 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:31:45.498Z [INFO]: ::1 - - [19/Jul/2025:18:31:45 +0000] "POST /api/user/resend-verification HTTP/1.1" 409 72 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:31:58.229Z [INFO]: ::1 - - [19/Jul/2025:18:31:58 +0000] "POST /api/user/resend-verification HTTP/1.1" 200 93 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:33:07.081Z [INFO]: ::1 - - [19/Jul/2025:18:33:07 +0000] "POST /api/user/verify-email HTTP/1.1" 400 58 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:33:33.156Z [INFO]: ::1 - - [19/Jul/2025:18:33:33 +0000] "POST /api/user/verify-email HTTP/1.1" 400 58 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:34:11.109Z [INFO]: ::1 - - [19/Jul/2025:18:34:11 +0000] "POST /api/user/verify-email HTTP/1.1" 200 65 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:34:57.697Z [INFO]: ::1 - - [19/Jul/2025:18:34:57 +0000] "GET /api/user/verify-email?token=60eedb7945d14d40b3d27d45bf0cae3a55b87c4699e2fa2132729d4968e683af HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:35:58.244Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:36:05.688Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:36:18.885Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:36:26.691Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:37:01.483Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:37:06.914Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:37:17.244Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T18:37:21.614Z [INFO]: ::1 - - [19/Jul/2025:18:37:21 +0000] "GET /api/user/verify-email?token=60eedb7945d14d40b3d27d45bf0cae3a55b87c4699e2fa2132729d4968e683af HTTP/1.1" 400 55 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:37:55.299Z [INFO]: ::1 - - [19/Jul/2025:18:37:55 +0000] "POST /api/user/register HTTP/1.1" 409 50 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:38:08.451Z [INFO]: ::1 - - [19/Jul/2025:18:38:08 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-19T18:39:31.955Z [INFO]: ::1 - - [19/Jul/2025:18:39:31 +0000] "GET /api/user/verify-email?token=77a37ba3e2a85022413098d9091e12be1c51428aada0d30174e8ed9438701885 HTTP/1.1" 200 65 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-19T18:39:32.065Z [INFO]: ::1 - - [19/Jul/2025:18:39:32 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"

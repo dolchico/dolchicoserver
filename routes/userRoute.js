@@ -5,7 +5,8 @@ import {
   verifyEmail,
   requestPhoneLoginOTP,
   verifyPhoneLoginOTP,
-  resendPhoneLoginOTP
+  resendPhoneLoginOTP,
+  resendVerificationEmail
   // Add more controllers as needed (e.g., verifyPhone, resendVerification)
 } from '../controllers/userController.js';
 import { validateRegister, validateLogin } from '../validators/userValidator.js';
@@ -20,14 +21,13 @@ router.post('/login',                 validateLogin,    loginUser);
 router.post('/register',              validateRegister, registerUser);
 
 /* ───────── Email verification ───── */
-router.post('/verify-email', verifyEmail);
 router.get ('/verify-email', verifyEmail);
 
 /* ───────── Phone-OTP login ──────── */
 router.post('/login/request-otp', requestPhoneLoginOTP);
 router.post('/login/resend-otp',  resendPhoneLoginOTP);
 router.post('/login/verify-otp',  verifyPhoneLoginOTP);
-
+router.post('/resend-verification', resendVerificationEmail);
 router.patch('/update-profile', ensureAuth, updateUserProfile);
 
 
