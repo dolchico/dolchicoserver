@@ -34,7 +34,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
           Thank you for joining <strong>Dolchi Co</strong> – where style meets comfort and every piece tells a story. We're thrilled to have you as part of our vibrant community of fashion lovers!
         </p>
         <p style="font-size: 1.1em; line-height: 1.6;">
-          Ready to explore? <a href="${process.env.FRONTEND_URL || 'https://dolchico.com'}" style="color: #4f46e5; text-decoration: underline;">Visit our shop</a> and discover the latest trends, timeless classics, and everything in between.
+          Ready to explore? <a href="${'https://dolchico.com'}" style="color: #4f46e5; text-decoration: underline;">Visit our shop</a> and discover the latest trends, timeless classics, and everything in between.
         </p>
         <hr style="margin: 32px 0;" />
         <p style="font-size: 1em; color: #555;">
@@ -51,7 +51,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
  * Sends an email with a verification link.
  */
 export const sendVerificationEmail = async (toEmail, userName, token) => {
-  const verificationUrl = `${process.env.BACKEND_URL || 'https://dolchico-backend.up.railway.app'}/api/user/verify-email?token=${token}`;
+  const verificationUrl = `${'https://valyris-i.onrender.com/'}/api/user/verify-email?token=${token}`;
 
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
@@ -78,7 +78,7 @@ export const sendVerificationEmail = async (toEmail, userName, token) => {
  * Sends a password reset email.
  */
 export const sendResetPasswordEmail = async (toEmail, userName, token) => {
-  const resetUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/reset-password?token=${token}`;
+  const resetUrl = `${'https://dolchico.com'}/reset-password?token=${token}`;
 
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
