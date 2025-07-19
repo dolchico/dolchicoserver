@@ -1,28 +1,12 @@
 import express from 'express';
-import passport from 'passport';
+import { forgotPassword, resetPassword } from '../controllers/authController.js';
 
 const router = express.Router();
 
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Maps the route to the 'forgotPassword' controller function
+router.post('/forgot-password', forgotPassword);
 
-router.get('/google/callback', passport.authenticate('google', {
-  successRedirect: '/',  // ✅ Redirect to index route
-  failureRedirect: '/login?error=google-auth-failed'
-}));
-
-router.get('/logout', (req, res, next) => {
-  req.logout(err => {
-    if (err) return next(err);
-    res.redirect('/');
-  });
-});
-
-router.get('/profile', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json({ user: req.user });
-  } else {
-    res.status(401).json({ message: 'Not authenticated' });
-  }
-});
+// Maps the route to the 'resetPassword' controller function
+router.post('/reset-password', resetPassword);
 
 export default router;

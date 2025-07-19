@@ -2,7 +2,6 @@ import express from 'express';
 import {
   loginUser,
   registerUser,
-  resetPassword,
   verifyEmail,
   requestPhoneLoginOTP,
   verifyPhoneLoginOTP,
@@ -29,8 +28,6 @@ router.post('/login/request-otp', requestPhoneLoginOTP);
 router.post('/login/resend-otp',  resendPhoneLoginOTP);
 router.post('/login/verify-otp',  verifyPhoneLoginOTP);
 
-// router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
 router.patch('/update-profile', ensureAuth, updateUserProfile);
 
 

@@ -1,3 +1,5 @@
+// --- FILE: schema.prisma (Refactored for Production-Grade Cart) ---
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,22 +32,20 @@ enum OrderStatus {
 // ================================
 
 model User {
-  id             Int      @id @default(autoincrement())
-  name           String
-  email          String   @unique @db.VarChar(255)
-  password       String?
-  role           UserRole @default(USER)
-  cartData       Json     @default("{}")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  resetToken        String?   // nullable
-  resetTokenExpiry  DateTime? // nullable
+  id               Int      @id @default(autoincrement())
+  name             String
+  email            String   @unique @db.VarChar(255)
+  password         String?
+  role             UserRole @default(USER)
+  // cartData         Json     @default("{}") // REFACTORED: REMOVED. This is an anti-pattern. The CartItem model is the single source of truth.
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  resetToken       String?
+  resetTokenExpiry DateTime?
 
-
-  // New fields:
-    phoneNumber    String?  @unique @db.VarChar(20)
-  emailVerified  Boolean  @default(false)
-  phoneVerified  Boolean  @default(false)
+  phoneNumber   String?  @unique @db.VarChar(20)
+  emailVerified Boolean  @default(false)
+  phoneVerified Boolean  @default(false)
 
   // Relations
   cartItems      CartItem[]
@@ -61,22 +61,21 @@ model User {
   @@index([phoneNumber])
 }
 
-
+// --- NO CHANGES TO THIS MODEL ---
 model Account {
-  id                Int     @id @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   userId            Int
-  provider          String  @db.VarChar(50)
-  providerAccountId String  @db.VarChar(255)
-  accessToken       String? @db.Text
-  refreshToken      String? @db.Text
+  provider          String   @db.VarChar(50)
+  providerAccountId String   @db.VarChar(255)
+  accessToken       String?  @db.Text
+  refreshToken      String?  @db.Text
   expiresAt         Int?
-  tokenType         String? @db.VarChar(50)
-  scope             String? @db.VarChar(255)
-  idToken           String? @db.Text
+  tokenType         String?  @db.VarChar(50)
+  scope             String?  @db.VarChar(255)
+  idToken           String?  @db.Text
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -85,6 +84,7 @@ model Account {
   @@map("accounts")
 }
 
+// --- NO CHANGES TO THIS MODEL ---
 model Session {
   id           Int      @id @default(autoincrement())
   sessionToken String   @unique @db.VarChar(255)
@@ -93,7 +93,6 @@ model Session {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -101,6 +100,7 @@ model Session {
   @@map("sessions")
 }
 
+// --- NO CHANGES TO THIS MODEL ---
 model Product {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
@@ -117,7 +117,6 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relations
   cartItems CartItem[]
 
   @@index([category])
@@ -127,6 +126,7 @@ model Product {
   @@map("products")
 }
 
+// --- NO CHANGES TO THIS MODEL ---
 model Order {
   id            Int         @id @default(autoincrement())
   userId        Int
@@ -140,7 +140,6 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  // Relations
   user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
 
@@ -151,21 +150,26 @@ model Order {
   @@map("orders")
 }
 
+// --- THIS MODEL IS REFACTORED FOR CART LOGIC ---
 model CartItem {
-  id        Int @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   userId    Int
   productId Int
   orderId   Int?
-  size      String @db.VarChar(10)
+  size      String   @db.VarChar(10)
   quantity  Int
-  price     Float? // Store price at time of adding to cart
+  price     Float    // REFACTORED: Changed to non-nullable. We will always store the price at the time of adding to cart.
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  user    User     @relation(fields: [userId], references: [id])
-  product Product  @relation(fields: [productId], references: [id])
-  order   Order?   @relation(fields: [orderId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade) // REFACTORED: Added onDelete: Cascade for automatic cleanup.
+  product Product @relation(fields: [productId], references: [id])
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  // NEW: A database-level unique constraint is more robust than an application-level check.
+  // This ensures a user cannot have two separate cart entries for the same product and size.
+  @@unique([userId, productId, size])
 
   @@index([userId])
   @@index([productId])
@@ -173,9 +177,7 @@ model CartItem {
   @@map("cart_items")
 }
 
-// ================================
-// ADDITIONAL MODELS (Optional)
-// ================================
+// --- ALL MODELS BELOW THIS LINE ARE UNCHANGED ---
 
 model VerificationToken {
   identifier String
@@ -200,21 +202,22 @@ model Category {
 }
 
 model Coupon {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique @db.VarChar(50)
+  id          Int       @id @default(autoincrement())
+  code        String    @unique @db.VarChar(50)
   discount    Float
-  isActive    Boolean  @default(true)
+  isActive    Boolean   @default(true)
   expiresAt   DateTime?
   usageLimit  Int?
-  usageCount  Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  usageCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([code])
   @@index([isActive])
   @@index([expiresAt])
   @@map("coupons")
 }
+
 model EmailVerificationToken {
   id        Int      @id @default(autoincrement())
   token     String   @unique
@@ -232,3 +235,4 @@ model PhoneOTP {
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
+

@@ -24,7 +24,8 @@ import productRouter       from './routes/productRoute.js';
 import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
-import authRouter          from './routes/authRoute.js';
+import OAuthRouter          from './routes/OauthRoute.js';
+import authRoutes           from './routes/authRoute.js'; 
 
 import './config/passport-setup.js';
 
@@ -98,12 +99,13 @@ app.use(morgan('combined', {
  * Routes
  * =============================
  */
-app.use('/api/auth',    authRouter);
+app.use('/api/auth',    OAuthRouter);
 app.use('/api/user',    userRouter);
 app.use('/api/admin',   adminRouter);
 app.use('/api/product', productRouter);
 app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
+app.use('/api/auth', authRoutes);
 
 // Simple error-test route
 app.get('/error', (req, res) => {
