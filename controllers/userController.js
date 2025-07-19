@@ -1,4 +1,3 @@
-
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -9,7 +8,10 @@ import {
   findUserByPhone,
   createUser,
   verifyUserEmail,
-  verifyUserPhone
+  verifyUserPhone,
+  updateProfile,
+  findUserById,
+  resendEmailVerificationService  // <-- Add this new import
 } from '../services/userService.js';
 
 import {
@@ -21,7 +23,7 @@ import {
 import { generateOTP, verifyOTP } from '../services/otpService.js';
 import { sendOTP } from '../services/smsService.js';
 import { sendVerificationEmail } from '../services/mailService.js';
-import { updateProfile, findUserById } from '../services/userService.js';
+
 
 // --------- Helper JWT issuer ----------
 const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -116,10 +118,8 @@ export const loginUser = async (req, res) => {
 ============================================================================ */
 export const verifyEmail = async (req, res) => {
   try {
-    const token = req.body.token || req.query.token;
-      console.log('--- VERIFYING TOKEN FROM REQUEST ---');
-    console.log(token); // Log the exact token your server receives
-    
+    const token = req.query.token;
+      
     if (!token) {
       return res.status(400).json({ success: false, message: 'Verification token required.' });
     }
@@ -233,5 +233,57 @@ export const updateUserProfile = async (req, res) => {
       msg = 'Email or phone number already exists.';
     }
     res.status(400).json({ success: false, message: msg });
+  }
+};
+
+/* ===========================================================================
+   Resend Email Verification
+============================================================================ */
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    
+    const { email } = req.body;
+
+    // Basic input validation
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required.' });
+    }
+
+    // Validate email format
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: 'Invalid email address.' });
+    }
+
+    // Call the service to handle the business logic
+    const result = await resendEmailVerificationService(email);
+
+    // Handle different scenarios based on the service response
+    if (result.alreadyVerified) {
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Email is already verified. You can log in.' 
+      });
+    }
+
+    if (result.success) {
+      return res.status(200).json({
+        success: true,
+        message: 'A new verification email has been sent. Please check your inbox.'
+      });
+    }
+
+    // For security (email enumeration protection), we send the same generic response
+    // whether the user exists or not
+    return res.status(200).json({
+      success: true,
+      message: 'If an account with that email exists and is not verified, a new verification email has been sent.'
+    });
+
+  } catch (err) {
+    console.error('Resend Verification Email Controller Error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
   }
 };

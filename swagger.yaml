@@ -685,14 +685,14 @@
 #     get:
 #       tags:
 #         - Cart
-#       summary: Get the current user's shopping cart
+#       summary: Get user cart
 #       description: Retrieves all items in the authenticated user's cart, along with a calculated summary including subtotal and total items.
 #       security:
 #         - bearerAuth: []
 #         - sessionAuth: []
 #       responses:
 #         "200":
-#           description: Successfully retrieved the user's cart.
+#           description: Successfully retrieved user's cart.
 #           content:
 #             application/json:
 #               schema:
@@ -719,8 +719,10 @@
 #                               type: integer
 #                               example: 101
 #                             size:
-#                               type: string
-#                               example: "M"
+#                               type: array
+#                               items:
+#                                 type: string
+#                               example: ["M"]
 #                             quantity:
 #                               type: integer
 #                               example: 2
@@ -766,7 +768,6 @@
 #                   message:
 #                     type: string
 #                     example: "Unauthorized"
-
 #   /cart/items:
 #     post:
 #       tags:
@@ -777,7 +778,6 @@
 #         - bearerAuth: []
 #         - sessionAuth: []
 #       requestBody:
-#         required: true
 #         content:
 #           application/json:
 #             schema:
@@ -785,6 +785,7 @@
 #               required:
 #                 - productId
 #                 - size
+#                 - quantity
 #               properties:
 #                 productId:
 #                   type: integer
@@ -799,6 +800,7 @@
 #       responses:
 #         "201":
 #           description: Item successfully added to the cart.
+#           required: true
 #           content:
 #             application/json:
 #               schema:
@@ -858,7 +860,6 @@
 #                   message:
 #                     type: string
 #                     example: "Product not found."
-
 #   /cart/items/{cartItemId}:
 #     put:
 #       tags:
@@ -876,17 +877,13 @@
 #           schema:
 #             type: integer
 #       requestBody:
-#         required: true
 #         content:
 #           application/json:
 #             schema:
 #               type: object
-#               required:
-#                 - quantity
 #               properties:
 #                 quantity:
 #                   type: integer
-#                   minimum: 0
 #                   example: 3
 #       responses:
 #         "200":
@@ -1097,7 +1094,6 @@
 #                 - price
 #                 - category
 #                 - subCategory
-#                 - sizes
 #               properties:
 #                 name:
 #                   type: string
@@ -1105,9 +1101,6 @@
 #                 description:
 #                   type: string
 #                   example: "Comfortable cotton t-shirt"
-#                 price:
-#                   type: number
-#                   example: 29.99
 #                 category:
 #                   type: string
 #                   example: "Clothing"
@@ -1118,11 +1111,10 @@
 #                   type: boolean
 #                   example: false
 #                 sizes:
-#                   type: string
-#                   example: '["S","M","L"]'
-#                 image1:
-#                   type: string
-#                   format: binary
+#                   type: array
+#                   items:
+#                     type: string
+#                   example: ["S", "M", "L", "XL"]
 #                 image2:
 #                   type: string
 #                   format: binary
