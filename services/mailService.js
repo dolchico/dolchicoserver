@@ -54,7 +54,7 @@ export const sendVerificationEmail = async (toEmail, userName, token) => {
   const verificationUrl = `${'https://valyris-i.onrender.com'}/api/user/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
+    from: `"Dolchi Co" <${'https://valyris-i.onrender.com'}>`,
     to: toEmail,
     subject: 'Verify Your Email – Dolchi Co',
     html: `

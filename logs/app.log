@@ -932,3 +932,13 @@
 2025-07-19T11:03:50.355Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /api/user/verify-email?token=1d8dc9764c99c4f4b37b31c92b484d2beda19ffaab6faa7e3ad41984e4ae1679 HTTP/1.1" 200 65 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-19T11:03:50.466Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 187 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-19T11:03:50.509Z [INFO]: ::1 - - [19/Jul/2025:11:03:50 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-19T11:06:21.304Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:06:29.602Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:07:10.730Z [INFO]: ::1 - - [19/Jul/2025:11:07:10 +0000] "POST /api/user/login HTTP/1.1" 200 166 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:09:17.897Z [INFO]: ::1 - - [19/Jul/2025:11:09:17 +0000] "POST /api/cart/items HTTP/1.1" 404 48 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:09:47.756Z [INFO]: ::1 - - [19/Jul/2025:11:09:47 +0000] "POST /api/cart/items HTTP/1.1" 400 71 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:09:54.781Z [INFO]: ::1 - - [19/Jul/2025:11:09:54 +0000] "POST /api/cart/items HTTP/1.1" 400 71 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:11:07.758Z [INFO]: ::1 - - [19/Jul/2025:11:11:07 +0000] "POST /api/cart/items HTTP/1.1" 201 222 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:24:10.895Z [INFO]: ::1 - - [19/Jul/2025:11:24:10 +0000] "POST /api/cart/items HTTP/1.1" 201 222 "-" "PostmanRuntime/7.44.1"
+2025-07-19T11:32:38.799Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-19T11:33:33.804Z [INFO]: 🚀 Server started on PORT: 4000
