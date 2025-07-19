@@ -16,11 +16,11 @@ info:
       • **Google OAuth 2.0** – social login
     
     ## Base URLs
-      • **Production:** https://dolchico-backend.up.railway.app/api  
+      • **Production:** https://valyris-i.onrender.com/api  
       • **Development:** http://localhost:4000/api
 
 servers:
-  - url: https://dolchico-backend.up.railway.app/api
+  - url: https://valyris-i.onrender.com/api
     description: Production server
   - url: http://localhost:4000/api
     description: Development server
