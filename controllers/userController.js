@@ -2,7 +2,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-// --------- Internal services ----------
+// User-related services
 import {
   findUserByEmail,
   findUserByPhone,
@@ -11,20 +11,22 @@ import {
   verifyUserPhone,
   updateProfile,
   findUserById,
-  resendEmailVerificationService  // <-- Add this new import
+  resendEmailVerificationService
 } from '../services/userService.js';
-import {verifyEmailOtpService } from '../services/otpService.js';
 
+// OTP-related services
+import { storeEmailOTP, verifyEmailOtpService } from '../services/otpService.js';
 
+// Email verification token helpers
 import {
   createEmailVerificationToken,
   findEmailVerificationToken,
   deleteEmailVerificationToken
 } from '../services/tokenService.js';
 
+// Email/SMS
 import { sendOTP } from '../services/smsService.js';
 import { sendVerificationEmail } from '../services/mailService.js';
-
 
 // --------- Helper JWT issuer ----------
 const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -34,8 +36,7 @@ const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d
 ============================================================================ */
 /* ===========================================================================
    1. User Registration (email required, phone optional) 
-============================================================================ */
-export const registerUser = async (req, res) => {
+============================================================================ */export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
 
@@ -67,26 +68,24 @@ export const registerUser = async (req, res) => {
       phoneVerified: false,
     });
 
-    // --- Generate VERIFY TOKEN and OTP ---
+    // --- Generate verification token and store OTP ---
     const token = await createEmailVerificationToken(user.id);
-
-    // Only generate the OTP ONCE, pass everywhere it's needed:
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await storeEmailOTP(user.id, otp);
+    await storeEmailOTP(user.id, otp); // Correct: This writes to EmailOTP table
 
-    // --- Send the verification email (with both link & OTP) ---
+    // --- Send verification email (link + OTP) ---
     await sendVerificationEmail(user.email, user.name, token, otp);
 
     return res.status(201).json({
       success: true,
       message: 'Registration successful. Check your e-mail to verify your account.'
     });
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
 /* ===========================================================================
    2. Email / Password Login
 ============================================================================ */
