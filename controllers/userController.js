@@ -40,7 +40,7 @@ export const registerUser = async (req, res) => {
 
     // --- All your validation logic remains the same ---
     if (await findUserByEmail(email)) {
-      return res.status(409).json({ success: false, message: 'User already exists.' });
+      return res.status(409).json({ success: false, message: 'User already exists. Please proceed with login.' });
     }
     if (phoneNumber && await findUserByPhone(phoneNumber)) {
       return res.status(409).json({ success: false, message: 'Phone number already in use.' });
