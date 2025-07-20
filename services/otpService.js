@@ -3,39 +3,34 @@
 import prisma from '../lib/prisma.js';
 
 // ===============================
-// PHONE OTP FLOW
+// PHONE OTP FLOW (no OTP generation here!)
 // ===============================
 
 /**
- * Generate a phone OTP for a user and store it (5 min).
+ * Store a phone OTP for a user (5 min expiry).
+ * @param {number} userId
+ * @param {string} otp
  */
-export const generatePhoneOTP = async (userId) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+export const storePhoneOTP = async (userId, otp) => {
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-  await prisma.phoneOTP.create({
-    data: { otp, userId, expiresAt },
-  });
-
-  return otp;
+  await prisma.phoneOTP.create({ data: { otp, userId, expiresAt } });
 };
 
 /**
- * Verify a phone OTP: true if valid, not expired, one-time use.
+ * Verify a phone OTP (one-time, not expired).
+ * @returns {Promise<boolean>}
  */
 export const verifyPhoneOTP = async (userId, otp) => {
   const record = await prisma.phoneOTP.findFirst({
-    where: { userId, otp, expiresAt: { gt: new Date() } },
+    where: { userId, otp, expiresAt: { gt: new Date() } }
   });
-
   if (!record) return false;
-
   await prisma.phoneOTP.delete({ where: { id: record.id } });
   return true;
 };
 
 /**
- * Delete all phone OTPs for a user (cleanup utility).
+ * Cleanup all phone OTPs for a user.
  */
 export const deletePhoneOTPsForUser = async (userId) => {
   await prisma.phoneOTP.deleteMany({ where: { userId } });
@@ -43,60 +38,40 @@ export const deletePhoneOTPsForUser = async (userId) => {
 
 
 // ===============================
-// EMAIL OTP FLOW
+// EMAIL OTP FLOW (no OTP generation here!)
 // ===============================
 
 /**
- * Generate an email OTP for a user and store it (5 min).
+ * Store an email OTP for a user (5 min expiry).
+ * @param {number} userId
+ * @param {string} otp
  */
-export const generateEmailOTP = async (userId) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+export const storeEmailOTP = async (userId, otp) => {
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-  await prisma.emailOTP.create({
-    data: { otp, userId, expiresAt },
-  });
-
-  return otp;
+  await prisma.emailOTP.create({ data: { otp, userId, expiresAt } });
 };
 
 /**
- * Verify a user's email OTP.
- * @param {string} email
- * @param {string} otp
+ * Verify a user's email OTP (one-time, not expired).
  * @returns {Promise<{ success: boolean, message: string }>}
  */
 export const verifyEmailOtpService = async (email, otp) => {
-  if (!email || !otp) {
-    return { success: false, message: 'Email and OTP required.' };
-  }
-
-  // Find user by email
+  if (!email || !otp) return { success: false, message: 'Email and OTP required.' };
   const user = await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } });
-  if (!user) {
-    return { success: false, message: 'User not found.' };
-  }
+  if (!user) return { success: false, message: 'User not found.' };
 
-  // Find OTP that matches and is not expired
   const otpRecord = await prisma.emailOTP.findFirst({
-    where: { userId: user.id, otp, expiresAt: { gt: new Date() } },
+    where: { userId: user.id, otp, expiresAt: { gt: new Date() } }
   });
+  if (!otpRecord) return { success: false, message: 'Invalid or expired OTP.' };
 
-  if (!otpRecord) {
-    return { success: false, message: 'Invalid or expired OTP.' };
-  }
-
-  // Mark user as verified
   await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true } });
-
-  // Remove used OTP
   await prisma.emailOTP.delete({ where: { id: otpRecord.id } });
-
   return { success: true, message: 'Email verified successfully.' };
 };
 
 /**
- * Delete all email OTPs for a user (optional cleanup).
+ * Cleanup all email OTPs for a user.
  */
 export const deleteEmailOTPsForUser = async (userId) => {
   await prisma.emailOTP.deleteMany({ where: { userId } });
