@@ -1004,3 +1004,18 @@
 2025-07-19T18:38:08.451Z [INFO]: ::1 - - [19/Jul/2025:18:38:08 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
 2025-07-19T18:39:31.955Z [INFO]: ::1 - - [19/Jul/2025:18:39:31 +0000] "GET /api/user/verify-email?token=77a37ba3e2a85022413098d9091e12be1c51428aada0d30174e8ed9438701885 HTTP/1.1" 200 65 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-19T18:39:32.065Z [INFO]: ::1 - - [19/Jul/2025:18:39:32 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T04:22:30.366Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T04:25:56.712Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T04:28:52.740Z [INFO]: ::1 - - [20/Jul/2025:04:28:52 +0000] "POST /api/cart/items HTTP/1.1" 500 64 "-" "PostmanRuntime/7.44.1"
+2025-07-20T04:29:15.823Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T04:30:09.337Z [INFO]: ::1 - - [20/Jul/2025:04:30:09 +0000] "POST /api/cart/items HTTP/1.1" 400 63 "-" "PostmanRuntime/7.44.1"
+2025-07-20T04:30:19.249Z [INFO]: ::1 - - [20/Jul/2025:04:30:19 +0000] "POST /api/cart/items HTTP/1.1" 400 63 "-" "PostmanRuntime/7.44.1"
+2025-07-20T04:30:29.123Z [INFO]: ::1 - - [20/Jul/2025:04:30:29 +0000] "POST /api/cart/items HTTP/1.1" 400 63 "-" "PostmanRuntime/7.44.1"
+2025-07-20T04:30:42.666Z [INFO]: ::1 - - [20/Jul/2025:04:30:42 +0000] "POST /api/cart/items HTTP/1.1" 500 64 "-" "PostmanRuntime/7.44.1"
+2025-07-20T05:12:41.953Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T05:13:52.355Z [INFO]: ::1 - - [20/Jul/2025:05:13:52 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-20T05:14:26.180Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T05:18:21.654Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T05:20:28.123Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T05:20:36.144Z [INFO]: ::1 - - [20/Jul/2025:05:20:36 +0000] "POST /api/user/register HTTP/1.1" 201 95 "-" "PostmanRuntime/7.44.1"
+2025-07-20T05:22:07.436Z [INFO]: ::1 - - [20/Jul/2025:05:22:07 +0000] "POST /api/user/verify-email-otp HTTP/1.1" 200 57 "-" "PostmanRuntime/7.44.1"

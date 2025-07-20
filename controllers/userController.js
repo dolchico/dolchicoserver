@@ -13,6 +13,8 @@ import {
   findUserById,
   resendEmailVerificationService  // <-- Add this new import
 } from '../services/userService.js';
+import { generateEmailOTP, verifyEmailOtpService } from '../services/otpService.js';
+
 
 import {
   createEmailVerificationToken,
@@ -20,7 +22,6 @@ import {
   deleteEmailVerificationToken
 } from '../services/tokenService.js';
 
-import { generateOTP, verifyOTP } from '../services/otpService.js';
 import { sendOTP } from '../services/smsService.js';
 import { sendVerificationEmail } from '../services/mailService.js';
 
@@ -34,6 +35,7 @@ const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d
 /* ===========================================================================
    1. User Registration (email required, phone optional) 
 ============================================================================ */
+
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
@@ -57,7 +59,7 @@ export const registerUser = async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
-    // --- THIS IS THE CORRECTED CODE BLOCK ---
+    // --- User creation, unchanged ---
     const user = await createUser({
       name,
       email,
@@ -65,12 +67,16 @@ export const registerUser = async (req, res) => {
       phoneNumber: phoneNumber ?? null,
       emailVerified: false,
       phoneVerified: false,
-      // The `cartData: {}` line has been completely removed.
     });
-    // --- END OF CORRECTED BLOCK ---
 
+    // --- Generate email verification token (for link in email) ---
     const token = await createEmailVerificationToken(user.id);
-    await sendVerificationEmail(user.email, user.name, token);
+
+    // --- Generate OTP, store in DB ---
+    const otp = await generateEmailOTP(user.id); // <-- Generates and stores OTP for this user
+
+    // --- Send verification email with BOTH the link and the OTP ---
+    await sendVerificationEmail(user.email, user.name, token, otp); // <-- Pass OTP as 4th argument
 
     return res.status(201).json({
       success: true,
@@ -285,5 +291,18 @@ export const resendVerificationEmail = async (req, res) => {
       success: false, 
       message: 'Internal server error' 
     });
+  }
+};
+export const verifyEmailOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await verifyEmailOtpService(email, otp);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    return res.json(result);
+  } catch (err) {
+    console.error('Error verifying email OTP:', err);
+    res.status(500).json({ success: false, message: 'Internal server error.' });
   }
 };

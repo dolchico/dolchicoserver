@@ -1,27 +1,35 @@
+// --- FILE: services/mailService.js ---
+
 import dotenv from 'dotenv';
 dotenv.config();
 import nodemailer from 'nodemailer';
 
 // --- Constants ---
-const RESET_TOKEN_EXPIRATION_MINUTES = 60; // Consistent with the service layer
+const RESET_TOKEN_EXPIRATION_MINUTES = 60; // Used in password reset email
 
 // --- Nodemailer Transporter Setup ---
-// This configuration is solid, using environment variables for security.
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: 'gmail', // You can adjust the service/provider as needed
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
   },
-  family: 4, // Forces IPv4, a common fix for hosting environment issues.
+  family: 4,
 });
 
-
-// --- Email Functions ---
-
+// --- General Send Email Function ---
 /**
- * Sends a welcome email to a new user.
+ * Internal helper to send an email.
+ * @param {Object} mailOptions - Same as Nodemailer mailOptions
  */
+const sendEmail = async (mailOptions) => {
+  await transporter.sendMail(mailOptions);
+};
+
+
+// ===========================
+// Welcome Email
+// ===========================
 export const sendWelcomeEmail = async (toEmail, userName) => {
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
@@ -34,7 +42,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
           Thank you for joining <strong>Dolchi Co</strong> – where style meets comfort and every piece tells a story. We're thrilled to have you as part of our vibrant community of fashion lovers!
         </p>
         <p style="font-size: 1.1em; line-height: 1.6;">
-          Ready to explore? <a href="${'https://dolchico.com'}" style="color: #4f46e5; text-decoration: underline;">Visit our shop</a> and discover the latest trends, timeless classics, and everything in between.
+          Ready to explore? <a href="https://dolchico.com" style="color: #4f46e5; text-decoration: underline;">Visit our shop</a> and discover the latest trends, timeless classics, and everything in between.
         </p>
         <hr style="margin: 32px 0;" />
         <p style="font-size: 1em; color: #555;">
@@ -44,17 +52,37 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  await sendEmail(mailOptions);
 };
 
+
+// ===========================
+// Email Verification Email
+// ===========================
 /**
- * Sends an email with a verification link.
+ * Send an email with a verification link (and optionally an OTP)
+ * @param {String} toEmail
+ * @param {String} userName
+ * @param {String} token         Verification token for link generation
+ * @param {String|null} otp      Optional OTP code (included if present)
  */
-export const sendVerificationEmail = async (toEmail, userName, token) => {
-  const verificationUrl = `${'https://dolchico.com'}/verifyemail?token=${token}`;
+export const sendVerificationEmail = async (toEmail, userName, token, otp = null) => {
+  const verificationUrl = `https://dolchico.com/verifyemail?token=${token}`;
+  let otpSection = '';
+  if (otp) {
+    otpSection = `
+      <p style="font-size: 1.1em; line-height: 1.6; color: #333; margin-top:32px;">
+        Your one-time verification code (OTP) is:<br>
+        <span style="font-size: 1.3em; font-weight: bold; color: #4f46e5;">${otp}</span>
+      </p>
+      <p style="font-size: 1em; color: #555;">
+        If you did not request this, simply ignore this email.
+      </p>
+    `;
+  }
 
   const mailOptions = {
-    from: `"Dolchi Co" <${'https://valyris-i.onrender.com'}>`,
+    from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
     to: toEmail,
     subject: 'Verify Your Email – Dolchi Co',
     html: `
@@ -68,18 +96,19 @@ export const sendVerificationEmail = async (toEmail, userName, token) => {
             Verify Email
           </a>
         </div>
+        ${otpSection}
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  await sendEmail(mailOptions);
 };
 
-/**
- * Sends a password reset email.
- */
-export const sendResetPasswordEmail = async (toEmail, userName, token) => {
-  const resetUrl = `${'https://dolchico.com'}/reset-password?token=${token}`;
 
+// ===========================
+// Password Reset Email
+// ===========================
+export const sendResetPasswordEmail = async (toEmail, userName, token) => {
+  const resetUrl = `https://dolchico.com/reset-password?token=${token}`;
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
     to: toEmail,
@@ -102,5 +131,5 @@ export const sendResetPasswordEmail = async (toEmail, userName, token) => {
       </div>
     `,
   };
-  await transporter.sendMail(mailOptions);
+  await sendEmail(mailOptions);
 };

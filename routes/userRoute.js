@@ -10,6 +10,7 @@ import {
   // Add more controllers as needed (e.g., verifyPhone, resendVerification)
 } from '../controllers/userController.js';
 import { validateRegister, validateLogin } from '../validators/userValidator.js';
+import { verifyEmailOtp } from '../controllers/userController.js';
 import { updateUserProfile } from '../controllers/userController.js';
 import {ensureAuth} from "../middleware/authMiddleware.js"
 // ⬅ authLimiter and otpRateLimiter deliberately NOT imported
@@ -29,6 +30,7 @@ router.post('/login/resend-otp',  resendPhoneLoginOTP);
 router.post('/login/verify-otp',  verifyPhoneLoginOTP);
 router.post('/resend-verification', resendVerificationEmail);
 router.patch('/update-profile', ensureAuth, updateUserProfile);
+router.post('/verify-email-otp', verifyEmailOtp);
 
 
 export default router;
