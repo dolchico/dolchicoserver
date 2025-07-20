@@ -184,7 +184,7 @@ model PhoneOTP {
   createdAt DateTime @default(now())
 }
 
-model emailOTP {
+model EmailOTP {
   id        Int      @id @default(autoincrement())
   userId    Int
   otp       String
