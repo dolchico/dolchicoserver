@@ -1035,3 +1035,16 @@
 2025-07-20T05:57:31.606Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-20T06:34:32.316Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-20T07:12:58.106Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T07:43:54.239Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T07:43:57.819Z [INFO]: ::1 - - [20/Jul/2025:07:43:57 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T07:44:10.061Z [INFO]: ::1 - - [20/Jul/2025:07:44:10 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJjQhYv2f_hqUgqQdtTFPzaQh8zX0L_LyLiEmZUBkEgy8uKDCgzZvXAQ6c4qi9WZiA&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 302 34 "https://accounts.google.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T07:44:10.067Z [INFO]: ::1 - - [20/Jul/2025:07:44:10 +0000] "GET /Home HTTP/1.1" 404 143 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T09:15:08.991Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T09:15:46.403Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T09:15:49.788Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T09:15:51.193Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-20T09:16:46.253Z [INFO]: ::1 - - [20/Jul/2025:09:16:46 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T09:16:49.978Z [INFO]: ::1 - - [20/Jul/2025:09:16:49 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJjfcAae1-eo5n6chlFuN7q1FgxswZb0xvPTjlTXj_GkGdxOLNtW4Zcj3jr_MfumpA&scope=email+profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=0&prompt=none HTTP/1.1" 302 54 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T09:17:14.777Z [INFO]: ::1 - - [20/Jul/2025:09:17:14 +0000] "GET / HTTP/1.1" 200 11 "http://localhost:4000/api-docs/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T09:17:29.773Z [INFO]: ::1 - - [20/Jul/2025:09:17:29 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T09:17:31.179Z [INFO]: ::1 - - [20/Jul/2025:09:17:31 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJiROJwO1d8Vlb4va3Baa2dNApeEGSBQYGpD8lYFaS5p9is1l5nhoWYjG2eligT9_A&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 54 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
