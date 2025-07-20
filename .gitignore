@@ -4,3 +4,5 @@ node_modules
 app.log
 logs
 /generated/prisma
+app.log
+*app.log
