@@ -93,7 +93,7 @@ export const loginUser = async (req, res) => {
 
     const user = await findUserByEmail(cleanEmail);
     if (!user) {
-      return res.status(401).json({ success: false, message: 'User not found.' });
+      return res.status(401).json({ success: false, message: 'User not found. Please enter valid email address.' });
     }
 
     if (!user.emailVerified) {
@@ -224,7 +224,7 @@ export const updateUserProfile = async (req, res) => {
 
     const user = await findUserById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found.' });
+      return res.status(404).json({ success: false, message: 'User not found. Please enter valid email address.' });
     }
     res.json({ success: true, message: 'Profile updated', user });
   } catch (err) {

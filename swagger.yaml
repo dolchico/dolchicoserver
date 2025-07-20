@@ -1264,7 +1264,7 @@
 #               schema:
 #                 $ref: '#/components/schemas/ErrorResponse'
 #         "404":
-#           description: User not found
+#           description: User not found.  Please enter valid email address.
 #           content:
 #             application/json:
 #               schema:
