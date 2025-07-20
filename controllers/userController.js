@@ -13,7 +13,7 @@ import {
   findUserById,
   resendEmailVerificationService  // <-- Add this new import
 } from '../services/userService.js';
-import { generateEmailOTP, verifyEmailOtpService } from '../services/otpService.js';
+import {verifyEmailOtpService } from '../services/otpService.js';
 
 
 import {
