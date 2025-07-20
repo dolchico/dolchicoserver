@@ -35,12 +35,11 @@ const issueJwt = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d
 /* ===========================================================================
    1. User Registration (email required, phone optional) 
 ============================================================================ */
-
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, phoneNumber } = req.body;
 
-    // --- All your validation logic remains the same ---
+    // --- Validation ---
     if (await findUserByEmail(email)) {
       return res.status(409).json({ success: false, message: 'User already exists. Please proceed with login.' });
     }
@@ -57,9 +56,8 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid phone number.' });
     }
 
+    // --- User creation ---
     const hashed = await bcrypt.hash(password, 10);
-
-    // --- User creation, unchanged ---
     const user = await createUser({
       name,
       email,
@@ -69,14 +67,15 @@ export const registerUser = async (req, res) => {
       phoneVerified: false,
     });
 
-    // --- Generate email verification token (for link in email) ---
+    // --- Generate VERIFY TOKEN and OTP ---
     const token = await createEmailVerificationToken(user.id);
 
-    // --- Generate OTP, store in DB ---
-    const otp = await generateEmailOTP(user.id); // <-- Generates and stores OTP for this user
+    // Only generate the OTP ONCE, pass everywhere it's needed:
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await storeEmailOTP(user.id, otp);
 
-    // --- Send verification email with BOTH the link and the OTP ---
-    await sendVerificationEmail(user.email, user.name, token, otp); // <-- Pass OTP as 4th argument
+    // --- Send the verification email (with both link & OTP) ---
+    await sendVerificationEmail(user.email, user.name, token, otp);
 
     return res.status(201).json({
       success: true,
@@ -88,7 +87,6 @@ export const registerUser = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
-
 /* ===========================================================================
    2. Email / Password Login
 ============================================================================ */

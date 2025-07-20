@@ -38,6 +38,8 @@ dotenv.config();
 const app  = express();
 const port = process.env.PORT || 4000;
 
+app.set('trust proxy', true);
+
 /**
  * =============================
  * Swagger – Specs & Routes
