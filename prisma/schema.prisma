@@ -184,16 +184,15 @@ model PhoneOTP {
   createdAt DateTime @default(now())
 }
 
-model EmailOTP {
+model emailOTP {
   id        Int      @id @default(autoincrement())
   userId    Int
   otp       String
   expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  // Optionally allow only one outstanding OTP:
-  // @@unique([userId])
+  user      User     @relation(fields: [userId], references: [id])
+  @@index([userId])
 }
+
 
 // --------- Optionally keep all your other unchanged models, for example: -------
 
