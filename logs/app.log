@@ -1048,3 +1048,31 @@
 2025-07-20T09:17:14.777Z [INFO]: ::1 - - [20/Jul/2025:09:17:14 +0000] "GET / HTTP/1.1" 200 11 "http://localhost:4000/api-docs/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-20T09:17:29.773Z [INFO]: ::1 - - [20/Jul/2025:09:17:29 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-20T09:17:31.179Z [INFO]: ::1 - - [20/Jul/2025:09:17:31 +0000] "GET /api/auth/google/callback?code=4%2F0AVMBsJiROJwO1d8Vlb4va3Baa2dNApeEGSBQYGpD8lYFaS5p9is1l5nhoWYjG2eligT9_A&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 54 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-20T12:53:32.852Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T05:33:43.086Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T06:24:06.819Z [WARN]: JWT_SECRET should be at least 32 characters long for security
+2025-07-21T06:24:06.820Z [WARN]: SESSION_SECRET should be at least 32 characters long for security
+2025-07-21T06:24:06.821Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T06:24:06.821Z [INFO]: 📋 Configuration Summary:
+2025-07-21T06:24:07.393Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T06:24:07.393Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T06:24:07.393Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T06:24:07.393Z [INFO]: 💻 Environment: production
+2025-07-21T06:24:07.393Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T06:42:41.321Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T06:42:41.322Z [INFO]: 📋 Configuration Summary:
+2025-07-21T06:42:41.371Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T06:42:41.371Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T06:42:41.371Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T06:42:41.371Z [INFO]: 💻 Environment: production
+2025-07-21T06:42:41.371Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T06:43:04.015Z [INFO]: SIGINT received, shutting down gracefully
+2025-07-21T06:43:04.021Z [INFO]: HTTP server closed
+2025-07-21T06:43:04.024Z [INFO]: Database disconnected
+2025-07-21T08:03:21.197Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:03:21.199Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:03:21.712Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:03:21.712Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:03:21.712Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:03:21.713Z [INFO]: 💻 Environment: production
+2025-07-21T08:03:21.713Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅

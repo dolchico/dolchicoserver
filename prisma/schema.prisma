@@ -28,10 +28,9 @@ enum OrderStatus {
 // ================================
 // MODELS
 // ================================
-
 model User {
   id               Int       @id @default(autoincrement())
-  name             String
+  name             String    @default("")
   email            String    @unique @db.VarChar(255)
   password         String?
   role             UserRole  @default(USER)
@@ -43,12 +42,21 @@ model User {
   phoneNumber      String?   @unique @db.VarChar(20)
   emailVerified    Boolean   @default(false)
   phoneVerified    Boolean   @default(false)
+  
+  // OAuth provider fields
+  googleId         String?   @unique
+  facebookId       String?   @unique
+  avatar           String?
+  firstName        String?
+  lastName         String?
+  lastLoginAt      DateTime?
+  isActive         Boolean   @default(true)
 
   // Relations
   cartItems        CartItem[]
   orders           Order[]
   accounts         Account[]
-  sessions         Session[]
+  userSessions     Session[] // Renamed and fixed relation
   emailTokens      EmailVerificationToken[]
   phoneOtps        PhoneOTP[]
   emailOtps        EmailOTP[]
@@ -56,6 +64,9 @@ model User {
   @@index([email])
   @@index([role])
   @@index([phoneNumber])
+  @@index([googleId])
+  @@index([facebookId])
+  @@index([isActive])
   @@map("users")
 }
 
@@ -81,6 +92,17 @@ model Account {
   @@map("accounts")
 }
 
+// Session model for express-session with Prisma store (no relations needed)
+model SessionStore {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime
+
+  @@map("sessions")
+}
+
+// User session tracking model (separate from SessionStore)
 model Session {
   id           Int      @id @default(autoincrement())
   sessionToken String   @unique @db.VarChar(255)
@@ -93,7 +115,7 @@ model Session {
 
   @@index([userId])
   @@index([expires])
-  @@map("sessions")
+  @@map("user_sessions")
 }
 
 model Product {
@@ -173,6 +195,11 @@ model EmailVerificationToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
 }
 
 model PhoneOTP {
@@ -182,6 +209,10 @@ model PhoneOTP {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("phone_otps")
 }
 
 model EmailOTP {
@@ -190,9 +221,28 @@ model EmailOTP {
   otp       String
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
+  
   @@index([userId])
+  @@index([expiresAt])
+  @@map("email_otps")
 }
 
+// Data deletion tracking for compliance
+model DataDeletionRequest {
+  id                Int      @id @default(autoincrement())
+  userId            Int?     // nullable in case user is already deleted
+  provider          String   @db.VarChar(50) // facebook, google, etc.
+  providerUserId    String   @db.VarChar(255)
+  confirmationCode  String   @unique @db.VarChar(255)
+  status            String   @default("PENDING") @db.VarChar(50) // PENDING, COMPLETED, FAILED
+  requestedAt       DateTime @default(now())
+  completedAt       DateTime?
+  
+  @@index([provider])
+  @@index([status])
+  @@index([requestedAt])
+  @@map("data_deletion_requests")
+}
 
 // --------- Optionally keep all your other unchanged models, for example: -------
 

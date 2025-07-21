@@ -8,7 +8,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "server": "nodemon server.js",
-    "seed": "npx prisma db seed"
+    "seed": "npx prisma db seed",
+    "migrate": "npx prisma migrate dev",
+    "studio": "npx prisma studio",
+    "reset": "npx prisma migrate reset",
+    "generate": "npx prisma generate"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -18,10 +22,12 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.12.0",
+    "@quixo3/prisma-session-store": "^3.1.13",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.4.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.1",
@@ -35,8 +41,10 @@
     "nodemailer": "^7.0.5",
     "nodemon": "^3.1.10",
     "passport": "^0.7.0",
+    "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
     "razorpay": "^2.9.4",
+    "resend": "^4.7.0",
     "stripe": "^16.8.0",
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.7.3",
