@@ -304,11 +304,7 @@ process.on('unhandledRejection', (reason, promise) => {
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
-/**
- * =============================
- * Server Start
- * =============================
- */
+
 const server = app.listen(port, () => {
   console.log(`🚀 Server started: http://localhost:${port}`);
   logger.info(`🚀 Server started on PORT: ${port}`);

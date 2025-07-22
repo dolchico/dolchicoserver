@@ -1076,3 +1076,109 @@
 2025-07-21T08:03:21.712Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
 2025-07-21T08:03:21.713Z [INFO]: 💻 Environment: production
 2025-07-21T08:03:21.713Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:07.746Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:07.751Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:07.789Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:07.789Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:07.789Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:07.789Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:07.789Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:17.335Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:17.337Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:17.366Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:17.366Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:17.367Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:17.367Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:17.367Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:30.257Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:30.259Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:30.288Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:30.288Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:30.288Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:30.289Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:30.289Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:41.520Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:41.522Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:41.550Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:41.551Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:41.551Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:41.551Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:41.551Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:45.979Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:45.981Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:46.011Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:46.011Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:46.011Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:46.012Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:46.012Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:16:49.172Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:16:49.174Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:16:49.202Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:16:49.202Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:16:49.203Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:16:49.203Z [INFO]: 💻 Environment: production
+2025-07-21T08:16:49.203Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:01.670Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:01.672Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:01.701Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:01.701Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:01.701Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:01.701Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:01.702Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:02.733Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:02.734Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:02.763Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:02.763Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:02.763Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:02.763Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:02.763Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:11.298Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:11.300Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:11.327Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:11.327Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:11.327Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:11.327Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:11.327Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:17.259Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:17.260Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:17.288Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:17.288Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:17.288Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:17.288Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:17.288Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:22.159Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:22.161Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:22.188Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:22.188Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:22.188Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:22.189Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:22.189Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-21T08:17:28.596Z [INFO]: ✅ Environment validation completed successfully
+2025-07-21T08:17:28.597Z [INFO]: 📋 Configuration Summary:
+2025-07-21T08:17:28.625Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-21T08:17:28.625Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-21T08:17:28.625Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-21T08:17:28.625Z [INFO]: 💻 Environment: production
+2025-07-21T08:17:28.625Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-22T14:23:57.539Z [INFO]: ✅ Environment validation completed successfully
+2025-07-22T14:23:57.546Z [INFO]: 📋 Configuration Summary:
+2025-07-22T14:23:57.585Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-22T14:23:57.585Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-22T14:23:57.585Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-22T14:23:57.585Z [INFO]: 💻 Environment: production
+2025-07-22T14:23:57.585Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-22T14:38:58.541Z [INFO]: ✅ Environment validation completed successfully
+2025-07-22T14:38:58.545Z [INFO]: 📋 Configuration Summary:
+2025-07-22T14:38:58.585Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-22T14:38:58.586Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-22T14:38:58.586Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-22T14:38:58.586Z [INFO]: 💻 Environment: production
+2025-07-22T14:38:58.586Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
+2025-07-22T14:39:03.593Z [ERROR]: Unhandled Rejection at:
+2025-07-22T14:40:29.336Z [INFO]: ✅ Environment validation completed successfully
+2025-07-22T14:40:29.339Z [INFO]: 📋 Configuration Summary:
+2025-07-22T14:40:29.387Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-22T14:40:29.387Z [INFO]: 📚 API Docs: http://localhost:4000/api-docs
+2025-07-22T14:40:29.387Z [INFO]: 🔐 Auth Docs: http://localhost:4000/api-docs-auth
+2025-07-22T14:40:29.388Z [INFO]: 💻 Environment: production
+2025-07-22T14:40:29.388Z [INFO]: 🔑 OAuth Status: Google ✅, Facebook ✅
