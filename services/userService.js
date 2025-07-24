@@ -1,17 +1,67 @@
 import prisma from '../lib/prisma.js';
-import { createEmailVerificationToken } from './tokenService.js'; // Import the token service
-import { sendVerificationEmail } from './mailService.js'; // Import the mail service
+import { createEmailVerificationToken } from './tokenService.js';
+import { sendVerificationEmail } from './mailService.js';
+import bcrypt from 'bcryptjs';
 
-// Create a new user with normalized email and phone number
 export const createUser = async (userData) => {
-  if (userData.email) {
-    userData.email = userData.email.trim().toLowerCase();
+  try {
+    const cleanUserData = { ...userData };
+    
+    if (cleanUserData.email) {
+      cleanUserData.email = cleanUserData.email.trim().toLowerCase();
+    }
+    
+    if (cleanUserData.phoneNumber) {
+      cleanUserData.phoneNumber = cleanUserData.phoneNumber.trim();
+    }
+    
+    // ✅ Only set what's provided, let Prisma handle defaults
+    const userDataWithDefaults = {
+      name: cleanUserData.name || null,
+      email: cleanUserData.email || null,
+      phoneNumber: cleanUserData.phoneNumber || null,
+      password: cleanUserData.password || null,
+      role: cleanUserData.role || 'USER',
+      emailVerified: cleanUserData.emailVerified ?? false,
+      phoneVerified: cleanUserData.phoneVerified ?? false,
+      isProfileComplete: cleanUserData.isProfileComplete ?? false
+    };
+    
+    const newUser = await prisma.user.create({ 
+      data: userDataWithDefaults,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isActive: true,
+        isProfileComplete: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+    
+    console.log('User created successfully:', {
+      id: newUser.id,
+      email: newUser.email,
+      phoneNumber: newUser.phoneNumber
+    });
+    
+    return newUser;
+    
+  } catch (error) {
+    console.error('Error creating user:', error);
+    
+    if (error.code === 'P2002') {
+      const field = error.meta?.target?.[0] || 'field';
+      throw new Error(`${field === 'email' ? 'Email' : 'Phone number'} already exists`);
+    }
+    
+    throw new Error('Failed to create user: ' + error.message);
   }
-  if (userData.phoneNumber) {
-    userData.phoneNumber = userData.phoneNumber.trim();
-  }
-
-  return prisma.user.create({ data: userData });
 };
 
 // Find user by email (always trimmed and lowercased)
@@ -33,7 +83,7 @@ export const findUserByPhone = async (phoneNumber) => {
 // Find user by ID
 export const findUserById = async (id) => {
   if (!id) return null;
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({ where: { id: Number(id) } });
 };
 
 // Update user's emailVerified status
@@ -41,7 +91,7 @@ export const verifyUserEmail = async (userId) => {
   if (!userId) throw new Error('userId is required');
   try {
     return await prisma.user.update({
-      where: { id: userId },
+      where: { id: Number(userId) },
       data: { emailVerified: true },
     });
   } catch (error) {
@@ -55,7 +105,7 @@ export const verifyUserPhone = async (userId) => {
   if (!userId) throw new Error('userId is required');
   try {
     return await prisma.user.update({
-      where: { id: userId },
+      where: { id: Number(userId) },
       data: { phoneVerified: true },
     });
   } catch (error) {
@@ -66,14 +116,13 @@ export const verifyUserPhone = async (userId) => {
 
 // Update user profile with allowed fields
 export const updateProfile = async (userId, updateData) => {
-  // Allow these fields to be updated:
-  const allowedFields = ['name', 'email', 'phoneNumber', 'emailVerified', 'phoneVerified'];
+  const allowedFields = ['name', 'email', 'phoneNumber', 'emailVerified', 'phoneVerified', 'isProfileComplete'];
   const data = {};
+  
   for (const field of allowedFields) {
     if (updateData[field] !== undefined) data[field] = updateData[field];
   }
   
-  // Normalize inputs
   if (data.email) data.email = data.email.trim().toLowerCase();
   if (data.phoneNumber) data.phoneNumber = data.phoneNumber.trim();
 
@@ -94,70 +143,175 @@ export const updateProfile = async (userId, updateData) => {
   }
 };
 
-// === NEW: Resend Email Verification Service ===
-/**
- * Resends an email verification token to a user.
- * This service handles the complete business logic of:
- * 1. Finding the user by email (normalized)
- * 2. Checking if they're already verified
- * 3. Cleaning up old tokens (ensures only one active token)
- * 4. Creating a new token
- * 5. Sending the verification email
- * 
- * @param {string} email - The user's email address
- * @returns {Promise<{success: boolean, userFound: boolean, alreadyVerified: boolean}>}
- */
+// Existing email verification service
 export const resendEmailVerificationService = async (email) => {
-  // Normalize the email using the same pattern as other functions
   const cleanEmail = email.trim().toLowerCase();
-  
-  // Find the user by email using the existing service function
   const user = await findUserByEmail(cleanEmail);
 
-  // If user doesn't exist, return status object (don't throw error for security)
-  // This allows the controller to send a generic response to prevent email enumeration
   if (!user) {
-    return {
-      success: false,
-      userFound: false,
-      alreadyVerified: false
-    };
+    return { success: false, userFound: false, alreadyVerified: false };
   }
 
-  // If user is already verified, return appropriate status
   if (user.emailVerified) {
-    return {
-      success: false,
-      userFound: true,
-      alreadyVerified: true
-    };
+    return { success: false, userFound: true, alreadyVerified: true };
   }
 
   try {
-    // Use a transaction to ensure atomicity:
-    // Delete old tokens and create/send new one as a single operation
     await prisma.$transaction(async (tx) => {
-      // Step 1: Delete any existing verification tokens for this user
-      // This ensures only one active token exists at a time, preventing confusion
       await tx.emailVerificationToken.deleteMany({
         where: { userId: user.id }
       });
 
-      // Step 2: Create a new verification token using the existing token service
       const newToken = await createEmailVerificationToken(user.id);
-
-      // Step 3: Send the verification email using the existing mail service
-      await sendVerificationEmail(user.email, user.name, newToken);
+      await sendVerificationEmail(user.email, user.name || 'User', newToken);
     });
 
-    return {
-      success: true,
-      userFound: true,
-      alreadyVerified: false
-    };
+    return { success: true, userFound: true, alreadyVerified: false };
 
   } catch (error) {
     console.error('Error in resendEmailVerificationService:', error);
-    throw error; // Let the controller handle the error response
+    throw error;
+  }
+};
+
+// Auth flow determination
+export const determineAuthFlow = async (phoneNumber) => {
+  const cleanPhone = phoneNumber.trim();
+  
+  try {
+    const user = await findUserByPhone(cleanPhone);
+    
+    if (!user) {
+      return { flowType: 'signup', user: null };
+    } else if (user.phoneVerified && user.isProfileComplete) {
+      return { flowType: 'signin', user };
+    } else {
+      return { flowType: 'signup', user };
+    }
+  } catch (error) {
+    console.error('Error determining auth flow:', error);
+    throw new Error('Failed to determine authentication flow');
+  }
+};
+
+// Find or create user (simplified)
+export const findOrCreateUser = async (phoneNumber) => {
+  const cleanPhone = phoneNumber.trim();
+  
+  try {
+    let user = await findUserByPhone(cleanPhone);
+    
+    if (!user) {
+      user = await createUser({
+        phoneNumber: cleanPhone
+        // Let Prisma handle all defaults
+      });
+      
+      console.log('Created new user for phone:', cleanPhone, 'with ID:', user.id);
+    }
+    
+    return user;
+    
+  } catch (error) {
+    console.error('Error in findOrCreateUser:', error);
+    
+    if (error.code === 'P2002') {
+      throw new Error('Phone number already exists with another account');
+    }
+    
+    throw new Error('Failed to create or find user');
+  }
+};
+
+// Profile completion
+export const updateProfileCompletion = async (userId, profileData) => {
+  const { name, email, password } = profileData;
+  
+  try {
+    const updateData = {
+      name: name.trim(),
+      phoneVerified: true,
+      isProfileComplete: true
+    };
+    
+    if (email && email.trim()) {
+      updateData.email = email.trim().toLowerCase();
+      
+      const existingEmailUser = await prisma.user.findUnique({
+        where: { email: updateData.email }
+      });
+      
+      if (existingEmailUser && existingEmailUser.id !== Number(userId)) {
+        throw new Error('Email address is already registered with another account');
+      }
+    }
+    
+    if (password && password.trim()) {
+      const saltRounds = 12;
+      updateData.password = await bcrypt.hash(password.trim(), saltRounds);
+    }
+    
+    const updatedUser = await prisma.user.update({
+      where: { id: Number(userId) },
+      data: updateData,
+      select: {
+        id: true,
+        phoneNumber: true,
+        name: true,
+        email: true,
+        phoneVerified: true,
+        emailVerified: true,
+        isProfileComplete: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+    
+    console.log('Profile completed for user:', userId);
+    return updatedUser;
+    
+  } catch (error) {
+    console.error('Error updating profile completion:', error);
+    
+    if (error.code === 'P2002') {
+      throw new Error('Email address is already registered');
+    }
+    
+    throw error;
+  }
+};
+
+// Get user auth status
+export const getUserAuthStatus = async (userId) => {
+  if (!userId) return null;
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isActive: true,
+        isProfileComplete: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+
+    if (!user || !user.isActive) {
+      return null;
+    }
+
+    return user;
+    
+  } catch (error) {
+    console.error('Error getting user auth status:', error);
+    return null;
   }
 };

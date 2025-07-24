@@ -25,24 +25,48 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum OTPType {
+  SIGNIN
+  SIGNUP
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+  PHONE_VERIFICATION
+}
+
 // ================================
 // MODELS
 // ================================
 
 model User {
   id               Int       @id @default(autoincrement())
-  name             String
-  email            String    @unique @db.VarChar(255)
-  password         String?
+  name             String?   // ✅ Made optional for initial registration
+  email            String?   @unique @db.VarChar(255)
+  password         String?   // ✅ Optional for passwordless registration
   role             UserRole  @default(USER)
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   resetToken       String?
   resetTokenExpiry DateTime?
 
+  // Contact Information
   phoneNumber      String?   @unique @db.VarChar(20)
   emailVerified    Boolean   @default(false)
   phoneVerified    Boolean   @default(false)
+  
+  // Profile & Status Fields
+  isActive         Boolean   @default(true)        // ✅ Added missing field
+  isProfileComplete Boolean  @default(false)
+  lastLoginAt      DateTime?
+  failedOtpAttempts Int      @default(0)
+  lockedUntil      DateTime?
+
+  // Additional Status Fields
+  isOnline         Boolean   @default(false)       // ✅ Added for user status
+  lastSeen         DateTime?                       // ✅ Added for user activity
+  status           String    @default("available") // ✅ Added for custom status
+  statusMessage    String?                         // ✅ Added for status messages
+  deactivationReason String?                       // ✅ Added for account management
+  deactivatedAt    DateTime?                       // ✅ Added for audit trail
 
   // Relations
   cartItems        CartItem[]
@@ -54,8 +78,13 @@ model User {
   emailOtps        EmailOTP[]
 
   @@index([email])
-  @@index([role])
   @@index([phoneNumber])
+  @@index([role])
+  @@index([isActive])
+  @@index([phoneVerified, isProfileComplete])
+  @@index([emailVerified, isProfileComplete])
+  @@index([isOnline])
+  @@index([lastSeen])
   @@map("users")
 }
 
@@ -95,6 +124,72 @@ model Session {
   @@index([expires])
   @@map("sessions")
 }
+
+// ✅ Enhanced PhoneOTP Model
+model PhoneOTP {
+  id        Int      @id @default(autoincrement())
+  otp       String   @db.VarChar(6)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Enhanced OTP fields
+  type      OTPType  @default(SIGNIN)
+  attempts  Int      @default(0)
+  maxAttempts Int    @default(3)
+  ipAddress String?  @db.VarChar(45)
+  userAgent String?  @db.Text
+  isUsed    Boolean  @default(false)
+  
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([userId, type, createdAt])
+  @@index([otp, isUsed, expiresAt])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("phone_otps")
+}
+
+// ✅ Enhanced EmailOTP Model
+model EmailOTP {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  otp       String   @db.VarChar(6)
+  type      OTPType  @default(EMAIL_VERIFICATION)
+  attempts  Int      @default(0)
+  maxAttempts Int    @default(3)
+  ipAddress String?  @db.VarChar(45)
+  userAgent String?  @db.Text
+  isUsed    Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, type])
+  @@index([otp, isUsed, expiresAt])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("email_otps")
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
+}
+
+// ================================
+// UNCHANGED MODELS (KEEP AS IS)
+// ================================
 
 model Product {
   id          Int      @id @default(autoincrement())
@@ -151,7 +246,7 @@ model CartItem {
   orderId   Int?
   size      String   @db.VarChar(10)
   quantity  Int
-  price     Float    // price at time of add-to-cart
+  price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -165,36 +260,6 @@ model CartItem {
   @@index([orderId])
   @@map("cart_items")
 }
-
-model EmailVerificationToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model PhoneOTP {
-  id        Int      @id @default(autoincrement())
-  otp       String
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model EmailOTP {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  otp       String
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id])
-  @@index([userId])
-}
-
-
-// --------- Optionally keep all your other unchanged models, for example: -------
 
 model VerificationToken {
   identifier String
