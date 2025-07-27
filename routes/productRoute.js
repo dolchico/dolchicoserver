@@ -5,12 +5,14 @@ import {
   addProduct,
   removeProduct,
   singleProduct,
+  searchProducts, // Add this new controller
 } from '../controllers/productController.js';
 import upload from '../middleware/multer.js';
 import adminAuth from '../middleware/adminAuth.js';
 
 const productRouter = express.Router();
 
+// Admin routes (keep these for admin panel)
 productRouter.post(
   '/add',
   adminAuth,
@@ -24,12 +26,10 @@ productRouter.post(
 );
 
 productRouter.post('/remove', adminAuth, removeProduct);
-// routes/productRoutes.js (or wherever productRouter is defined)
 
-// CHANGE START: Change from .post to .get and use query parameter
-// routes/productRoutes.js
+// Public routes (for users)
 productRouter.get('/single/:productId', singleProduct);
-// CHANGE END
 productRouter.get('/list', listProducts);
+productRouter.get('/search', searchProducts); // Add this line
 
 export default productRouter;

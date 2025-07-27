@@ -7,9 +7,261 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ================================
-// ENUMS
-// ================================
+model User {
+  id                 Int                      @id @default(autoincrement())
+  name               String?
+  email              String?                  @unique @db.VarChar(255)
+  password           String?
+  role               UserRole                 @default(USER)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  emailVerified      Boolean                  @default(false)
+  phoneNumber        String?                  @unique @db.VarChar(20)
+  phoneVerified      Boolean                  @default(false)
+  resetToken         String?
+  resetTokenExpiry   DateTime?
+  lastLoginAt        DateTime?
+  failedOtpAttempts  Int                      @default(0)
+  isProfileComplete  Boolean                  @default(false)
+  lockedUntil        DateTime?
+  deactivatedAt      DateTime?
+  deactivationReason String?
+  isActive           Boolean                  @default(true)
+  isOnline           Boolean                  @default(false)
+  lastSeen           DateTime?
+  status             String                   @default("available")
+  statusMessage      String?
+  accounts           Account[]
+  cartItems          CartItem[]
+  emailOtps          EmailOTP[]
+  emailTokens        EmailVerificationToken[]
+  orders             Order[]
+  phoneOtps          PhoneOTP[]
+  sessions           Session[]
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([role])
+  @@index([isActive])
+  @@index([phoneVerified, isProfileComplete])
+  @@index([emailVerified, isProfileComplete])
+  @@index([isOnline])
+  @@index([lastSeen])
+  @@map("users")
+}
+
+model Account {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  provider          String   @db.VarChar(50)
+  providerAccountId String   @db.VarChar(255)
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         Int?
+  tokenType         String?  @db.VarChar(50)
+  scope             String?  @db.VarChar(255)
+  idToken           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([provider])
+  @@map("accounts")
+}
+
+model Session {
+  createdAt    DateTime @default(now())
+  expires      DateTime
+  sessionToken String   @unique @db.VarChar(255)
+  updatedAt    DateTime @updatedAt
+  userId       Int
+  id           Int      @id @default(autoincrement())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+  @@map("sessions")
+}
+
+model PhoneOTP {
+  id          Int      @id @default(autoincrement())
+  otp         String   @db.VarChar(6)
+  userId      Int
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  attempts    Int      @default(0)
+  ipAddress   String?  @db.VarChar(45)
+  isUsed      Boolean  @default(false)
+  type        OTPType  @default(SIGNIN)
+  userAgent   String?
+  maxAttempts Int      @default(3)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, createdAt])
+  @@index([otp, isUsed, expiresAt])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("phone_otps")
+}
+
+model EmailOTP {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  otp         String   @db.VarChar(6)
+  expiresAt   DateTime
+  attempts    Int      @default(0)
+  createdAt   DateTime @default(now())
+  ipAddress   String?  @db.VarChar(45)
+  isUsed      Boolean  @default(false)
+  maxAttempts Int      @default(3)
+  type        OTPType  @default(EMAIL_VERIFICATION)
+  userAgent   String?
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([otp, isUsed, expiresAt])
+  @@index([createdAt])
+  @@index([expiresAt])
+  @@map("email_otps")
+}
+
+model EmailVerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("email_verification_tokens")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  description String
+  price       Float
+  image       String[]
+  category    String      @db.VarChar(100)
+  subCategory String      @db.VarChar(100)
+  sizes       String[]
+  bestseller  Boolean?    @default(false)
+  isActive    Boolean     @default(true)
+  stock       Int         @default(0)
+  date        BigInt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@index([category])
+  @@index([subCategory])
+  @@index([bestseller])
+  @@index([isActive])
+  @@map("products")
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  size      String   @db.VarChar(10)
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  amount        Float
+  address       Json
+  status        OrderStatus @default(ORDER_PLACED)
+  paymentMethod String      @db.VarChar(50)
+  payment       Boolean     @default(false)
+  paymentId     String?     @db.VarChar(255)
+  date          BigInt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([payment])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  size      String   @db.VarChar(10)
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId, size])
+  @@index([userId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("categories")
+}
+
+model Coupon {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique @db.VarChar(50)
+  discount   Float
+  isActive   Boolean   @default(true)
+  expiresAt  DateTime?
+  usageLimit Int?
+  usageCount Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+  @@index([expiresAt])
+  @@map("coupons")
+}
 
 enum UserRole {
   USER
@@ -31,271 +283,4 @@ enum OTPType {
   PASSWORD_RESET
   EMAIL_VERIFICATION
   PHONE_VERIFICATION
-}
-
-// ================================
-// MODELS
-// ================================
-
-model User {
-  id               Int       @id @default(autoincrement())
-  name             String?   // ✅ Made optional for initial registration
-  email            String?   @unique @db.VarChar(255)
-  password         String?   // ✅ Optional for passwordless registration
-  role             UserRole  @default(USER)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  resetToken       String?
-  resetTokenExpiry DateTime?
-
-  // Contact Information
-  phoneNumber      String?   @unique @db.VarChar(20)
-  emailVerified    Boolean   @default(false)
-  phoneVerified    Boolean   @default(false)
-  
-  // Profile & Status Fields
-  isActive         Boolean   @default(true)        // ✅ Added missing field
-  isProfileComplete Boolean  @default(false)
-  lastLoginAt      DateTime?
-  failedOtpAttempts Int      @default(0)
-  lockedUntil      DateTime?
-
-  // Additional Status Fields
-  isOnline         Boolean   @default(false)       // ✅ Added for user status
-  lastSeen         DateTime?                       // ✅ Added for user activity
-  status           String    @default("available") // ✅ Added for custom status
-  statusMessage    String?                         // ✅ Added for status messages
-  deactivationReason String?                       // ✅ Added for account management
-  deactivatedAt    DateTime?                       // ✅ Added for audit trail
-
-  // Relations
-  cartItems        CartItem[]
-  orders           Order[]
-  accounts         Account[]
-  sessions         Session[]
-  emailTokens      EmailVerificationToken[]
-  phoneOtps        PhoneOTP[]
-  emailOtps        EmailOTP[]
-
-  @@index([email])
-  @@index([phoneNumber])
-  @@index([role])
-  @@index([isActive])
-  @@index([phoneVerified, isProfileComplete])
-  @@index([emailVerified, isProfileComplete])
-  @@index([isOnline])
-  @@index([lastSeen])
-  @@map("users")
-}
-
-model Account {
-  id                Int      @id @default(autoincrement())
-  userId            Int
-  provider          String   @db.VarChar(50)
-  providerAccountId String   @db.VarChar(255)
-  accessToken       String?  @db.Text
-  refreshToken      String?  @db.Text
-  expiresAt         Int?
-  tokenType         String?  @db.VarChar(50)
-  scope             String?  @db.VarChar(255)
-  idToken           String?  @db.Text
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-  @@index([provider])
-  @@map("accounts")
-}
-
-model Session {
-  id           Int      @id @default(autoincrement())
-  sessionToken String   @unique @db.VarChar(255)
-  userId       Int
-  expires      DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([expires])
-  @@map("sessions")
-}
-
-// ✅ Enhanced PhoneOTP Model
-model PhoneOTP {
-  id        Int      @id @default(autoincrement())
-  otp       String   @db.VarChar(6)
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Enhanced OTP fields
-  type      OTPType  @default(SIGNIN)
-  attempts  Int      @default(0)
-  maxAttempts Int    @default(3)
-  ipAddress String?  @db.VarChar(45)
-  userAgent String?  @db.Text
-  isUsed    Boolean  @default(false)
-  
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  
-  @@index([userId, type, createdAt])
-  @@index([otp, isUsed, expiresAt])
-  @@index([createdAt])
-  @@index([expiresAt])
-  @@map("phone_otps")
-}
-
-// ✅ Enhanced EmailOTP Model
-model EmailOTP {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  otp       String   @db.VarChar(6)
-  type      OTPType  @default(EMAIL_VERIFICATION)
-  attempts  Int      @default(0)
-  maxAttempts Int    @default(3)
-  ipAddress String?  @db.VarChar(45)
-  userAgent String?  @db.Text
-  isUsed    Boolean  @default(false)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId, type])
-  @@index([otp, isUsed, expiresAt])
-  @@index([createdAt])
-  @@index([expiresAt])
-  @@map("email_otps")
-}
-
-model EmailVerificationToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  
-  @@index([token])
-  @@index([userId])
-  @@index([expiresAt])
-  @@map("email_verification_tokens")
-}
-
-// ================================
-// UNCHANGED MODELS (KEEP AS IS)
-// ================================
-
-model Product {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  description String   @db.Text
-  price       Float
-  image       String[]
-  category    String   @db.VarChar(100)
-  subCategory String   @db.VarChar(100)
-  sizes       String[]
-  bestseller  Boolean? @default(false)
-  isActive    Boolean  @default(true)
-  stock       Int      @default(0)
-  date        BigInt
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  cartItems CartItem[]
-
-  @@index([category])
-  @@index([subCategory])
-  @@index([bestseller])
-  @@index([isActive])
-  @@map("products")
-}
-
-model Order {
-  id            Int         @id @default(autoincrement())
-  userId        Int
-  amount        Float
-  address       Json
-  status        OrderStatus @default(ORDER_PLACED)
-  paymentMethod String      @db.VarChar(50)
-  payment       Boolean     @default(false)
-  paymentId     String?     @db.VarChar(255)
-  date          BigInt
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  user  User       @relation(fields: [userId], references: [id])
-  items CartItem[]
-
-  @@index([userId])
-  @@index([status])
-  @@index([payment])
-  @@index([createdAt])
-  @@map("orders")
-}
-
-model CartItem {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  productId Int
-  orderId   Int?
-  size      String   @db.VarChar(10)
-  quantity  Int
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-  order   Order?  @relation(fields: [orderId], references: [id])
-
-  @@unique([userId, productId, size])
-  @@index([userId])
-  @@index([productId])
-  @@index([orderId])
-  @@map("cart_items")
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  createdAt  DateTime @default(now())
-
-  @@unique([identifier, token])
-  @@map("verification_tokens")
-}
-
-model Category {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique @db.VarChar(100)
-  description String?  @db.Text
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([isActive])
-  @@map("categories")
-}
-
-model Coupon {
-  id          Int       @id @default(autoincrement())
-  code        String    @unique @db.VarChar(50)
-  discount    Float
-  isActive    Boolean   @default(true)
-  expiresAt   DateTime?
-  usageLimit  Int?
-  usageCount  Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([code])
-  @@index([isActive])
-  @@index([expiresAt])
-  @@map("coupons")
 }

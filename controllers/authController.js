@@ -1,17 +1,16 @@
-import { forgotPasswordService, resetPasswordService } from '../services/authService.js';
-import { sendResetPasswordEmail } from '../services/mailService.js';
+import { 
+  forgotPasswordService, 
+  resetPasswordService, 
+  verifyOTP as verifyEmailOTP, 
+  clearOTP 
+} from '../services/authService.js';
+import { sendOTPEmail } from '../services/mailService.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
 import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from '../services/userService.js';
-import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP } from '../services/msg91Service.js';
+import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from '../services/msg91Service.js';
 import jwt from 'jsonwebtoken';
 
-// ================================
-// EXISTING PASSWORD RESET CONTROLLERS
-// ================================
 
-/**
- * CONTROLLER for POST /forgot-password
- */
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -25,34 +24,58 @@ export const forgotPassword = async (req, res) => {
     // If a user was found, the service returns data needed to send the email.
     if (result) {
       try {
-        await sendResetPasswordEmail(result.email, result.userName, result.token);
+        // The forgotPasswordService already generates and stores the OTP
+        // Just send the OTP email using the OTP from the result
+        await sendOTPEmail(result.email, result.userName, result.otp);
       } catch (mailError) {
         // Log the email error for debugging, but do not expose it to the client.
-        // The process continues to send a generic success message for security.
-        console.error('CRITICAL: Failed to send password reset email:', mailError);
+        console.error('CRITICAL: Failed to send OTP email:', mailError);
       }
     }
 
     // Always return a generic success message to prevent attackers from guessing emails.
     return res.status(200).json({
       success: true,
-      message: 'If an account with that email exists, a reset link has been sent.',
+      message: 'If an account with that email exists, an OTP has been sent.',
     });
   } catch (error) {
     console.error('Forgot Password Controller Error:', error);
     return res.status(500).json({ success: false, message: 'An internal server error occurred.' });
   }
 };
-
-/**
- * CONTROLLER for POST /reset-password
- */
 export const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { email, otp, newPassword } = req.body;
+
+  // Validate required fields
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Email, OTP, and new password are required.' 
+    });
+  }
 
   try {
-    await resetPasswordService(token, newPassword);
-    res.status(200).json({ success: true, message: 'Password has been reset successfully.' });
+    // Verify OTP first - using the renamed function
+    const isValidOTP = await verifyEmailOTP(email, otp);
+    
+    if (!isValidOTP) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid or expired OTP.' 
+      });
+    }
+
+    // Reset password using email instead of token
+    await resetPasswordService(email, newPassword);
+    
+    // Clear the OTP after successful password reset
+    await clearOTP(email);
+
+    res.status(200).json({ 
+      success: true, 
+      message: 'Password has been reset successfully.' 
+    });
+
   } catch (err) {
     console.error('Reset Password Controller Error:', err);
 
@@ -69,14 +92,8 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// ================================
-// NEW WHATSAPP OTP CONTROLLERS (MYNTRA STYLE)
-// ================================
 
-/**
- * CONTROLLER for POST /send-otp
- * Unified endpoint for both signin and signup - determines flow automatically
- */
+
 export const sendOTP = async (req, res) => {
   const { phoneNumber } = req.body;
 
