@@ -1797,3 +1797,9 @@
 2025-07-27T10:30:38.585Z [INFO]: ::1 - - [27/Jul/2025:10:30:38 +0000] "POST /api/user/register HTTP/1.1" 500 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-27T10:47:07.699Z [INFO]: 🚀 Server started on PORT: 4000
 2025-07-27T10:47:26.756Z [INFO]: ::1 - - [27/Jul/2025:10:47:26 +0000] "POST /api/user/register HTTP/1.1" 201 200 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T10:55:34.654Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T11:38:23.793Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T17:02:15.597Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T17:03:01.406Z [INFO]: ::1 - - [27/Jul/2025:17:03:01 +0000] "POST /api/user/register HTTP/1.1" 500 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T17:05:01.299Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T17:05:13.562Z [INFO]: ::1 - - [27/Jul/2025:17:05:13 +0000] "POST /api/user/register HTTP/1.1" 201 199 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"

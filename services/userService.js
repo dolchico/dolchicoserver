@@ -2,95 +2,35 @@ import prisma from '../lib/prisma.js';
 import { createEmailVerificationToken } from './tokenService.js';
 import { sendVerificationEmail } from './mailService.js';
 import bcrypt from 'bcryptjs';
-
-// export const createUser = async (userData) => {
-//   try {
-//     const cleanUserData = { ...userData };
-    
-//     if (cleanUserData.email) {
-//       cleanUserData.email = cleanUserData.email.trim().toLowerCase();
-//     }
-    
-//     if (cleanUserData.phoneNumber) {
-//       cleanUserData.phoneNumber = cleanUserData.phoneNumber.trim();
-//     }
-    
-//     // ✅ Only set what's provided, let Prisma handle defaults
-//     const userDataWithDefaults = {
-//       name: cleanUserData.name || null,
-//       email: cleanUserData.email || null,
-//       phoneNumber: cleanUserData.phoneNumber || null,
-//       password: cleanUserData.password || null,
-//       role: cleanUserData.role || 'USER',
-//       emailVerified: cleanUserData.emailVerified ?? false,
-//       phoneVerified: cleanUserData.phoneVerified ?? false,
-//       isProfileComplete: cleanUserData.isProfileComplete ?? false
-//     };
-//     console.log("userDataWithDefaults.name:", userDataWithDefaults.name);
-// if (!userDataWithDefaults.name) {
-//   throw new Error("Name is missing before user creation");
-// }
-
-    
-//     const newUser = await prisma.user.create({ 
-//       data: userDataWithDefaults,
-//       select: {
-//         id: true,
-//         name: true,
-//         email: true,
-//         phoneNumber: true,
-//         emailVerified: true,
-//         phoneVerified: true,
-//         isActive: true,
-//         isProfileComplete: true,
-//         role: true,
-//         createdAt: true,
-//         updatedAt: true
-//       }
-//     });
-    
-//     console.log('User created successfully:', {
-//       id: newUser.id,
-//       email: newUser.email,
-//       phoneNumber: newUser.phoneNumber
-//     });
-    
-//     return newUser;
-    
-//   } catch (error) {
-//     console.error('Error creating user:', error);
-    
-//     if (error.code === 'P2002') {
-//       const field = error.meta?.target?.[0] || 'field';
-//       throw new Error(`${field === 'email' ? 'Email' : 'Phone number'} already exists`);
-//     }
-    
-//     throw new Error('Failed to create user: ' + error.message);
-//   }
-// };
-
+ 
 
 export const createUser = async (userData) => {
   try {
-    // ✅ Make name optional for registration flow
-    const cleanUserData = {
-      name: userData.name || 'User', // Default name if not provided
-      email: userData.email?.trim().toLowerCase() || null,
-      phoneNumber: userData.phoneNumber?.trim() || null,
-      password: userData.password || 'temp_password_' + Date.now(),
-      role: userData.role || 'USER',
-      emailVerified: userData.emailVerified ?? false,
-      phoneVerified: userData.phoneVerified ?? false,
-      isProfileComplete: userData.isProfileComplete ?? false
+    const cleanUserData = { ...userData };
+    
+    if (cleanUserData.email) {
+      cleanUserData.email = cleanUserData.email.trim().toLowerCase();
+    }
+    
+    if (cleanUserData.phoneNumber) {
+      cleanUserData.phoneNumber = cleanUserData.phoneNumber.trim();
+    }
+    
+    const userDataWithDefaults = {
+      name: cleanUserData.name || null,
+      email: cleanUserData.email || null,
+      phoneNumber: cleanUserData.phoneNumber || null,
+      password: cleanUserData.password || null,
+      role: cleanUserData.role || 'USER',
+      emailVerified: cleanUserData.emailVerified ?? false,
+      phoneVerified: cleanUserData.phoneVerified ?? false,
+      isProfileComplete: cleanUserData.isProfileComplete ?? false
     };
 
-    // ✅ Validate that at least email OR phone is provided
-    if (!cleanUserData.email && !cleanUserData.phoneNumber) {
-      throw new Error("Either email or phone number is required");
-    }
-
+    // Remove the name validation since users can register without names
+    
     const newUser = await prisma.user.create({ 
-      data: cleanUserData,
+      data: userDataWithDefaults,
       select: {
         id: true,
         name: true,
@@ -106,6 +46,12 @@ export const createUser = async (userData) => {
       }
     });
     
+    console.log('User created successfully:', {
+      id: newUser.id,
+      email: newUser.email,
+      phoneNumber: newUser.phoneNumber
+    });
+    
     return newUser;
     
   } catch (error) {
@@ -113,17 +59,14 @@ export const createUser = async (userData) => {
     
     if (error.code === 'P2002') {
       const field = error.meta?.target?.[0] || 'field';
-      if (field === 'email') {
-        throw new Error('Email already exists');
-      }
-      if (field === 'phoneNumber') {
-        throw new Error('Phone number already exists');
-      }
+      throw new Error(`${field === 'email' ? 'Email' : 'Phone number'} already exists`);
     }
     
     throw new Error('Failed to create user: ' + error.message);
   }
 };
+
+
 
 // Find user by email (always trimmed and lowercased)
 export const findUserByEmail = async (email) => {
