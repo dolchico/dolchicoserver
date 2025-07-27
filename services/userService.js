@@ -16,8 +16,9 @@ export const createUser = async (userData) => {
       cleanUserData.phoneNumber = cleanUserData.phoneNumber.trim();
     }
 
-    // Create userDataWithDefaults without name field
+    // Create userDataWithDefaults with name included
     const userDataWithDefaults = {
+      name: cleanUserData.name || null,
       email: cleanUserData.email || null,
       phoneNumber: cleanUserData.phoneNumber || null,
       password: cleanUserData.password || null,
@@ -31,6 +32,7 @@ export const createUser = async (userData) => {
       data: userDataWithDefaults,
       select: {
         id: true,
+        name: true,
         email: true,
         phoneNumber: true,
         emailVerified: true,

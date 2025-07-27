@@ -196,26 +196,8 @@ export const registerUser = async (req, res) => {
   try {
     const { email, phoneNumber } = req.body;
 
-    /* --------------------- basic payload validation --------------------- */
-    if (!email && !phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Either email or phone number is required.'
-      });
-    }
-    if (email && phoneNumber) {
-      return res.status(400).json({
-        success: false,
-        message: 'Provide only one credential — email or phone, not both.'
-      });
-    }
-
     /* --------------------------- email flow --------------------------- */
     if (email) {
-      if (!validator.isEmail(email)) {
-        return res.status(400).json({ success: false, message: 'Invalid email format.' });
-      }
-
       const existing = await findUserByEmail(email);
       if (existing) {
         if (existing.emailVerified) {
@@ -227,7 +209,6 @@ export const registerUser = async (req, res) => {
         const otp   = String(Math.floor(100000 + Math.random() * 900000));
         await storeEmailOTP(existing.id, otp);
         
-        // ✅ Removed name reference - just use 'User' as default
         await sendVerificationEmail(existing.email, token, otp, 'User');
 
         return res.status(200).json({
@@ -251,7 +232,6 @@ export const registerUser = async (req, res) => {
       const otp   = String(Math.floor(100000 + Math.random() * 900000));
       await storeEmailOTP(user.id, otp);
 
-      // ✅ Already correct - using 'User' as default
       await sendVerificationEmail(user.email, token, otp, 'User');
 
       return res.status(201).json({
@@ -266,9 +246,6 @@ export const registerUser = async (req, res) => {
 
     /* --------------------------- phone flow --------------------------- */
     const phone = phoneNumber.trim();
-    if (!validator.isMobilePhone(phone, 'any')) {
-      return res.status(400).json({ success: false, message: 'Invalid phone number.' });
-    }
 
     const existingPhone = await findUserByPhone(phone);
     if (existingPhone) {
@@ -318,6 +295,7 @@ export const registerUser = async (req, res) => {
     });
   }
 };
+
 
 
 /* ===========================================================================
