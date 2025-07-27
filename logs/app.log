@@ -1787,3 +1787,9 @@
 2025-07-27T06:05:13.976Z [INFO]: ::1 - - [27/Jul/2025:06:05:13 +0000] "POST /api/user/login HTTP/1.1" 200 330 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-27T06:05:52.173Z [INFO]: ::1 - - [27/Jul/2025:06:05:52 +0000] "POST /api/user/login HTTP/1.1" 200 330 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-07-27T06:06:16.324Z [INFO]: ::1 - - [27/Jul/2025:06:06:16 +0000] "POST /api/user/register HTTP/1.1" 201 202 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T07:36:07.790Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T07:37:18.220Z [INFO]: ::1 - - [27/Jul/2025:07:37:18 +0000] "POST /api/user/register HTTP/1.1" 200 127 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T07:37:54.954Z [INFO]: ::1 - - [27/Jul/2025:07:37:54 +0000] "POST /api/user/verify-email-otp HTTP/1.1" 200 132 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T07:38:01.704Z [INFO]: ::1 - - [27/Jul/2025:07:38:01 +0000] "POST /api/user/complete-profile HTTP/1.1" 200 463 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-07-27T10:14:00.915Z [INFO]: 🚀 Server started on PORT: 4000
+2025-07-27T10:15:03.841Z [INFO]: ::1 - - [27/Jul/2025:10:15:03 +0000] "POST /api/user/register HTTP/1.1" 201 201 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
