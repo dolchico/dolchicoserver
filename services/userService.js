@@ -15,9 +15,9 @@ export const createUser = async (userData) => {
     if (cleanUserData.phoneNumber) {
       cleanUserData.phoneNumber = cleanUserData.phoneNumber.trim();
     }
-    
+
+    // Create userDataWithDefaults without name field
     const userDataWithDefaults = {
-      name: cleanUserData.name || null,
       email: cleanUserData.email || null,
       phoneNumber: cleanUserData.phoneNumber || null,
       password: cleanUserData.password || null,
@@ -27,13 +27,10 @@ export const createUser = async (userData) => {
       isProfileComplete: cleanUserData.isProfileComplete ?? false
     };
 
-    // Remove the name validation since users can register without names
-    
     const newUser = await prisma.user.create({ 
       data: userDataWithDefaults,
       select: {
         id: true,
-        name: true,
         email: true,
         phoneNumber: true,
         emailVerified: true,

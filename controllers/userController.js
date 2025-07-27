@@ -227,8 +227,8 @@ export const registerUser = async (req, res) => {
         const otp   = String(Math.floor(100000 + Math.random() * 900000));
         await storeEmailOTP(existing.id, otp);
         
-        // ✅ Correct parameter order: email, token, otp, userName
-        await sendVerificationEmail(existing.email, token, otp, existing.name || 'User');
+        // ✅ Removed name reference - just use 'User' as default
+        await sendVerificationEmail(existing.email, token, otp, 'User');
 
         return res.status(200).json({
           success: true,
@@ -251,7 +251,7 @@ export const registerUser = async (req, res) => {
       const otp   = String(Math.floor(100000 + Math.random() * 900000));
       await storeEmailOTP(user.id, otp);
 
-      // ✅ Correct parameter order: email, token, otp, userName
+      // ✅ Already correct - using 'User' as default
       await sendVerificationEmail(user.email, token, otp, 'User');
 
       return res.status(201).json({
@@ -299,7 +299,6 @@ export const registerUser = async (req, res) => {
     });
 
     const otp = String(Math.floor(100000 + Math.random() * 900000));
-    // ✅ Use consistent function names
     await storePhoneOTP(user.id, otp);
     await sendOTP(user.phoneNumber, otp);
 
@@ -319,6 +318,7 @@ export const registerUser = async (req, res) => {
     });
   }
 };
+
 
 /* ===========================================================================
    2. Email OTP Verification
