@@ -8,36 +8,27 @@ datasource db {
 }
 
 model User {
-  id                 Int                      @id @default(autoincrement())
-  name               String?                  
-  email              String?                  @unique @db.VarChar(255)
-  password           String?
-  role               UserRole                 @default(USER)
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  emailVerified      Boolean                  @default(false)
-  phoneNumber        String?                  @unique @db.VarChar(20)
-  phoneVerified      Boolean                  @default(false)
-  resetToken         String?
-  resetTokenExpiry   DateTime?
-  lastLoginAt        DateTime?
-  failedOtpAttempts  Int                      @default(0)
-  isProfileComplete  Boolean                  @default(false)
-  lockedUntil        DateTime?
-  deactivatedAt      DateTime?
-  deactivationReason String?
-  isActive           Boolean                  @default(true)
-  isOnline           Boolean                  @default(false)
-  lastSeen           DateTime?
-  status             String                   @default("available")
-  statusMessage      String?
-  accounts           Account[]
-  cartItems          CartItem[]
-  emailOtps          EmailOTP[]
-  emailTokens        EmailVerificationToken[]
-  orders             Order[]
-  phoneOtps          PhoneOTP[]
-  sessions           Session[]
+  id                Int                      @id @default(autoincrement())
+  name              String?                  
+  email             String?                  @unique @db.VarChar(255)
+  password          String?
+  role              UserRole                 @default(USER)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  emailVerified     Boolean                  @default(false)
+  phoneNumber       String?                  @unique @db.VarChar(20)
+  phoneVerified     Boolean                  @default(false)
+  isProfileComplete Boolean                  @default(false)
+  isActive          Boolean                  @default(true)
+  
+  // Relations
+  accounts          Account[]
+  cartItems         CartItem[]
+  emailOtps         EmailOTP[]
+  emailTokens       EmailVerificationToken[]
+  orders            Order[]
+  phoneOtps         PhoneOTP[]
+  sessions          Session[]
 
   @@index([email])
   @@index([phoneNumber])
@@ -45,8 +36,6 @@ model User {
   @@index([isActive])
   @@index([phoneVerified, isProfileComplete])
   @@index([emailVerified, isProfileComplete])
-  @@index([isOnline])
-  @@index([lastSeen])
   @@map("users")
 }
 
