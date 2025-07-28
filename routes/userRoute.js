@@ -7,6 +7,7 @@ import {
   verifyEmailOtp,
   verifyPhoneOtp,
   completeProfile,
+  checkUserExistence,
   updateUserProfile,
   resendVerificationEmail
 } from '../controllers/userController.js';
@@ -245,5 +246,8 @@ router.post('/login/resend-otp',
     }
   }
 );
+
+router.post('/check-user', checkUserExistence);
+
 
 export default router;

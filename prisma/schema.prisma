@@ -20,6 +20,7 @@ model User {
   phoneVerified     Boolean                  @default(false)
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
+  resetToken        String?                  @db.VarChar(255)
   
   // Relations
   accounts          Account[]

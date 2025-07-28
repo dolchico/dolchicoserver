@@ -318,3 +318,39 @@ export const getUserAuthStatus = async (userId) => {
     return null;
   }
 };
+
+
+export const checkUserExistenceService = async (emailOrPhone) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: emailOrPhone },
+        { phoneNumber: emailOrPhone }
+      ]
+    },
+    select: {
+      id: true,
+      email: true,
+      phoneNumber: true,
+      isActive: true,
+      emailVerified: true,
+      phoneVerified: true,
+      role: true,
+    }
+  });
+
+  if (user) {
+    const methods = ['otp']; // Always allow OTP
+    if (user.emailVerified || user.phoneVerified) {
+      methods.push('password'); // Allow password only if verified
+    }
+
+    return {
+      exists: true,
+      methods,
+      userRole: user.role,
+    };
+  }
+
+  return { exists: false };
+};
