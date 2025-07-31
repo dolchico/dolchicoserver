@@ -275,3 +275,47 @@ export const sendAccountActivatedEmail = async (toEmail, userName) => {
   
   await sendEmail(mailOptions);
 };
+
+/**
+ * Send an OTP email specifically for login verification
+ * @param {String} toEmail - Recipient email address
+ * @param {String} otp - One-Time Password code
+ */
+export const sendLoginOTPEmail = async (toEmail, otp) => {
+  const purpose = 'login';
+
+  const mailOptions = {
+    from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: `Your ${purpose} code – Dolchi Co`,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto; background: #faf9f6; padding: 32px; border-radius: 12px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="color: #1a202c;">Your Login Code</h1>
+        </div>
+        
+        <p style="font-size: 1.1em; line-height: 1.6; color: #333; text-align: center;">
+          Use this code to log in to your Dolchi Co account:
+        </p>
+        
+        <div style="background: #f0f8ff; padding: 24px; border-radius: 8px; margin: 24px 0; text-align: center;">
+          <p style="font-size: 2.5em; font-weight: bold; color: #d9673f; letter-spacing: 6px; margin: 0;">
+            ${otp}
+          </p>
+          <p style="font-size: 1em; color: #666; margin-top: 12px;">
+            This code expires in ${OTP_EXPIRATION_MINUTES} minutes
+          </p>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 16px; border-radius: 6px; border-left: 4px solid #ffc107;">
+          <p style="font-size: 0.9em; color: #856404; margin: 0;">
+            <strong>Security Note:</strong> Never share this code with anyone. Dolchi Co will never ask for your verification code.
+          </p>
+        </div>
+      </div>
+    `,
+  };
+
+  await sendEmail(mailOptions);
+};
+

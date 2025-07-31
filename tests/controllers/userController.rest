@@ -1,0 +1,120 @@
+@baseUrl = http://localhost:4000
+
+### Register with Email
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+    "email": "akashthanda14@gmail.com"
+}
+
+### Register with Phone Number
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+    "phoneNumber": "+1234567890"
+}
+
+### Verify Email OTP
+POST {{baseUrl}}/api/user/verify-email-otp
+Content-Type: application/json
+
+{
+    "email": "akashthanda14@gmail.com",
+    "otp": "123456"
+}
+
+### Verify Phone OTP
+POST {{baseUrl}}/api/user/verify-phone-otp
+Content-Type: application/json
+
+{
+    "phoneNumber": "+1234567890",
+    "otp": "123456"
+}
+
+### Complete Profile
+# Note: userId is returned from the registration step.
+POST {{baseUrl}}/api/user/complete-profile
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "name": "John Doe",
+    "password": "password123"
+}
+
+### Login User
+POST {{baseUrl}}/api/user/login
+Content-Type: application/json
+
+{
+    "email": "akashthanda14@gmail.com",
+    "password": "password123"
+}
+
+### Update User Profile
+# Note: Requires authentication. Replace YOUR_JWT_TOKEN with the token from login.
+PUT {{baseUrl}}/api/user/profile
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+    "name": "Johnathan Doe",
+    "phoneNumber": "+1987654321"
+}
+
+### Resend Verification Email
+POST {{baseUrl}}/api/user/resend-verification-email
+Content-Type: application/json
+
+{
+    "email": "akashthanda14@gmail.com"
+}
+
+### Verify Email via Link
+# Note: The token is sent to the user's email.
+GET {{baseUrl}}/api/user/verify-email?token=SOME_VERIFICATION_TOKEN
+
+### Check User Existence
+POST {{baseUrl}}/api/user/check-user
+Content-Type: application/json
+
+{
+    "emailOrPhone": "akashthanda14@gmail.com"
+}
+
+### Send Unified OTP
+# Sends OTP to either email or phone based on what's provided
+POST {{baseUrl}}/api/user/send-otp
+Content-Type: application/json
+
+{
+    "emailOrPhone": "akashthanda14@gmail.com"
+}
+
+### Check Auth Methods for a User
+POST {{baseUrl}}/api/user/check-auth
+Content-Type: application/json
+
+{
+    "emailOrPhone": "akashthanda14@gmail.com"
+}
+
+### Send Email OTP to an Existing User
+POST {{baseUrl}}/api/user/send-email-otp-existing
+Content-Type: application/json
+
+{
+    "email": "akashthanda14@gmail.com"
+}
+
+### Send Phone OTP to an Existing User
+POST {{baseUrl}}/api/user/send-phone-otp-existing
+Content-Type: application/json
+
+{
+    "phoneNumber": "+1234567890"
+}
+

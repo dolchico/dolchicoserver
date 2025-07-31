@@ -320,37 +320,41 @@ export const getUserAuthStatus = async (userId) => {
 };
 
 
+// Add this to userService.js
 export const checkUserExistenceService = async (emailOrPhone) => {
-  const user = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { email: emailOrPhone },
-        { phoneNumber: emailOrPhone }
-      ]
-    },
-    select: {
-      id: true,
-      email: true,
-      phoneNumber: true,
-      isActive: true,
-      emailVerified: true,
-      phoneVerified: true,
-      role: true,
-    }
-  });
+  try {
+    const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
+    
+    const user = isPhone 
+      ? await findUserByPhone(emailOrPhone.trim())
+      : await findUserByEmail(emailOrPhone.trim().toLowerCase());
 
-  if (user) {
-    const methods = ['otp']; // Always allow OTP
-    if (user.emailVerified || user.phoneVerified) {
-      methods.push('password'); // Allow password only if verified
+    if (!user) {
+      return {
+        exists: false,
+        loginMethods: ['otp'],
+        requiresRegistration: true
+      };
+    }
+
+    const loginMethods = ['otp'];
+    const hasVerifiedContact = isPhone ? user.phoneVerified : user.emailVerified;
+    
+    if (hasVerifiedContact && user.password) {
+      loginMethods.push('password');
     }
 
     return {
       exists: true,
-      methods,
+      loginMethods,
       userRole: user.role,
+      isProfileComplete: user.isProfileComplete,
+      requiresRegistration: false
     };
-  }
 
-  return { exists: false };
+  } catch (error) {
+    console.error('Error in checkUserExistenceService:', error);
+    throw new Error('Failed to check user existence');
+  }
 };
+

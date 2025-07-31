@@ -12,6 +12,13 @@ import {
   resendVerificationEmail
 } from '../controllers/userController.js';
 import { 
+  // ... existing imports
+  sendUnifiedOTP,
+  checkUserForAuth,
+  sendEmailOTPToExisting,
+  sendPhoneOTPToExisting
+} from '../controllers/userController.js';
+import { 
   forgotPassword, 
   resetPassword
 } from '../controllers/authController.js';
@@ -248,6 +255,14 @@ router.post('/login/resend-otp',
 );
 
 router.post('/check-user', checkUserExistence);
+
+// New unified routes
+router.post('/auth/send-otp', sendUnifiedOTP);
+router.post('/auth/check-user', checkUserForAuth);
+
+// Existing user OTP routes
+router.post('/send-email-otp', sendEmailOTPToExisting);
+router.post('/send-phone-otp', sendPhoneOTPToExisting);
 
 
 export default router;
