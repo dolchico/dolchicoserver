@@ -25,7 +25,7 @@ import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
 import OAuthRouter          from './routes/OAuthRoute.js';
-import paymentRoutes from './routes/paymentRoutes.js';
+// import paymentRoutes from './routes/paymentRoutes.js';
 
 import './config/passport-setup.js';
 
@@ -106,7 +106,7 @@ app.use('/api/admin',   adminRouter);
 app.use('/api/product', productRouter);
 app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
-app.use('/api/payment', paymentRoutes);
+// app.use('/api/payment', paymentRoutes);
 
 // Simple error-test route
 app.get('/error', (req, res) => {
