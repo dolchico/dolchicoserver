@@ -25,7 +25,7 @@ import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
 import OAuthRouter          from './routes/OAuthRoute.js';
-const paymentRoutes = require('./routes/paymentRoutes');
+import paymentRoutes from './routes/paymentRoutes.js';
 
 import './config/passport-setup.js';
 
