@@ -318,3 +318,43 @@ export const getUserAuthStatus = async (userId) => {
     return null;
   }
 };
+
+
+// Add this to userService.js
+export const checkUserExistenceService = async (emailOrPhone) => {
+  try {
+    const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
+    
+    const user = isPhone 
+      ? await findUserByPhone(emailOrPhone.trim())
+      : await findUserByEmail(emailOrPhone.trim().toLowerCase());
+
+    if (!user) {
+      return {
+        exists: false,
+        loginMethods: ['otp'],
+        requiresRegistration: true
+      };
+    }
+
+    const loginMethods = ['otp'];
+    const hasVerifiedContact = isPhone ? user.phoneVerified : user.emailVerified;
+    
+    if (hasVerifiedContact && user.password) {
+      loginMethods.push('password');
+    }
+
+    return {
+      exists: true,
+      loginMethods,
+      userRole: user.role,
+      isProfileComplete: user.isProfileComplete,
+      requiresRegistration: false
+    };
+
+  } catch (error) {
+    console.error('Error in checkUserExistenceService:', error);
+    throw new Error('Failed to check user existence');
+  }
+};
+

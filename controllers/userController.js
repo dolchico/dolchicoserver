@@ -10,6 +10,7 @@ import {
   createUser,
   verifyUserEmail,
   verifyUserPhone,
+  checkUserExistenceService,
   updateProfile,
   findUserById,
   resendEmailVerificationService
@@ -36,161 +37,6 @@ import { sendVerificationEmail } from '../services/mailService.js';
 
 // --------- Helper JWT issuer ----------
 const issueJwt = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-/* ===========================================================================
-   1. User Registration (email or phone only - no name/password required)
-============================================================================ */
-// export const registerUser = async (req, res) => {
-//   try {
-//     const { email, phoneNumber } = req.body;
-
-//     // --- Validation: Must provide either email or phone ---
-//     if (!email && !phoneNumber) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: 'Either email or phone number is required.' 
-//       });
-//     }
-
-//     if (email && phoneNumber) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: 'Please provide either email or phone number, not both.' 
-//       });
-//     }
-
-//     let user;
-//     let verificationType;
-
-//     // --- Email Registration Flow ---
-//     if (email) {
-//       // Validate email format
-//       if (!validator.isEmail(email)) {
-//         return res.status(400).json({ 
-//           success: false, 
-//           message: 'Invalid email address format.' 
-//         });
-//       }
-
-//       // Check if user already exists
-//       const existingUser = await findUserByEmail(email);
-//       if (existingUser) {
-//         if (existingUser.emailVerified && existingUser.isProfileComplete) {
-//           return res.status(409).json({ 
-//             success: false, 
-//             message: 'Email already registered. Please proceed with login.' 
-//           });
-//         } else {
-//           // User exists but not verified or profile incomplete - resend verification
-//           const token = await createEmailVerificationToken(existingUser.id);
-//           const otp = Math.floor(100000 + Math.random() * 900000).toString();
-//           await storeEmailOTP(existingUser.id, otp);
-//           await sendVerificationEmail(existingUser.email, token, otp);
-          
-//           return res.status(200).json({
-//             success: true,
-//             message: 'Verification email resent. Please check your email to verify your account.',
-//             userId: existingUser.id,
-//             verificationType: 'email',
-//             requiresProfileCompletion: !existingUser.isProfileComplete
-//           });
-//         }
-//       }
-
-//       // Create new user with email only
-//       user = await createUser({
-//         email: email.trim().toLowerCase(),
-//         phoneNumber: null,
-//         name: null, // Will be filled after verification
-//         emailVerified: false,
-//         phoneVerified: false,
-//         isProfileComplete: false
-//       });
-
-//       verificationType = 'email';
-
-//       // Generate verification token and OTP for email
-//       const token = await createEmailVerificationToken(user.id);
-//       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-//       await storeEmailOTP(user.id, otp);
-
-//       // Send verification email
-//       await sendVerificationEmail(user.email, token, otp);
-
-//     } 
-//     // --- Phone Registration Flow ---
-//     else if (phoneNumber) {
-//       // Validate phone number format
-//       if (!validator.isMobilePhone(String(phoneNumber), 'any')) {
-//         return res.status(400).json({ 
-//           success: false, 
-//           message: 'Invalid phone number format.' 
-//         });
-//       }
-
-//       const cleanPhone = phoneNumber.trim();
-
-//       // Check if user already exists
-//       const existingUser = await findUserByPhone(cleanPhone);
-//       if (existingUser) {
-//         if (existingUser.phoneVerified && existingUser.isProfileComplete) {
-//           return res.status(409).json({ 
-//             success: false, 
-//             message: 'Phone number already registered. Please proceed with login.' 
-//           });
-//         } else {
-//           // User exists but not verified or profile incomplete - resend OTP
-//           const otp = Math.floor(100000 + Math.random() * 900000).toString();
-//           await storePhoneOTP(existingUser.id, otp);
-//           await sendOTP(existingUser.phoneNumber, otp);
-          
-//           return res.status(200).json({
-//             success: true,
-//             message: 'Verification OTP resent to your phone number.',
-//             userId: existingUser.id,
-//             verificationType: 'phone',
-//             requiresProfileCompletion: !existingUser.isProfileComplete
-//           });
-//         }
-//       }
-
-//       // Create new user with phone only
-//       user = await createUser({
-//         email: null,
-//         phoneNumber: cleanPhone,
-//         name: null, // Will be filled after verification
-//         emailVerified: false,
-//         phoneVerified: false,
-//         isProfileComplete: false
-//       });
-
-//       verificationType = 'phone';
-
-//       // Generate and send SMS OTP
-//       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-//       await storePhoneOTP(user.id, otp);
-//       await sendOTP(user.phoneNumber, otp);
-//     }
-
-//     return res.status(201).json({
-//       success: true,
-//       message: verificationType === 'email' 
-//         ? 'Registration successful. Check your email for verification instructions.' 
-//         : 'Registration successful. Check your phone for verification OTP.',
-//       userId: user.id,
-//       verificationType,
-//       contactInfo: verificationType === 'email' ? user.email : user.phoneNumber,
-//       requiresProfileCompletion: true
-//     });
-
-//   } catch (err) {
-//     console.error('Registration error:', err);
-//     return res.status(500).json({ 
-//       success: false, 
-//       message: 'Internal server error. Please try again.' 
-//     });
-//   }
-// };
 
 export const registerUser = async (req, res) => {
   try {
@@ -242,13 +88,12 @@ export const registerUser = async (req, res) => {
         contactInfo: user.email,
         requiresProfileCompletion: true
       });
-    }
+    } else if (phoneNumber) {
+      /* --------------------------- phone flow --------------------------- */
+      const phone = phoneNumber.trim();
 
-    /* --------------------------- phone flow --------------------------- */
-    const phone = phoneNumber.trim();
-
-    const existingPhone = await findUserByPhone(phone);
-    if (existingPhone) {
+      const existingPhone = await findUserByPhone(phone);
+      if (existingPhone) {
       if (existingPhone.phoneVerified) {
         return res.status(409).json({ success: false, message: 'Phone number already registered. Log in instead.' });
       }
@@ -285,12 +130,18 @@ export const registerUser = async (req, res) => {
       userId: user.id,
       verificationType: 'phone',
       contactInfo: user.phoneNumber,
+      contactInfo: user.phoneNumber,
       requiresProfileCompletion: true
     });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Email or phone number is required for registration.'
+      });
+    }
   } catch (error) {
     console.error('Registration error:', error);
     return res.status(500).json({
-      success: false,
       message: 'Internal server error. Please try again later.'
     });
   }
@@ -531,9 +382,100 @@ export const completeProfile = async (req, res) => {
 /* ===========================================================================
    5. Login with Email/Phone and Password
 ============================================================================ */
+// export const loginUser = async (req, res) => {
+//   try {
+//     const { email, phoneNumber, password } = req.body;
+
+//     if (!password) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         message: 'Password is required.' 
+//       });
+//     }
+
+//     let user;
+
+//     if (email) {
+//       const cleanEmail = email.trim().toLowerCase();
+//       user = await findUserByEmail(cleanEmail);
+      
+//       if (!user) {
+//         return res.status(401).json({ 
+//           success: false, 
+//           message: 'User not found with this email address.' 
+//         });
+//       }
+
+//       if (!user.emailVerified) {
+//         return res.status(403).json({ 
+//           success: false, 
+//           message: 'Please verify your email before logging in.' 
+//         });
+//       }
+//     } else if (phoneNumber) {
+//       user = await findUserByPhone(phoneNumber);
+      
+//       if (!user) {
+//         return res.status(401).json({ 
+//           success: false, 
+//           message: 'User not found with this phone number.' 
+//         });
+//       }
+
+//       if (!user.phoneVerified) {
+//         return res.status(403).json({ 
+//           success: false, 
+//           message: 'Please verify your phone number before logging in.' 
+//         });
+//       }
+//     } else {
+//       return res.status(400).json({ 
+//         success: false, 
+//         message: 'Email or phone number is required.' 
+//       });
+//     }
+
+//     if (!user.password) {
+//       return res.status(401).json({ 
+//         success: false, 
+//         message: 'Please complete your profile setup first.' 
+//       });
+//     }
+
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       return res.status(401).json({ 
+//         success: false, 
+//         message: 'Invalid password.' 
+//       });
+//     }
+
+//     return res.status(200).json({ 
+//       success: true, 
+//       token: issueJwt(user.id),
+//       user: {
+//         id: user.id,
+//         name: user.name,
+//         email: user.email,
+//         phoneNumber: user.phoneNumber,
+//         emailVerified: user.emailVerified,
+//         phoneVerified: user.phoneVerified,
+//         isProfileComplete: user.isProfileComplete
+//       }
+//     });
+
+//   } catch (err) {
+//     console.error('Login error:', err);
+//     return res.status(500).json({ 
+//       success: false, 
+//       message: 'Internal server error' 
+//     });
+//   }
+// };
+
 export const loginUser = async (req, res) => {
   try {
-    const { email, phoneNumber, password } = req.body;
+    const { emailOrPhone, password } = req.body;
 
     if (!password) {
       return res.status(400).json({ 
@@ -542,35 +484,25 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    if (!emailOrPhone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email or phone number is required.'
+      });
+    }
+
+    // Determine if input is phone or email
+    const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
     let user;
 
-    if (email) {
-      const cleanEmail = email.trim().toLowerCase();
-      user = await findUserByEmail(cleanEmail);
-      
-      if (!user) {
-        return res.status(401).json({ 
-          success: false, 
-          message: 'User not found with this email address.' 
-        });
-      }
-
-      if (!user.emailVerified) {
-        return res.status(403).json({ 
-          success: false, 
-          message: 'Please verify your email before logging in.' 
-        });
-      }
-    } else if (phoneNumber) {
-      user = await findUserByPhone(phoneNumber);
-      
+    if (isPhone) {
+      user = await findUserByPhone(emailOrPhone.trim());
       if (!user) {
         return res.status(401).json({ 
           success: false, 
           message: 'User not found with this phone number.' 
         });
       }
-
       if (!user.phoneVerified) {
         return res.status(403).json({ 
           success: false, 
@@ -578,10 +510,20 @@ export const loginUser = async (req, res) => {
         });
       }
     } else {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Email or phone number is required.' 
-      });
+      const cleanEmail = emailOrPhone.trim().toLowerCase();
+      user = await findUserByEmail(cleanEmail);
+      if (!user) {
+        return res.status(401).json({ 
+          success: false, 
+          message: 'User not found with this email address.' 
+        });
+      }
+      if (!user.emailVerified) {
+        return res.status(403).json({ 
+          success: false, 
+          message: 'Please verify your email before logging in.' 
+        });
+      }
     }
 
     if (!user.password) {
@@ -742,5 +684,233 @@ export const verifyEmail = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+
+export const checkUserExistence = async (req, res) => {
+  try {
+    const { emailOrPhone } = req.body;
+
+    if (!emailOrPhone) {
+      return res.status(400).json({ message: 'Email or phone number is required.' });
+    }
+
+    const result = await checkUserExistenceService(emailOrPhone);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Error in checkUserExistence:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+/* ===========================================================================
+   NEW: Unified Send OTP (for both new and existing users)
+============================================================================ */
+export const sendUnifiedOTP = async (req, res) => {
+  try {
+    const { emailOrPhone } = req.body;
+
+    if (!emailOrPhone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email or phone number is required.'
+      });
+    }
+
+    // Determine if it's email or phone
+    const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
+    const contactType = isPhone ? 'phone' : 'email';
+    
+    // Check if user exists
+    const existingUser = isPhone 
+      ? await findUserByPhone(emailOrPhone.trim())
+      : await findUserByEmail(emailOrPhone.trim());
+
+    let userId = null;
+    let isNewUser = false;
+    
+    if (!existingUser) {
+      // Create new user if doesn't exist
+      const userData = isPhone 
+        ? { phoneNumber: emailOrPhone.trim() }
+        : { email: emailOrPhone.trim().toLowerCase() };
+      
+      const newUser = await createUser({
+        ...userData,
+        emailVerified: false,
+        phoneVerified: false,
+        isProfileComplete: false
+      });
+      
+      userId = newUser.id;
+      isNewUser = true;
+    } else {
+      userId = existingUser.id;
+    }
+
+    // Generate and send OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    
+    if (isPhone) {
+      await storePhoneOTP(userId, otp);
+      await sendOTP(emailOrPhone.trim(), otp);
+    } else {
+      await storeEmailOTP(userId, otp);
+      // For email, you might want to send both token and OTP
+      const token = await createEmailVerificationToken(userId);
+      await sendVerificationEmail(emailOrPhone.trim(), token, otp, 'User');
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent successfully',
+      userId: isNewUser ? userId : undefined, // Only return userId for new users
+      userExists: !isNewUser,
+      contactType
+    });
+
+  } catch (error) {
+    console.error('Send unified OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to send OTP'
+    });
+  }
+};
+
+/* ===========================================================================
+   NEW: Enhanced Check User (for dynamic auth flow)
+============================================================================ */
+export const checkUserForAuth = async (req, res) => {
+  try {
+    const { emailOrPhone } = req.body;
+
+    if (!emailOrPhone) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email or phone number is required.'
+      });
+    }
+
+    const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
+    const user = isPhone 
+      ? await findUserByPhone(emailOrPhone.trim())
+      : await findUserByEmail(emailOrPhone.trim());
+
+    if (!user) {
+      return res.status(200).json({
+        exists: false,
+        loginMethods: ['otp'], // New users can only use OTP initially
+        requiresRegistration: true
+      });
+    }
+
+    // Determine available login methods for existing users
+    const loginMethods = ['otp']; // OTP always available
+    
+    // Add password option if user has verified contact and password
+    const hasVerifiedContact = isPhone ? user.phoneVerified : user.emailVerified;
+    if (hasVerifiedContact && user.password) {
+      loginMethods.push('password');
+    }
+
+    res.status(200).json({
+      exists: true,
+      loginMethods,
+      userRole: user.role,
+      isProfileComplete: user.isProfileComplete,
+      requiresRegistration: false
+    });
+
+  } catch (error) {
+    console.error('Check user for auth error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check user'
+    });
+  }
+};
+
+/* ===========================================================================
+   NEW: Send OTP to Existing Users (separate endpoints)
+============================================================================ */
+export const sendEmailOTPToExisting = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required.'
+      });
+    }
+
+    const user = await findUserByEmail(email.trim().toLowerCase());
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found with this email address.'
+      });
+    }
+
+    // Generate and send OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    await storeEmailOTP(user.id, otp);
+    
+    // Create token for email verification
+    const token = await createEmailVerificationToken(user.id);
+    await sendVerificationEmail(user.email, token, otp, user.name || 'User');
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent to your email successfully'
+    });
+
+  } catch (error) {
+    console.error('Send email OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send OTP'
+    });
+  }
+};
+
+export const sendPhoneOTPToExisting = async (req, res) => {
+  try {
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number is required.'
+      });
+    }
+
+    const user = await findUserByPhone(phoneNumber.trim());
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found with this phone number.'
+      });
+    }
+
+    // Generate and send OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    await storePhoneOTP(user.id, otp);
+    await sendOTP(user.phoneNumber, otp);
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent to your phone successfully'
+    });
+
+  } catch (error) {
+    console.error('Send phone OTP error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send OTP'
+    });
   }
 };

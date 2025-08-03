@@ -20,6 +20,8 @@ model User {
   phoneVerified     Boolean                  @default(false)
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
+  resetToken        String?                  @db.VarChar(255)
+  resetTokenExpiry  DateTime?                // Add this missing field
   
   // Relations
   accounts          Account[]
@@ -36,8 +38,10 @@ model User {
   @@index([isActive])
   @@index([phoneVerified, isProfileComplete])
   @@index([emailVerified, isProfileComplete])
+  @@index([resetToken])                     // Add index for password reset lookups
   @@map("users")
 }
+
 
 model Account {
   id                Int      @id @default(autoincrement())
