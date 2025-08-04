@@ -8,7 +8,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "server": "nodemon server.js",
-    "seed": "npx prisma db seed"
+    "seed": "npx prisma db seed",
+    "pushprod": "npx prisma format"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
