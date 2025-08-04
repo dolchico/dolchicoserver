@@ -1,3 +1,4 @@
+// middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import { getUserAuthStatus } from '../services/userService.js';
 
@@ -45,6 +46,7 @@ export const ensureAuth = (req, res, next) => {
 };
 
 // NEW: Enhanced auth middleware that also checks user account status
+// middleware/authMiddleware.js - Update ensureAuthWithStatus
 export const ensureAuthWithStatus = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   
@@ -54,10 +56,24 @@ export const ensureAuthWithStatus = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
-      // Get current user status from database
-      const userStatus = await getUserAuthStatus(decoded.userId);
+      // Debug the decoded token
+      console.log('Decoded JWT:', decoded);
       
-      // Check if user account is locked
+      // Get user ID from token (handle both 'id' and 'userId')
+      const userId = decoded.userId || decoded.id;
+      
+      if (!userId) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'User ID not found in token.',
+          code: 'INVALID_TOKEN_PAYLOAD'
+        });
+      }
+      
+      // Get current user status from database
+      const userStatus = await getUserAuthStatus(userId);
+      
+      // Check if user account is locked (using default values)
       if (userStatus.isLocked) {
         return res.status(423).json({ 
           success: false,
@@ -67,8 +83,17 @@ export const ensureAuthWithStatus = async (req, res, next) => {
         });
       }
       
+      // Check if user is active
+      if (!userStatus.isActive) {
+        return res.status(403).json({ 
+          success: false,
+          message: 'Account is deactivated.',
+          code: 'ACCOUNT_INACTIVE'
+        });
+      }
+      
       // Attach both JWT data and current user status to request
-      req.user = decoded;
+      req.user = { ...decoded, userId }; // Ensure userId is available
       req.userStatus = userStatus;
       
       return next();
@@ -81,6 +106,12 @@ export const ensureAuthWithStatus = async (req, res, next) => {
           success: false,
           message: 'Token has expired. Please login again.',
           code: 'TOKEN_EXPIRED'
+        });
+      } else if (err.name === 'JsonWebTokenError') {
+        return res.status(401).json({ 
+          success: false,
+          message: 'Invalid token format.',
+          code: 'INVALID_TOKEN'
         });
       }
       
@@ -98,6 +129,7 @@ export const ensureAuthWithStatus = async (req, res, next) => {
     code: 'NO_TOKEN'
   });
 };
+
 
 // NEW: Middleware to ensure user has completed profile (for Myntra flow)
 export const ensureProfileComplete = (req, res, next) => {
@@ -172,7 +204,7 @@ export const ensureRole = (allowedRoles) => {
 };
 
 // NEW: Optional authentication middleware (for public endpoints that benefit from user context)
-export const optionalAuth = (req, res, next) => {
+export const optionalAuth = (req, res, next) => { // Fixed: added 'res' parameter
   const authHeader = req.headers.authorization;
   
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -235,7 +267,7 @@ export const otpRateLimit = (maxAttempts = 5, timeWindowMinutes = 15) => {
 // Export all middleware functions
 export default {
   ensureAuth,
-  ensureAuthWithStatus,
+  ensureAuthWithStatus, // Added this line
   ensureProfileComplete,
   ensurePhoneVerified,
   ensureRole,

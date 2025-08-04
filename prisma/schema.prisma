@@ -21,7 +21,7 @@ model User {
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
   resetToken        String?                  @db.VarChar(255)
-  resetTokenExpiry  DateTime?                // Add this missing field
+  resetTokenExpiry  DateTime?
   
   // Relations
   accounts          Account[]
@@ -31,6 +31,7 @@ model User {
   orders            Order[]
   phoneOtps         PhoneOTP[]
   sessions          Session[]
+  wishlist          Wishlist[]               // Added wishlist relation
 
   @@index([email])
   @@index([phoneNumber])
@@ -38,10 +39,56 @@ model User {
   @@index([isActive])
   @@index([phoneVerified, isProfileComplete])
   @@index([emailVerified, isProfileComplete])
-  @@index([resetToken])                     // Add index for password reset lookups
+  @@index([resetToken])
   @@map("users")
 }
 
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  description String
+  price       Float
+  image       String[]
+  category    String      @db.VarChar(100)
+  subCategory String      @db.VarChar(100)
+  sizes       String[]
+  bestseller  Boolean?    @default(false)
+  isActive    Boolean     @default(true)
+  stock       Int         @default(0)
+  date        BigInt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  wishlist    Wishlist[]                   // Added wishlist relation
+
+  @@index([category])
+  @@index([subCategory])
+  @@index([bestseller])
+  @@index([isActive])
+  @@map("products")
+}
+
+// New Wishlist model
+model Wishlist {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  // Composite unique constraint to prevent duplicates
+  @@unique([userId, productId], name: "userId_productId")
+  @@index([userId])
+  @@index([productId])
+  @@index([createdAt])
+  @@map("wishlist")
+}
+
+// Rest of your existing models remain unchanged...
 
 model Account {
   id                Int      @id @default(autoincrement())
@@ -132,31 +179,6 @@ model EmailVerificationToken {
   @@index([userId])
   @@index([expiresAt])
   @@map("email_verification_tokens")
-}
-
-model Product {
-  id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(255)
-  description String
-  price       Float
-  image       String[]
-  category    String      @db.VarChar(100)
-  subCategory String      @db.VarChar(100)
-  sizes       String[]
-  bestseller  Boolean?    @default(false)
-  isActive    Boolean     @default(true)
-  stock       Int         @default(0)
-  date        BigInt
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-
-  @@index([category])
-  @@index([subCategory])
-  @@index([bestseller])
-  @@index([isActive])
-  @@map("products")
 }
 
 model OrderItem {

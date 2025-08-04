@@ -286,38 +286,6 @@ export const updateProfileCompletion = async (userId, profileData) => {
 };
 
 // Get user auth status
-export const getUserAuthStatus = async (userId) => {
-  if (!userId) return null;
-  
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(userId) },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phoneNumber: true,
-        emailVerified: true,
-        phoneVerified: true,
-        isActive: true,
-        isProfileComplete: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true
-      }
-    });
-
-    if (!user || !user.isActive) {
-      return null;
-    }
-
-    return user;
-    
-  } catch (error) {
-    console.error('Error getting user auth status:', error);
-    return null;
-  }
-};
 
 
 // Add this to userService.js
@@ -355,6 +323,49 @@ export const checkUserExistenceService = async (emailOrPhone) => {
   } catch (error) {
     console.error('Error in checkUserExistenceService:', error);
     throw new Error('Failed to check user existence');
+  }
+};
+
+// services/userService.js - Fix the getUserAuthStatus function
+export const getUserAuthStatus = async (userId) => {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(userId) },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        role: true,
+        isActive: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        createdAt: true,
+        updatedAt: true
+        // Remove these lines - they don't exist in your schema:
+        // isLocked: false,
+        // lockedUntil: null
+      }
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Add default values for fields that don't exist in schema
+    return {
+      ...user,
+      isLocked: false,  // Default value since it doesn't exist in schema
+      lockedUntil: null // Default value since it doesn't exist in schema
+    };
+  } catch (error) {
+    console.error('Error getting user auth status:', error);
+    throw error;
   }
 };
 

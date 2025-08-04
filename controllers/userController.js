@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 
-// User-related services
+
 import {
   findUserByEmail,
   findUserByPhone,
@@ -147,11 +147,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-
-
-/* ===========================================================================
-   2. Email OTP Verification
-============================================================================ */
 export const verifyEmailOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -379,99 +374,6 @@ export const completeProfile = async (req, res) => {
   }
 };
 
-/* ===========================================================================
-   5. Login with Email/Phone and Password
-============================================================================ */
-// export const loginUser = async (req, res) => {
-//   try {
-//     const { email, phoneNumber, password } = req.body;
-
-//     if (!password) {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: 'Password is required.' 
-//       });
-//     }
-
-//     let user;
-
-//     if (email) {
-//       const cleanEmail = email.trim().toLowerCase();
-//       user = await findUserByEmail(cleanEmail);
-      
-//       if (!user) {
-//         return res.status(401).json({ 
-//           success: false, 
-//           message: 'User not found with this email address.' 
-//         });
-//       }
-
-//       if (!user.emailVerified) {
-//         return res.status(403).json({ 
-//           success: false, 
-//           message: 'Please verify your email before logging in.' 
-//         });
-//       }
-//     } else if (phoneNumber) {
-//       user = await findUserByPhone(phoneNumber);
-      
-//       if (!user) {
-//         return res.status(401).json({ 
-//           success: false, 
-//           message: 'User not found with this phone number.' 
-//         });
-//       }
-
-//       if (!user.phoneVerified) {
-//         return res.status(403).json({ 
-//           success: false, 
-//           message: 'Please verify your phone number before logging in.' 
-//         });
-//       }
-//     } else {
-//       return res.status(400).json({ 
-//         success: false, 
-//         message: 'Email or phone number is required.' 
-//       });
-//     }
-
-//     if (!user.password) {
-//       return res.status(401).json({ 
-//         success: false, 
-//         message: 'Please complete your profile setup first.' 
-//       });
-//     }
-
-//     const isPasswordValid = await bcrypt.compare(password, user.password);
-//     if (!isPasswordValid) {
-//       return res.status(401).json({ 
-//         success: false, 
-//         message: 'Invalid password.' 
-//       });
-//     }
-
-//     return res.status(200).json({ 
-//       success: true, 
-//       token: issueJwt(user.id),
-//       user: {
-//         id: user.id,
-//         name: user.name,
-//         email: user.email,
-//         phoneNumber: user.phoneNumber,
-//         emailVerified: user.emailVerified,
-//         phoneVerified: user.phoneVerified,
-//         isProfileComplete: user.isProfileComplete
-//       }
-//     });
-
-//   } catch (err) {
-//     console.error('Login error:', err);
-//     return res.status(500).json({ 
-//       success: false, 
-//       message: 'Internal server error' 
-//     });
-//   }
-// };
 
 export const loginUser = async (req, res) => {
   try {
