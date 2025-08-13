@@ -25,6 +25,8 @@ model User {
   pendingEmailOtp    String?
   pendingEmailExpiry DateTime?
   resetTokenExpiry  DateTime?
+  pendingDeleteOtp     String?
+  pendingDeleteExpiry  DateTime?
   
   // Relations
   accounts          Account[]
@@ -34,7 +36,11 @@ model User {
   orders            Order[]
   phoneOtps         PhoneOTP[]
   sessions          Session[]
-  wishlist          Wishlist[]               // Added wishlist relation
+  wishlist          Wishlist[]  
+  addresses         Address[]
+  savedCards        SavedCard[] 
+  savedUpis         SavedUpi[]  
+
 
   @@index([email])
   @@index([phoneNumber])
@@ -302,4 +308,63 @@ enum OTPType {
   EMAIL_VERIFICATION
   PHONE_VERIFICATION
   EMAIL_CHANGE
+  ACCOUNT_DELETE
+
+}
+
+model Address {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  name         String   // The name of the recipient, e.g., "John Doe"
+  street       String
+  city         String
+  state        String
+  zip          String
+  country      String
+  phone        String
+  instructions String?  // Optional delivery instructions
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Establish the relationship with the User model
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("addresses")
+}
+
+model SavedCard {
+  id                  Int      @id @default(autoincrement())
+  userId              Int
+  cardholderName      String
+  last4               String   @db.VarChar(4)
+  brand               String   // e.g., "visa", "mastercard"
+  expiryMonth         Int
+  expiryYear          Int
+  paymentGatewayToken String   @unique // IMPORTANT: Secure token from your payment provider (e.g., Stripe, Razorpay)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relation to the User model
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_cards")
+}
+
+model SavedUpi {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String   // Name associated with the UPI
+  vpa       String   @unique // Virtual Payment Address, e.g., "username@okhdfcbank"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation to the User model
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_upis")
 }

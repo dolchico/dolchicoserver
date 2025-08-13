@@ -15,8 +15,11 @@ import {
   sendEmailOTPToExisting,
   sendPhoneOTPToExisting,
   requestEmailChange,
-  verifyEmailChange
+  verifyEmailChange,
+  getUserProfile 
 } from '../controllers/userController.js';
+
+import { requestAccountDeletion, verifyAccountDeletion } from '../controllers/userController.js';
 import { 
   forgotPassword, 
   resetPassword
@@ -122,26 +125,8 @@ router.patch('/update-profile',
   updateUserProfile        // ← Third: handles the actual update
 );
 
+router.get('/profile', getUserProfile);
 
-// Get user profile - Enhanced auth
-router.get('/profile', 
-  ensureAuth,
-  async (req, res) => {
-    try {
-      res.json({
-        success: true,
-        user: req.userStatus,
-        message: 'Profile retrieved successfully'
-      });
-    } catch (error) {
-      console.error('Get profile error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve profile'
-      });
-    }
-  }
-);
 
 // ================================
 // UTILITY ROUTES
@@ -257,6 +242,12 @@ router.post('/login/resend-otp',
 // routes/user.js
 router.post('/request-email-change', ensureAuth, requestEmailChange);
 router.post('/verify-email-change',  ensureAuth, verifyEmailChange);
+
+
+
+router.post('/request-account-deletion', ensureAuth, requestAccountDeletion);
+router.post('/verify-account-deletion', ensureAuth, verifyAccountDeletion);
+
 
 
 export default router;

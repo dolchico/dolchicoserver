@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 
 
+
+
 import {
   findUserByEmail,
   findUserByPhone,
@@ -24,6 +26,7 @@ import {
   verifyEmailOTPByUserId  ,
   verifyPhoneOtpService
 } from '../services/otpService.js';
+import { sendAccountDeletionOtp, verifyAndDeleteAccount } from '../services/accountService.js';
 
 // Email verification token helpers
 import {
@@ -481,14 +484,25 @@ export const updateUserProfile = async (req, res) => {
 
     const userId = req.user.id;
 
-    // Prepare the update fields
-    const updateFields = { ...req.body };
+    // Remove fields that have dedicated endpoints (excluding phone since we're not implementing it)
+    const { 
+      email,           // Has dedicated email change flow
+      password,        // Has dedicated password change flow
+      ...updateFields 
+    } = req.body;
 
-    if (updateFields.email !== undefined) {
-      updateFields.emailVerified = false;
+    // Validate excluded fields
+    if (email !== undefined) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Email changes must use /request-email-change endpoint' 
+      });
     }
-    if (updateFields.phoneNumber !== undefined) {
-      updateFields.phoneVerified = false;
+    if (password !== undefined) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Password changes must use /change-password endpoint' 
+      });
     }
 
     await updateProfile(userId, updateFields);
@@ -497,6 +511,7 @@ export const updateUserProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found.' });
     }
+    
     res.json({ success: true, message: 'Profile updated', user });
   } catch (err) {
     let msg = err.message || 'Profile update failed';
@@ -506,6 +521,7 @@ export const updateUserProfile = async (req, res) => {
     res.status(400).json({ success: false, message: msg });
   }
 };
+
 
 
 // POST /request-email-change
@@ -596,9 +612,9 @@ export const verifyEmailChange = async (req, res) => {
     }
 
     // Update user email
-    await updateProfile(userId, {
+       await updateProfile(userId, {
       email: newEmail,
-      emailVerified: false
+      emailVerified: true
     });
 
     // Clear the resetToken
@@ -614,7 +630,7 @@ export const verifyEmailChange = async (req, res) => {
 
     return res.status(200).json({ 
       message: 'Email updated successfully',
-      user: { email: newEmail, emailVerified: true }
+      user: { email: newEmail}
     });
 
   } catch (err) {
@@ -936,6 +952,90 @@ export const sendPhoneOTPToExisting = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to send OTP'
+    });
+  }
+};
+
+
+
+export const requestAccountDeletion = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const result = await sendAccountDeletionOtp(userId);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('requestAccountDeletion error:', err.message);
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const verifyAccountDeletion = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const { otp } = req.body;
+    const result = await verifyAndDeleteAccount(userId, otp);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('verifyAccountDeletion error:', err.message);
+    res.status(400).json({ error: err.message });
+  }
+};
+
+/* ===========================================================================
+   9. Get User Profile (Protected Route)
+============================================================================ */
+export const getUserProfile = async (req, res) => {
+  try {
+    // The user's ID is attached to the request object by the authentication middleware.
+    const userId = req.user?.id;
+
+    if (!userId) {
+      // This case should ideally be caught by the auth middleware, but it's good practice to double-check.
+      return res.status(401).json({ 
+        success: false, 
+        message: "Unauthorized: No user ID found in token." 
+      });
+    }
+
+    // Use the existing 'findUserById' service to get the user's data.
+    const user = await findUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found.' 
+      });
+    }
+
+    // IMPORTANT: Exclude sensitive information like the password before sending the response.
+    // The 'user' object from findUserById already excludes the password, which is great.
+    // We will explicitly return the fields to ensure no sensitive data is ever leaked.
+    const userProfile = {
+      id: user.id,
+      name: user.name,
+      username: user.username, // Assuming you add this field to your model
+      fullName: user.fullName, // Assuming you add this field
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      emailVerified: user.emailVerified,
+      phoneVerified: user.phoneVerified,
+      isProfileComplete: user.isProfileComplete,
+      country: user.country, // Assuming you add this field
+      state: user.state, // Assuming you add this field
+      zip: user.zip, // Assuming you add this field
+      createdAt: user.createdAt,
+    };
+
+    return res.status(200).json({
+      success: true,
+      user: userProfile
+    });
+
+  } catch (err) {
+    console.error('Get User Profile Error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
     });
   }
 };
