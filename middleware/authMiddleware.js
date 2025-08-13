@@ -266,6 +266,57 @@ export const otpRateLimit = (maxAttempts = 5, timeWindowMinutes = 15) => {
   };
 };
 
+export const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required. No token provided.',
+      code: 'NO_TOKEN',
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    // 1. Verify the token using your JWT_SECRET
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // 2. Get the user ID from the decoded token
+    const userId = decoded.id || decoded.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token payload.',
+        code: 'INVALID_TOKEN_PAYLOAD',
+      });
+    }
+
+    // 3. Attach a simplified user object to the request.
+    // This is crucial for your controllers to access the user's ID.
+    req.user = { id: userId };
+
+    // 4. Proceed to the next function (the route controller)
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Your session has expired. Please login again.',
+        code: 'TOKEN_EXPIRED',
+      });
+    }
+    // For any other JWT error (e.g., malformed token)
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid or malformed token.',
+      code: 'TOKEN_INVALID',
+    });
+  }
+};
+
 // Export all middleware functions
 export default {
   ensureAuth,
@@ -274,5 +325,6 @@ export default {
   ensurePhoneVerified,
   ensureRole,
   optionalAuth,
-  otpRateLimit
+  otpRateLimit,
+  authMiddleware
 };

@@ -15,7 +15,8 @@ import {
   sendEmailOTPToExisting,
   sendPhoneOTPToExisting,
   requestEmailChange,
-  verifyEmailChange
+  verifyEmailChange,
+  getUserProfile 
 } from '../controllers/userController.js';
 
 import { requestAccountDeletion, verifyAccountDeletion } from '../controllers/userController.js';
@@ -124,26 +125,8 @@ router.patch('/update-profile',
   updateUserProfile        // ← Third: handles the actual update
 );
 
+router.get('/profile', getUserProfile);
 
-// Get user profile - Enhanced auth
-router.get('/profile', 
-  ensureAuth,
-  async (req, res) => {
-    try {
-      res.json({
-        success: true,
-        user: req.userStatus,
-        message: 'Profile retrieved successfully'
-      });
-    } catch (error) {
-      console.error('Get profile error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to retrieve profile'
-      });
-    }
-  }
-);
 
 // ================================
 // UTILITY ROUTES
