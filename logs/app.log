@@ -2592,3 +2592,25 @@
 2025-08-13T04:32:47.846Z [INFO]: ::1 - - [13/Aug/2025:04:32:47 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.45.0"
 2025-08-13T04:33:12.287Z [INFO]: ::1 - - [13/Aug/2025:04:33:12 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.45.0"
 2025-08-13T04:33:57.045Z [INFO]: ::1 - - [13/Aug/2025:04:33:57 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 105 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:52:44.167Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:52:51.699Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:53:20.731Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:09.228Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:13.236Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:15.834Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:23.275Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:25.166Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:35.685Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:38.145Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:38.620Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:40.227Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:59:44.627Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T05:00:28.776Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T05:00:30.832Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T05:00:42.628Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T05:02:31.687Z [INFO]: ::1 - - [13/Aug/2025:05:02:31 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.45.0"
+2025-08-13T05:02:50.102Z [INFO]: ::1 - - [13/Aug/2025:05:02:50 +0000] "POST /api/user/request-account-deletion HTTP/1.1" 400 49 "-" "PostmanRuntime/7.45.0"
+2025-08-13T05:04:35.767Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T05:04:51.082Z [INFO]: ::1 - - [13/Aug/2025:05:04:51 +0000] "POST /api/user/request-account-deletion HTTP/1.1" 200 76 "-" "PostmanRuntime/7.45.0"
+2025-08-13T05:05:40.455Z [INFO]: ::1 - - [13/Aug/2025:05:05:40 +0000] "POST /api/user/verify-account-deletion HTTP/1.1" 200 42 "-" "PostmanRuntime/7.45.0"
+2025-08-13T05:05:47.779Z [INFO]: ::1 - - [13/Aug/2025:05:05:47 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.45.0"

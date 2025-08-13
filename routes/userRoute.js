@@ -17,6 +17,8 @@ import {
   requestEmailChange,
   verifyEmailChange
 } from '../controllers/userController.js';
+
+import { requestAccountDeletion, verifyAccountDeletion } from '../controllers/userController.js';
 import { 
   forgotPassword, 
   resetPassword
@@ -257,6 +259,12 @@ router.post('/login/resend-otp',
 // routes/user.js
 router.post('/request-email-change', ensureAuth, requestEmailChange);
 router.post('/verify-email-change',  ensureAuth, verifyEmailChange);
+
+
+
+router.post('/request-account-deletion', ensureAuth, requestAccountDeletion);
+router.post('/verify-account-deletion', ensureAuth, verifyAccountDeletion);
+
 
 
 export default router;

@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 
 
+
+
 import {
   findUserByEmail,
   findUserByPhone,
@@ -24,6 +26,7 @@ import {
   verifyEmailOTPByUserId  ,
   verifyPhoneOtpService
 } from '../services/otpService.js';
+import { sendAccountDeletionOtp, verifyAndDeleteAccount } from '../services/accountService.js';
 
 // Email verification token helpers
 import {
@@ -937,5 +940,30 @@ export const sendPhoneOTPToExisting = async (req, res) => {
       success: false,
       message: 'Failed to send OTP'
     });
+  }
+};
+
+
+
+export const requestAccountDeletion = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const result = await sendAccountDeletionOtp(userId);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('requestAccountDeletion error:', err.message);
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const verifyAccountDeletion = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const { otp } = req.body;
+    const result = await verifyAndDeleteAccount(userId, otp);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('verifyAccountDeletion error:', err.message);
+    res.status(400).json({ error: err.message });
   }
 };

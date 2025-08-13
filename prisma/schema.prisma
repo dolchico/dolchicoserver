@@ -25,6 +25,8 @@ model User {
   pendingEmailOtp    String?
   pendingEmailExpiry DateTime?
   resetTokenExpiry  DateTime?
+  pendingDeleteOtp     String?
+  pendingDeleteExpiry  DateTime?
   
   // Relations
   accounts          Account[]
@@ -302,4 +304,6 @@ enum OTPType {
   EMAIL_VERIFICATION
   PHONE_VERIFICATION
   EMAIL_CHANGE
+  ACCOUNT_DELETE
+
 }
