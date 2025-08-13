@@ -93,7 +93,9 @@ export const ensureAuthWithStatus = async (req, res, next) => {
       }
       
       // Attach both JWT data and current user status to request
-      req.user = { ...decoded, userId }; // Ensure userId is available
+      // after you compute userId
+req.user = { ...decoded, id: userId, userId };   // guarantee both keys
+
       req.userStatus = userStatus;
       
       return next();

@@ -21,6 +21,7 @@ import {
   storeEmailOTP, 
   verifyEmailOtpService,
   storePhoneOTP,
+  verifyEmailOTPByUserId  ,
   verifyPhoneOtpService
 } from '../services/otpService.js';
 
@@ -33,7 +34,7 @@ import {
 
 // Email/SMS services
 import { sendOTP } from '../services/smsService.js';
-import { sendVerificationEmail } from '../services/mailService.js';
+import { sendVerificationEmail , sendOTPEmail } from '../services/mailService.js';
 
 // --------- Helper JWT issuer ----------
 const issueJwt = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -505,6 +506,128 @@ export const updateUserProfile = async (req, res) => {
     res.status(400).json({ success: false, message: msg });
   }
 };
+
+
+// POST /request-email-change
+// POST /request-email-change
+// POST /request-email-change  
+export const requestEmailChange = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const newEmail = (req.body?.newEmail || '').trim().toLowerCase();
+
+    if (!newEmail) return res.status(400).json({ error: 'Email required' });
+    if (!validator.isEmail(newEmail)) return res.status(400).json({ error: 'Invalid email format' });
+
+    const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.email && user.email.toLowerCase() === newEmail)
+      return res.status(400).json({ error: 'New email is the same as current email' });
+
+    const existing = await prisma.user.findFirst({ where: { email: newEmail, NOT: { id: Number(userId) } } });
+    if (existing) return res.status(409).json({ error: 'Email already in use' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    await prisma.emailOTP.deleteMany({ where: { userId: Number(userId) } });
+    await prisma.emailOTP.create({
+      data: {
+        userId: Number(userId),
+        otp,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+        type: 'EMAIL_CHANGE',
+        attempts: 0,
+        isUsed: false,
+        maxAttempts: 3
+      }
+    });
+
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { resetToken: `EMAIL_CHANGE:${newEmail}` }
+    });
+
+    await sendOTPEmail(newEmail, otp, 'email change');
+    return res.status(200).json({ message: 'OTP sent to new e-mail' });
+
+  } catch (err) {
+    console.error('requestEmailChange error:', err);
+    if (err.code === 'P2002') return res.status(409).json({ error: 'Email already in use' });
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
+
+// POST /verify-email-change
+export const verifyEmailChange = async (req, res) => {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const { otp } = req.body;
+
+    // Basic validation
+    if (!otp) {
+      return res.status(400).json({ error: 'OTP required' });
+    }
+    if (!validator.isLength(otp.trim(), { min: 6, max: 6 }) || !validator.isNumeric(otp.trim())) {
+      return res.status(400).json({ error: 'Invalid OTP format' });
+    }
+
+    // Use the correct function that accepts userId
+    const isValid = await verifyEmailOTPByUserId(userId, otp.trim());
+    
+    if (!isValid) {
+      return res.status(400).json({ 
+        error: 'Invalid or expired OTP' 
+      });
+    }
+
+    // Get user and update email
+    const user = await findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Extract new email from resetToken (where you stored "EMAIL_CHANGE:newEmail")
+    const newEmail = user.resetToken?.replace('EMAIL_CHANGE:', '');
+    if (!newEmail) {
+      return res.status(400).json({ error: 'No pending email change found' });
+    }
+
+    // Update user email
+    await updateProfile(userId, {
+      email: newEmail,
+      emailVerified: false
+    });
+
+    // Clear the resetToken
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: {
+        resetToken: null,
+        pendingEmail: null,
+        pendingEmailOtp: null,
+        pendingEmailExpiry: null
+      }
+    });
+
+    return res.status(200).json({ 
+      message: 'Email updated successfully',
+      user: { email: newEmail, emailVerified: true }
+    });
+
+  } catch (err) {
+    console.error('verifyEmailChange error:', err);
+    
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: 'Email already in use' });
+    }
+    
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 
 /* ===========================================================================
    7. Resend Email Verification

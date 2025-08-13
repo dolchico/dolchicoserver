@@ -129,26 +129,31 @@ export const deletePhoneOTPsForUser = async (userId) => {
  * @param {string} otp - OTP code
  * @returns {Promise<object>} Created OTP record
  */
-export const storeEmailOTP = async (userId, otp) => {
+export const storeEmailOTP = async (userId, otp, type = 'EMAIL_VERIFICATION') => {
   if (!userId || !otp) throw new Error('userId and otp are required');
-  
+
   try {
-    // Delete existing email OTPs for this user
-    await prisma.emailOTP.deleteMany({
-      where: { userId: Number(userId) }
+    await prisma.emailOTP.deleteMany({ where: { userId: Number(userId) } });
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    console.log('storeEmailOTP input debug:', {
+      userIdLength: userId ? userId.toString().length : 0,
+      otp: otp.toString(),
+      otpLength: otp.toString().length,
+      expiresAtLength: expiresAt ? expiresAt.toString().length : 0,
+      type: type,
+      typeLength: type ? type.length : 0
     });
 
-    // Create new OTP with 5-minute expiration
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    
     return await prisma.emailOTP.create({ 
       data: { 
-        otp: otp.toString(), 
+        otp: otp.toString().slice(0, 6),  // <- Guard against long OTPs
         userId: Number(userId), 
         expiresAt,
-        type: 'EMAIL_VERIFICATION',
+        type,
         attempts: 0,
-        isUsed: false
+        isUsed: false,
+        maxAttempts: 3 // Add if you use this field
       } 
     });
   } catch (error) {
@@ -156,6 +161,7 @@ export const storeEmailOTP = async (userId, otp) => {
     throw error;
   }
 };
+
 
 /**
  * Verify email OTP using email address

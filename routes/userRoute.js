@@ -13,7 +13,9 @@ import {
   sendUnifiedOTP,
   checkUserForAuth,
   sendEmailOTPToExisting,
-  sendPhoneOTPToExisting
+  sendPhoneOTPToExisting,
+  requestEmailChange,
+  verifyEmailChange
 } from '../controllers/userController.js';
 import { 
   forgotPassword, 
@@ -21,7 +23,8 @@ import {
 } from '../controllers/authController.js';
 import { 
   ensureAuth,
-  ensureProfileComplete
+  ensureProfileComplete,
+  ensureAuthWithStatus
 } from "../middleware/authMiddleware.js";
 
 // Import wishlist routes
@@ -114,9 +117,11 @@ router.post('/resend-verification', resendVerificationEmail);
 
 // Update profile - Enhanced auth with profile completion check
 router.patch('/update-profile', 
-  ensureProfileComplete,
-  updateUserProfile
+  ensureAuthWithStatus,    // ← First: authenticates and sets req.userStatus
+  ensureProfileComplete,   // ← Second: checks if profile is complete
+  updateUserProfile        // ← Third: handles the actual update
 );
+
 
 // Get user profile - Enhanced auth
 router.get('/profile', 
@@ -205,8 +210,7 @@ router.post('/check-user', checkUserExistence);
 // ================================
 // LEGACY ENDPOINTS (Backward compatibility)
 // ================================
-
-// Legacy phone OTP endpoints
+// // Legacy phone OTP endpoints
 router.post('/login/request-otp', 
   async (req, res) => {
     try {
@@ -249,5 +253,10 @@ router.post('/login/resend-otp',
     }
   }
 );
+
+// routes/user.js
+router.post('/request-email-change', ensureAuth, requestEmailChange);
+router.post('/verify-email-change',  ensureAuth, verifyEmailChange);
+
 
 export default router;
