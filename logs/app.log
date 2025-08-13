@@ -2420,3 +2420,175 @@
 2025-08-05T04:19:29.776Z [INFO]: ::1 - - [05/Aug/2025:04:19:29 +0000] "GET /api/user/wishlist/summary HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-08-05T04:19:32.856Z [INFO]: ::1 - - [05/Aug/2025:04:19:32 +0000] "GET /api/user/wishlist/summary HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 2025-08-05T04:19:33.379Z [INFO]: ::1 - - [05/Aug/2025:04:19:33 +0000] "GET /api/user/wishlist?page=1&limit=12&category=Unisex&sort=oldest HTTP/1.1" 200 853 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T05:06:41.537Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:06:54.692Z [INFO]: ::1 - - [05/Aug/2025:05:06:54 +0000] "POST /api/user/login HTTP/1.1" 200 330 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:07:51.018Z [INFO]: ::1 - - [05/Aug/2025:05:07:51 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:09:52.641Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:09:56.280Z [INFO]: ::1 - - [05/Aug/2025:05:09:56 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:01.679Z [INFO]: ::1 - - [05/Aug/2025:05:10:01 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:02.363Z [INFO]: ::1 - - [05/Aug/2025:05:10:02 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:03.129Z [INFO]: ::1 - - [05/Aug/2025:05:10:03 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:31.752Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:10:33.397Z [INFO]: ::1 - - [05/Aug/2025:05:10:33 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 42 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:38.812Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:10:47.771Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:10:50.177Z [INFO]: ::1 - - [05/Aug/2025:05:10:50 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:10:56.029Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:13:42.053Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:13:46.441Z [INFO]: ::1 - - [05/Aug/2025:05:13:46 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:13:50.397Z [INFO]: ::1 - - [05/Aug/2025:05:13:50 +0000] "PATCH /api/user/update-profile HTTP/1.1" 500 125 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:15:26.213Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T05:15:34.040Z [INFO]: ::1 - - [05/Aug/2025:05:15:34 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 74 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:16:51.820Z [INFO]: ::1 - - [05/Aug/2025:05:16:51 +0000] "POST /api/user/login HTTP/1.1" 200 330 "-" "PostmanRuntime/7.45.0"
+2025-08-05T05:17:28.794Z [INFO]: ::1 - - [05/Aug/2025:05:17:28 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 451 "-" "PostmanRuntime/7.45.0"
+2025-08-05T07:57:27.548Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T07:59:37.080Z [INFO]: ::1 - - [05/Aug/2025:07:59:37 +0000] "GET /user/profile HTTP/1.1" 404 151 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T07:59:42.218Z [INFO]: ::1 - - [05/Aug/2025:07:59:42 +0000] "GET /user/profile HTTP/1.1" 404 151 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T07:59:45.038Z [INFO]: ::1 - - [05/Aug/2025:07:59:45 +0000] "GET /user/profile HTTP/1.1" 404 151 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:11:13.230Z [INFO]: ::1 - - [05/Aug/2025:08:11:13 +0000] "PATCH /user/update-profile HTTP/1.1" 404 160 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:11:21.673Z [INFO]: ::1 - - [05/Aug/2025:08:11:21 +0000] "PATCH /user/update-profile HTTP/1.1" 404 160 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:11:43.833Z [INFO]: ::1 - - [05/Aug/2025:08:11:43 +0000] "PATCH /user/update-profile HTTP/1.1" 404 160 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:25.324Z [INFO]: ::1 - - [05/Aug/2025:08:12:25 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 71 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:27.011Z [INFO]: ::1 - - [05/Aug/2025:08:12:27 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 71 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:38.585Z [INFO]: ::1 - - [05/Aug/2025:08:12:38 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:40.075Z [INFO]: ::1 - - [05/Aug/2025:08:12:40 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:45.075Z [INFO]: ::1 - - [05/Aug/2025:08:12:45 +0000] "POST /api/user/login HTTP/1.1" 200 323 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:12:57.831Z [INFO]: ::1 - - [05/Aug/2025:08:12:57 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 71 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:18:08.054Z [INFO]: ::1 - - [05/Aug/2025:08:18:08 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:18:08.596Z [INFO]: ::1 - - [05/Aug/2025:08:18:08 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:18:12.572Z [INFO]: ::1 - - [05/Aug/2025:08:18:12 +0000] "POST /api/user/login HTTP/1.1" 200 323 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:20:10.605Z [INFO]: ::1 - - [05/Aug/2025:08:20:10 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:20:12.286Z [INFO]: ::1 - - [05/Aug/2025:08:20:12 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:20:17.179Z [INFO]: ::1 - - [05/Aug/2025:08:20:17 +0000] "POST /api/user/login HTTP/1.1" 200 323 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:53:20.767Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-05T08:54:09.149Z [INFO]: ::1 - - [05/Aug/2025:08:54:09 +0000] "PATCH /api/user/update-profile HTTP/1.1" 401 77 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:54:24.112Z [INFO]: ::1 - - [05/Aug/2025:08:54:24 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:54:25.628Z [INFO]: ::1 - - [05/Aug/2025:08:54:25 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:54:34.917Z [INFO]: ::1 - - [05/Aug/2025:08:54:34 +0000] "POST /api/user/login HTTP/1.1" 200 323 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:54:58.727Z [INFO]: ::1 - - [05/Aug/2025:08:54:58 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 456 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:57:38.204Z [INFO]: ::1 - - [05/Aug/2025:08:57:38 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 110 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:57:38.556Z [INFO]: ::1 - - [05/Aug/2025:08:57:38 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 110 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:57:47.716Z [INFO]: ::1 - - [05/Aug/2025:08:57:47 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 110 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T08:57:52.153Z [INFO]: ::1 - - [05/Aug/2025:08:57:52 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 110 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:14:29.043Z [INFO]: ::1 - - [05/Aug/2025:09:14:29 +0000] "POST /api/user/auth/check-user HTTP/1.1" 500 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:14:29.107Z [INFO]: ::1 - - [05/Aug/2025:09:14:29 +0000] "POST /api/user/auth/check-user HTTP/1.1" 500 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:14:34.273Z [INFO]: ::1 - - [05/Aug/2025:09:14:34 +0000] "POST /api/user/register HTTP/1.1" 500 60 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:23:03.263Z [INFO]: ::1 - - [05/Aug/2025:09:23:03 +0000] "POST /api/user/auth/check-user HTTP/1.1" 500 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:23:03.555Z [INFO]: ::1 - - [05/Aug/2025:09:23:03 +0000] "POST /api/user/auth/check-user HTTP/1.1" 500 50 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-05T09:23:08.600Z [INFO]: ::1 - - [05/Aug/2025:09:23:08 +0000] "POST /api/user/register HTTP/1.1" 500 60 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
+2025-08-11T04:56:18.009Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T04:56:31.947Z [INFO]: ::1 - - [11/Aug/2025:04:56:31 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 460 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:00:07.346Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:01:11.762Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:03:52.859Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:05:56.560Z [INFO]: ::1 - - [11/Aug/2025:05:05:56 +0000] "PATCH /api/user/email-change HTTP/1.1" 404 162 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:06:01.732Z [INFO]: ::1 - - [11/Aug/2025:05:06:01 +0000] "POST /api/user/email-change HTTP/1.1" 404 161 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:14:21.577Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:14:50.059Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:15:01.041Z [INFO]: ::1 - - [11/Aug/2025:05:15:01 +0000] "POST /api/user/request-email-change HTTP/1.1" 409 32 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:15:49.669Z [INFO]: ::1 - - [11/Aug/2025:05:15:49 +0000] "POST /api/user/request-email-change HTTP/1.1" 400 32 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:16:02.232Z [INFO]: ::1 - - [11/Aug/2025:05:16:02 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:18:01.130Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:21:13.274Z [INFO]: ::1 - - [11/Aug/2025:05:21:13 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:22:54.217Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:23:25.389Z [INFO]: ::1 - - [11/Aug/2025:05:23:25 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:24:55.753Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:25:04.281Z [INFO]: ::1 - - [11/Aug/2025:05:25:04 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:29:07.055Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:29:13.012Z [INFO]: ::1 - - [11/Aug/2025:05:29:13 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:30:20.779Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:30:30.220Z [INFO]: ::1 - - [11/Aug/2025:05:30:30 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:31:51.161Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:32:00.027Z [INFO]: ::1 - - [11/Aug/2025:05:32:00 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:32:08.428Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:32:10.610Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:32:16.265Z [INFO]: ::1 - - [11/Aug/2025:05:32:16 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:35:55.542Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:36:02.019Z [INFO]: ::1 - - [11/Aug/2025:05:36:02 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:38:47.545Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:38:54.269Z [INFO]: ::1 - - [11/Aug/2025:05:38:54 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T05:41:23.836Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T05:41:30.288Z [INFO]: ::1 - - [11/Aug/2025:05:41:30 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T06:01:55.112Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T06:02:00.793Z [INFO]: ::1 - - [11/Aug/2025:06:02:00 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T06:16:04.454Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T06:16:11.461Z [INFO]: ::1 - - [11/Aug/2025:06:16:11 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T06:16:24.863Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T06:16:30.798Z [INFO]: ::1 - - [11/Aug/2025:06:16:30 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:21:03.999Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:21:11.990Z [INFO]: ::1 - - [11/Aug/2025:08:21:11 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:22:00.856Z [INFO]: ::1 - - [11/Aug/2025:08:22:00 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:23:56.483Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:24:06.848Z [INFO]: ::1 - - [11/Aug/2025:08:24:06 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:35:27.689Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:35:35.633Z [INFO]: ::1 - - [11/Aug/2025:08:35:35 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:35:45.784Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:36:01.387Z [INFO]: ::1 - - [11/Aug/2025:08:36:01 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:38:25.772Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:38:26.977Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:38:54.553Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:39:06.206Z [INFO]: ::1 - - [11/Aug/2025:08:39:06 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:46:02.482Z [INFO]: ::1 - - [11/Aug/2025:08:46:02 +0000] "POST /api/user/request-email-verification HTTP/1.1" 404 175 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:46:44.575Z [INFO]: ::1 - - [11/Aug/2025:08:46:44 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 30 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:51:30.387Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:51:34.232Z [INFO]: ::1 - - [11/Aug/2025:08:51:34 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 30 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:51:44.454Z [INFO]: ::1 - - [11/Aug/2025:08:51:44 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T08:58:02.924Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T08:58:12.374Z [INFO]: ::1 - - [11/Aug/2025:08:58:12 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:04:52.992Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:05:02.291Z [INFO]: ::1 - - [11/Aug/2025:09:05:02 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:12:02.448Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:12:14.895Z [INFO]: ::1 - - [11/Aug/2025:09:12:14 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:20:37.258Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:20:44.982Z [INFO]: ::1 - - [11/Aug/2025:09:20:44 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:21:57.500Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:22:10.744Z [INFO]: ::1 - - [11/Aug/2025:09:22:10 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:43:50.518Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:44:04.902Z [INFO]: ::1 - - [11/Aug/2025:09:44:04 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:44:24.094Z [INFO]: ::1 - - [11/Aug/2025:09:44:24 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 32 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:46:02.715Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:46:07.567Z [INFO]: ::1 - - [11/Aug/2025:09:46:07 +0000] "POST /api/user/verify-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-11T09:46:57.820Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-11T09:47:09.731Z [INFO]: ::1 - - [11/Aug/2025:09:47:09 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 106 "-" "PostmanRuntime/7.45.0"
+2025-08-11T10:16:58.456Z [INFO]: ::1 - - [11/Aug/2025:10:16:58 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.45.0"
+2025-08-11T11:20:00.440Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T07:09:47.847Z [INFO]: ::1 - - [12/Aug/2025:07:09:47 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.45.0"
+2025-08-12T07:09:56.768Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T07:10:04.074Z [INFO]: ::1 - - [12/Aug/2025:07:10:04 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.45.0"
+2025-08-12T07:10:15.503Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T07:10:24.851Z [INFO]: ::1 - - [12/Aug/2025:07:10:24 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.45.0"
+2025-08-12T10:38:34.902Z [INFO]: ::1 - - [12/Aug/2025:10:38:34 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.45.0"
+2025-08-12T10:41:09.436Z [INFO]: ::1 - - [12/Aug/2025:10:41:09 +0000] "POST /api/user/login HTTP/1.1" 403 73 "-" "PostmanRuntime/7.45.0"
+2025-08-12T11:09:22.201Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T11:09:23.125Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T11:10:04.826Z [INFO]: ::1 - - [12/Aug/2025:11:10:04 +0000] "POST /api/user/login HTTP/1.1" 403 73 "-" "PostmanRuntime/7.45.0"
+2025-08-12T17:48:46.945Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T17:48:54.933Z [INFO]: ::1 - - [12/Aug/2025:17:48:54 +0000] "POST /api/user/login HTTP/1.1" 403 73 "-" "PostmanRuntime/7.45.0"
+2025-08-12T17:49:35.725Z [INFO]: ::1 - - [12/Aug/2025:17:49:35 +0000] "POST /api/user/login HTTP/1.1" 200 331 "-" "PostmanRuntime/7.45.0"
+2025-08-12T17:51:52.941Z [INFO]: ::1 - - [12/Aug/2025:17:51:52 +0000] "POST /api/user/request-email-change HTTP/1.1" 409 32 "-" "PostmanRuntime/7.45.0"
+2025-08-12T17:52:01.290Z [INFO]: ::1 - - [12/Aug/2025:17:52:01 +0000] "POST /api/user/request-email-change HTTP/1.1" 409 32 "-" "PostmanRuntime/7.45.0"
+2025-08-12T17:52:13.421Z [INFO]: ::1 - - [12/Aug/2025:17:52:13 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-12T18:06:49.484Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T18:06:55.536Z [INFO]: ::1 - - [12/Aug/2025:18:06:55 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-12T18:08:02.538Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-12T18:08:11.472Z [INFO]: ::1 - - [12/Aug/2025:18:08:11 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.45.0"
+2025-08-12T18:09:25.283Z [INFO]: ::1 - - [12/Aug/2025:18:09:25 +0000] "POST /api/user/verify-email-change HTTP/1.1" 401 102 "-" "PostmanRuntime/7.45.0"
+2025-08-12T18:09:52.072Z [INFO]: ::1 - - [12/Aug/2025:18:09:52 +0000] "POST /api/user/verify-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T03:57:23.614Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T03:57:29.523Z [INFO]: ::1 - - [13/Aug/2025:03:57:29 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.45.0"
+2025-08-13T03:57:40.255Z [INFO]: ::1 - - [13/Aug/2025:03:57:40 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T03:57:57.929Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T03:58:05.108Z [INFO]: ::1 - - [13/Aug/2025:03:58:05 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T03:58:10.989Z [INFO]: ::1 - - [13/Aug/2025:03:58:10 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:23:48.338Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:23:52.158Z [INFO]: ::1 - - [13/Aug/2025:04:23:52 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:29:33.582Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:29:37.256Z [INFO]: ::1 - - [13/Aug/2025:04:29:37 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:30:59.422Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-13T04:31:03.376Z [INFO]: ::1 - - [13/Aug/2025:04:31:03 +0000] "POST /api/user/request-email-change HTTP/1.1" 404 26 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:31:12.303Z [INFO]: ::1 - - [13/Aug/2025:04:31:12 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:32:35.437Z [INFO]: ::1 - - [13/Aug/2025:04:32:35 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:32:38.402Z [INFO]: ::1 - - [13/Aug/2025:04:32:38 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:32:47.846Z [INFO]: ::1 - - [13/Aug/2025:04:32:47 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:33:12.287Z [INFO]: ::1 - - [13/Aug/2025:04:33:12 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.45.0"
+2025-08-13T04:33:57.045Z [INFO]: ::1 - - [13/Aug/2025:04:33:57 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 105 "-" "PostmanRuntime/7.45.0"
