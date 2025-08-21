@@ -4,13 +4,16 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate",
     "ready": "npm i && npx prisma generate",
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "dev": "nodemon server.js", 
     "server": "nodemon server.js",
     "seed": "npx prisma db seed",
     "pushprod": "npx prisma format"
-  },
+  }
+,
   "prisma": {
     "seed": "node prisma/seed.js"
   },

@@ -2830,3 +2830,12 @@
 2025-08-21T04:25:12.119Z [INFO]: ::1 - - [21/Aug/2025:04:25:12 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-08-21T04:25:26.256Z [INFO]: ::1 - - [21/Aug/2025:04:25:26 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-08-21T04:25:39.385Z [INFO]: ::1 - - [21/Aug/2025:04:25:39 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-08-21T04:50:08.381Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-21T04:50:14.682Z [INFO]: ::1 - - [21/Aug/2025:04:50:14 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-08-21T04:50:19.072Z [INFO]: ::1 - - [21/Aug/2025:04:50:19 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-08-21T04:55:42.789Z [INFO]: ::1 - - [21/Aug/2025:04:55:42 +0000] "POST /api/user/login HTTP/1.1" 200 330 "-" "PostmanRuntime/7.45.0"
+2025-08-21T05:01:43.462Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-21T05:02:21.834Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-21T05:02:24.777Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-21T05:02:40.138Z [INFO]: 🚀 Server started on PORT: 4000
+2025-08-21T05:04:11.257Z [INFO]: 🚀 Server started on PORT: 4000

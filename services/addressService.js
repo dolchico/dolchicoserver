@@ -17,13 +17,16 @@ export const findAddressById = async (addressId) => {
  * @returns {Promise<Array>} An array of the user's addresses.
  */
 export const getAddressesByUserId = async (userId) => {
+  if (!prisma) {
+    throw new Error('Database connection not available');
+  }
+  
   return prisma.address.findMany({
     where: { userId },
-    orderBy: {
-      isDefault: 'desc', // Show default address first
-    },
+    orderBy: { isDefault: 'desc' },
   });
 };
+
 
 /**
  * Creates a new address for a user.
