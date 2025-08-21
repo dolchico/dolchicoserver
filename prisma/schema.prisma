@@ -10,6 +10,8 @@ datasource db {
 model User {
   id                Int                      @id @default(autoincrement())
   name              String?                  
+  username          String?                  @unique @db.VarChar(50)  // Add this
+  fullName          String?                  @db.VarChar(100)        // Add this
   email             String?                  @unique @db.VarChar(255)
   password          String?
   role              UserRole                 @default(USER)
@@ -21,6 +23,12 @@ model User {
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
   resetToken        String?                  @db.VarChar(255)
+  
+  // Add these new profile fields
+  country           String?                  @db.VarChar(100)        // Add this
+  state             String?                  @db.VarChar(100)        // Add this
+  zip               String?                  @db.VarChar(20)         // Add this
+  
   pendingEmail       String?
   pendingEmailOtp    String?
   pendingEmailExpiry DateTime?
@@ -41,9 +49,9 @@ model User {
   savedCards        SavedCard[] 
   savedUpis         SavedUpi[]  
 
-
   @@index([email])
   @@index([phoneNumber])
+  @@index([username])                        // Add this index
   @@index([role])
   @@index([isActive])
   @@index([phoneVerified, isProfileComplete])
@@ -51,6 +59,7 @@ model User {
   @@index([resetToken])
   @@map("users")
 }
+
 
 model Product {
   id          Int         @id @default(autoincrement())

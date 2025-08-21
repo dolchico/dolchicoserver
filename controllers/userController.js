@@ -287,11 +287,112 @@ export const verifyPhoneOtp = async (req, res) => {
 /* ===========================================================================
    4. Complete User Profile (after OTP verification)
 ============================================================================ */
+// export const completeProfile = async (req, res) => {
+//   try {
+//     const { userId, name, password } = req.body;
+
+//     // Validation
+//     if (!userId || !name || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'User ID, name, and password are required.'
+//       });
+//     }
+
+//     if (password.length < 8) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Password must be at least 8 characters long.'
+//       });
+//     }
+
+//     // Find user
+//     const user = await findUserById(userId);
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'User not found.'
+//       });
+//     }
+
+//     // Check if user is verified
+//     if (!user.emailVerified && !user.phoneVerified) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Please verify your email or phone first.'
+//       });
+//     }
+
+//     // Hash password
+//     const saltRounds = 12;
+//     const hashedPassword = await bcrypt.hash(password.trim(), saltRounds);
+
+//     // Update user profile
+//     const updateData = {
+//       name: name.trim(),
+//       password: hashedPassword,
+//       isProfileComplete: true,
+//       updatedAt: new Date()
+//     };
+
+//     const updatedUser = await prisma.user.update({
+//       where: { id: Number(userId) },
+//       data: updateData,
+//       select: {
+//         id: true,
+//         name: true,
+//         email: true,
+//         phoneNumber: true,
+//         emailVerified: true,
+//         phoneVerified: true,
+//         isProfileComplete: true,
+//         role: true,
+//         createdAt: true,
+//         updatedAt: true
+//       }
+//     });
+
+//     console.log('Profile completed for user:', userId);
+
+//     return res.status(200).json({
+//       success: true,
+//       message: 'Profile completed successfully.',
+//       token: issueJwt(updatedUser.id),
+//       user: updatedUser
+//     });
+
+//   } catch (err) {
+//     console.error('Profile completion error:', err);
+    
+//     if (err.code === 'P2002') {
+//       return res.status(409).json({
+//         success: false,
+//         message: 'Profile information already exists.'
+//       });
+//     }
+    
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Internal server error. Please try again.'
+//     });
+//   }
+// };
+
 export const completeProfile = async (req, res) => {
   try {
-    const { userId, name, password } = req.body;
+    const { 
+      userId, 
+      name, 
+      password,
+      // Optional profile fields
+      username,
+      fullName,
+      country,
+      state,
+      zip
+    } = req.body;
 
-    // Validation
+    // Required field validation
     if (!userId || !name || !password) {
       return res.status(400).json({
         success: false,
@@ -303,6 +404,14 @@ export const completeProfile = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Password must be at least 8 characters long.'
+      });
+    }
+
+    // Optional field validation
+    if (username && username.length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username must be at least 3 characters long.'
       });
     }
 
@@ -323,11 +432,28 @@ export const completeProfile = async (req, res) => {
       });
     }
 
+    // Check if username is already taken (if provided)
+    if (username) {
+      const existingUsername = await prisma.user.findFirst({
+        where: {
+          username: username.trim().toLowerCase(),
+          NOT: { id: Number(userId) }
+        }
+      });
+      
+      if (existingUsername) {
+        return res.status(409).json({
+          success: false,
+          message: 'Username is already taken.'
+        });
+      }
+    }
+
     // Hash password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password.trim(), saltRounds);
 
-    // Update user profile
+    // Build update data (only include fields that are provided)
     const updateData = {
       name: name.trim(),
       password: hashedPassword,
@@ -335,17 +461,29 @@ export const completeProfile = async (req, res) => {
       updatedAt: new Date()
     };
 
+    // Add optional fields if provided
+    if (username) updateData.username = username.trim().toLowerCase();
+    if (fullName) updateData.fullName = fullName.trim();
+    if (country) updateData.country = country.trim();
+    if (state) updateData.state = state.trim();
+    if (zip) updateData.zip = zip.trim();
+
     const updatedUser = await prisma.user.update({
       where: { id: Number(userId) },
       data: updateData,
       select: {
         id: true,
         name: true,
+        username: true,
+        fullName: true,
         email: true,
         phoneNumber: true,
         emailVerified: true,
         phoneVerified: true,
         isProfileComplete: true,
+        country: true,
+        state: true,
+        zip: true,
         role: true,
         createdAt: true,
         updatedAt: true
@@ -365,6 +503,14 @@ export const completeProfile = async (req, res) => {
     console.error('Profile completion error:', err);
     
     if (err.code === 'P2002') {
+      // Handle unique constraint violations
+      const target = err.meta?.target;
+      if (target?.includes('username')) {
+        return res.status(409).json({
+          success: false,
+          message: 'Username is already taken.'
+        });
+      }
       return res.status(409).json({
         success: false,
         message: 'Profile information already exists.'
@@ -473,6 +619,60 @@ export const loginUser = async (req, res) => {
 /* ===========================================================================
    6. Update User Profile (Protected Route)
 ============================================================================ */
+// export const updateUserProfile = async (req, res) => {
+//   try {
+//     if (!req.user || !req.user.id) {
+//       return res.status(401).json({ success: false, message: "Unauthorized" });
+//     }
+//     if (!req.body || Object.keys(req.body).length === 0) {
+//       return res.status(400).json({ success: false, message: 'No update fields provided.' });
+//     }
+
+//     const userId = req.user.id;
+
+//     // Remove fields that have dedicated endpoints (excluding phone since we're not implementing it)
+//     const { 
+//       email,           // Has dedicated email change flow
+//       password,        // Has dedicated password change flow
+//       ...updateFields 
+//     } = req.body;
+
+//     // Validate excluded fields
+//     if (email !== undefined) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         message: 'Email changes must use /request-email-change endpoint' 
+//       });
+//     }
+//     if (password !== undefined) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         message: 'Password changes must use /change-password endpoint' 
+//       });
+//     }
+
+//     await updateProfile(userId, updateFields);
+
+//     const user = await findUserById(userId);
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found.' });
+//     }
+    
+//     res.json({ success: true, message: 'Profile updated', user });
+//   } catch (err) {
+//     let msg = err.message || 'Profile update failed';
+//     if (err.code === 'P2002') {
+//       msg = 'Email or phone number already exists.';
+//     }
+//     res.status(400).json({ success: false, message: msg });
+//   }
+// };
+
+
+
+// POST /request-email-change
+// POST /request-email-change
+// POST /request-email-change  
 export const updateUserProfile = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -484,7 +684,7 @@ export const updateUserProfile = async (req, res) => {
 
     const userId = req.user.id;
 
-    // Remove fields that have dedicated endpoints (excluding phone since we're not implementing it)
+    // Remove fields that have dedicated endpoints
     const { 
       email,           // Has dedicated email change flow
       password,        // Has dedicated password change flow
@@ -505,6 +705,32 @@ export const updateUserProfile = async (req, res) => {
       });
     }
 
+    // ADD THIS: Username validation
+    if (updateFields.username !== undefined) {
+      if (updateFields.username && updateFields.username.length < 3) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Username must be at least 3 characters long.' 
+        });
+      }
+
+      if (updateFields.username) {
+        const existingUsername = await prisma.user.findFirst({
+          where: {
+            username: updateFields.username.trim().toLowerCase(),
+            NOT: { id: Number(userId) }
+          }
+        });
+
+        if (existingUsername) {
+          return res.status(409).json({ 
+            success: false, 
+            message: 'Username is already taken.' 
+          });
+        }
+      }
+    }
+
     await updateProfile(userId, updateFields);
 
     const user = await findUserById(userId);
@@ -515,18 +741,25 @@ export const updateUserProfile = async (req, res) => {
     res.json({ success: true, message: 'Profile updated', user });
   } catch (err) {
     let msg = err.message || 'Profile update failed';
+    
+    // Enhanced error handling for P2002 constraints
     if (err.code === 'P2002') {
-      msg = 'Email or phone number already exists.';
+      const target = err.meta?.target;
+      if (target?.includes('username')) {
+        msg = 'Username is already taken.';
+      } else if (target?.includes('email')) {
+        msg = 'Email already exists.';
+      } else if (target?.includes('phoneNumber')) {
+        msg = 'Phone number already exists.';
+      } else {
+        msg = 'This information already exists.';
+      }
     }
+    
     res.status(400).json({ success: false, message: msg });
   }
 };
 
-
-
-// POST /request-email-change
-// POST /request-email-change
-// POST /request-email-change  
 export const requestEmailChange = async (req, res) => {
   try {
     const userId = req.user.userId || req.user.id;
@@ -1010,21 +1243,22 @@ export const getUserProfile = async (req, res) => {
     // IMPORTANT: Exclude sensitive information like the password before sending the response.
     // The 'user' object from findUserById already excludes the password, which is great.
     // We will explicitly return the fields to ensure no sensitive data is ever leaked.
-    const userProfile = {
-      id: user.id,
-      name: user.name,
-      username: user.username, // Assuming you add this field to your model
-      fullName: user.fullName, // Assuming you add this field
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      emailVerified: user.emailVerified,
-      phoneVerified: user.phoneVerified,
-      isProfileComplete: user.isProfileComplete,
-      country: user.country, // Assuming you add this field
-      state: user.state, // Assuming you add this field
-      zip: user.zip, // Assuming you add this field
-      createdAt: user.createdAt,
-    };
+const userProfile = {
+  id: user.id,
+  name: user.name,
+  username: user.username || "", // Fallback for missing field
+  fullName: user.fullName || "", // Fallback for missing field
+  email: user.email,
+  phoneNumber: user.phoneNumber,
+  emailVerified: user.emailVerified,
+  phoneVerified: user.phoneVerified,
+  isProfileComplete: user.isProfileComplete,
+  country: user.country || "INDIA", // Fallback for missing field
+  state: user.state || "Punjab", // Fallback for missing field
+  zip: user.zip || "144410", // Fallback for missing field
+  createdAt: user.createdAt,
+};
+
 
     return res.status(200).json({
       success: true,

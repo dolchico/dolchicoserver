@@ -86,8 +86,33 @@ export const findUserByPhone = async (phoneNumber) => {
 // Find user by ID
 export const findUserById = async (id) => {
   if (!id) return null;
-  return prisma.user.findUnique({ where: { id: Number(id) } });
+  
+  return prisma.user.findUnique({ 
+    where: { id: Number(id) },
+    select: {
+      id: true,
+      name: true,
+      username: true,        // Add this
+      fullName: true,        // Add this
+      email: true,
+      phoneNumber: true,
+      emailVerified: true,
+      phoneVerified: true,
+      isProfileComplete: true,
+      country: true,         // Add this
+      state: true,           // Add this
+      zip: true,             // Add this
+      role: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
 };
+
+
+
+
 
 // Update user's emailVerified status
 export const verifyUserEmail = async (userId) => {
@@ -119,15 +144,37 @@ export const verifyUserPhone = async (userId) => {
 
 // Update user profile with allowed fields
 export const updateProfile = async (userId, updateData) => {
-  const allowedFields = ['name', 'email', 'phoneNumber', 'emailVerified', 'phoneVerified', 'isProfileComplete'];
+  const allowedFields = [
+    'name', 
+    'username',           // Add this
+    'fullName',           // Add this
+    'email', 
+    'phoneNumber', 
+    'country',            // Add this
+    'state',              // Add this
+    'zip',                // Add this
+    'emailVerified', 
+    'phoneVerified', 
+    'isProfileComplete'
+  ];
+  
   const data = {};
   
   for (const field of allowedFields) {
-    if (updateData[field] !== undefined) data[field] = updateData[field];
+    if (updateData[field] !== undefined) {
+      data[field] = updateData[field];
+    }
   }
   
+  // Clean and format data
   if (data.email) data.email = data.email.trim().toLowerCase();
   if (data.phoneNumber) data.phoneNumber = data.phoneNumber.trim();
+  if (data.username) data.username = data.username.trim().toLowerCase();
+  if (data.fullName) data.fullName = data.fullName.trim();
+  if (data.name) data.name = data.name.trim();
+  if (data.country) data.country = data.country.trim();
+  if (data.state) data.state = data.state.trim();
+  if (data.zip) data.zip = data.zip.trim();
 
   if (Object.keys(data).length === 0) {
     throw new Error('No fields provided for update.');
@@ -136,15 +183,46 @@ export const updateProfile = async (userId, updateData) => {
   try {
     return await prisma.user.update({
       where: { id: Number(userId) },
-      data
+      data: {
+        ...data,
+        updatedAt: new Date()
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        country: true,
+        state: true,
+        zip: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      }
     });
   } catch (err) {
     if (err.code === 'P2002') {
-      throw new Error('Email or phone number already exists.');
+      const target = err.meta?.target;
+      if (target?.includes('username')) {
+        throw new Error('Username already exists.');
+      }
+      if (target?.includes('email')) {
+        throw new Error('Email already exists.');
+      }
+      if (target?.includes('phoneNumber')) {
+        throw new Error('Phone number already exists.');
+      }
+      throw new Error('This information already exists.');
     }
     throw err;
   }
 };
+
 
 // Existing email verification service
 export const resendEmailVerificationService = async (email) => {

@@ -127,6 +127,7 @@ router.patch('/update-profile',
 
 router.get('/profile', getUserProfile);
 
+router.get('/get-user', ensureAuth, getUserProfile);
 
 // ================================
 // UTILITY ROUTES
