@@ -1,7 +1,7 @@
 import prisma from '../lib/prisma.js'
 import { serializeBigInts } from '../utils/serializeBigInt.js';
 
-// This will now work without conflicts
+// ✅ Fixed createOrder with timeout configuration
 export const createOrder = async (orderData) => {
   const order = await prisma.$transaction(async (tx) => {
     // Get product prices
@@ -46,12 +46,17 @@ export const createOrder = async (orderData) => {
     });
 
     return order;
+  }, {
+    // ⭐ KEY FIX: Add timeout configuration
+    maxWait: 10000,  // Wait up to 10 seconds to acquire transaction
+    timeout: 15000,  // Allow transaction to run for up to 15 seconds
   });
 
   // Serialize BigInts before returning
   return serializeBigInts(order);
 };
 
+// ✅ Fixed addToCart with timeout configuration
 export const addToCart = async (userId, productId, size, quantity = 1) => {
   const cartItem = await prisma.$transaction(async (tx) => {
     // Get product details and validate
@@ -108,12 +113,17 @@ export const addToCart = async (userId, productId, size, quantity = 1) => {
     });
 
     return cartItem;
+  }, {
+    // ⭐ Add timeout for cart operations too
+    maxWait: 5000,   // 5 seconds to acquire transaction
+    timeout: 10000,  // 10 seconds to complete transaction
   });
 
   // Serialize BigInts before returning
   return serializeBigInts(cartItem);
 };
 
+// ✅ Rest of your functions remain the same but add timeout where needed
 export const getAllOrders = async () => {
   const orders = await prisma.order.findMany({
     include: {
@@ -154,11 +164,8 @@ export const updateOrderStatus = async (orderId, status) => {
     }
   });
 
-  // Serialize BigInts before returning
   return serializeBigInts(updatedOrder);
 };
-
-// Additional helper functions you might need:
 
 export const getCartItems = async (userId) => {
   const cartItems = await prisma.cartItem.findMany({
@@ -242,47 +249,60 @@ export const clearCart = async (userId) => {
 };
 
 export const getSingleOrder = async (orderId, userId = null) => {
-  const whereClause = { id: Number(orderId) };
-  
-  // If userId is provided, ensure user can only access their own orders
-  if (userId) {
-    whereClause.userId = Number(userId);
+  // Validate input parameters
+  if (!orderId) {
+    throw new Error('Order ID is required');
   }
 
-  const order = await prisma.order.findUnique({
-    where: whereClause,
-    include: {
-      items: { 
-        include: { 
-          product: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-              price: true,
-              category: true,
-              subCategory: true
-            }
-          }
-        },
-        orderBy: { id: 'asc' } // Consistent ordering
+  try {
+    // ✅ Always use findUnique with just the order ID
+    const order = await prisma.order.findUnique({
+      where: { 
+        id: Number(orderId) 
       },
-      user: {
-        select: { 
-          id: true, 
-          name: true, 
-          email: true, 
-          phoneNumber: true 
+      include: {
+        items: { 
+          include: { 
+            product: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                price: true,
+                category: true,
+                subCategory: true
+              }
+            }
+          },
+          orderBy: { id: 'asc' }
+        },
+        user: {
+          select: { 
+            id: true, 
+            name: true, 
+            email: true, 
+            phoneNumber: true 
+          }
         }
       }
+    });
+
+    if (!order) {
+      throw new Error('Order not found');
     }
-  });
 
-  if (!order) {
-    throw new Error('Order not found');
+    // ✅ Authorization check: ensure user can only access their own orders
+    if (userId && order.userId !== Number(userId)) {
+      throw new Error('Unauthorized: You can only view your own orders');
+    }
+
+    // Serialize BigInts before returning
+    return serializeBigInts(order);
+
+  } catch (error) {
+    console.error('Error in getSingleOrder:', error);
+    throw error;
   }
-
-  // Serialize BigInts before returning
-  return serializeBigInts(order);
 };
+
 

@@ -5,7 +5,7 @@ import {
   getSingleOrderController,
   userOrders,
   updateStatus,
-  addItemToCart  // ✅ Add this import
+  addItemToCart
 } from '../controllers/orderController.js';
 import authUser from '../middleware/auth.js';
 import adminAuth from '../middleware/adminAuth.js';
@@ -13,15 +13,17 @@ import adminAuth from '../middleware/adminAuth.js';
 const orderRouter = express.Router();
 
 // Cart Routes
-orderRouter.post('/cart/add', authUser, addItemToCart); // ✅ Add this route
+orderRouter.post('/cart/add', authUser, addItemToCart);
 
 // User Order Routes
 orderRouter.post('/place', authUser, placeOrder);
-orderRouter.post('/userorders', authUser, userOrders);
+orderRouter.get('/user', authUser, userOrders);  // ✅ FIXED: Changed POST to GET
 
 // Admin Routes
-orderRouter.post('/list', adminAuth, allOrders);
-orderRouter.post('/status', adminAuth, updateStatus);
+orderRouter.get('/list', adminAuth, allOrders);   // ✅ FIXED: Changed POST to GET  
+orderRouter.post('/status', adminAuth, updateStatus); // Keep POST for updates
+
+// Single Order Route
 orderRouter.get('/:orderId', authUser, getSingleOrderController);
 
 export default orderRouter;

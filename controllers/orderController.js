@@ -2,9 +2,9 @@ import {
   createOrder,
   getAllOrders,
   getUserOrders,
-  getSingleOrder,
+  getSingleOrder,  // ✅ This is correctly imported
   updateOrderStatus,
-  addToCart  // ✅ Add this import
+  addToCart
 } from '../services/orderService.js';
 
 /**
@@ -153,17 +153,55 @@ export const updateStatus = async (req, res) => {
   }
 };
 
+// ✅ FIXED: Use getSingleOrder instead of getOrderById
 export const getSingleOrderController = async (req, res) => {
+  // ✅ Debug logging - Add these lines
+  console.log('=== DEBUG INFO ===');
+  console.log('Full req.params:', req.params);
+  console.log('orderId raw:', req.params.orderId);
+  console.log('orderId type:', typeof req.params.orderId);
+  console.log('URL path:', req.path);
+  console.log('Full URL:', req.originalUrl);
+  console.log('==================');
+
   try {
     const { orderId } = req.params;
-    const userId = req.user.id;
-    
-    const order = await getOrderById(orderId, userId);
-    
-    res.json({ success: true, order });
+    const userId = req.user?.id;
+
+    if (!orderId || orderId === 'undefined' || orderId.trim() === '') {
+      console.log('❌ OrderId validation failed:', orderId);
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID is required'
+      });
+    }
+
+    // Remove the problematic validation temporarily
+    const orderIdNumber = Number(orderId);
+    console.log('Parsed orderId:', orderIdNumber);
+
+    if (isNaN(orderIdNumber) || orderIdNumber <= 0) {
+      console.log('❌ OrderId number validation failed:', orderIdNumber);
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Order ID format'
+      });
+    }
+
+    const order = await getSingleOrder(orderIdNumber, userId);
+
+    res.status(200).json({
+      success: true,
+      order: order
+    });
+
   } catch (error) {
     console.error('Get Single Order Error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve order',
+      error: error.message
+    });
   }
 };
 
