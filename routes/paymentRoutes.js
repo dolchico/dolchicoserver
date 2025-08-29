@@ -1,17 +1,24 @@
-// // routes/paymentRoutes.js
-// import express from 'express';
-// import paymentController from '../controllers/paymentController.js';
-// import { authenticateToken } from '../middleware/auth.js'; // Your auth middleware
+import express from 'express';
+import {
+  createPaymentOrder,
+  verifyPayment,
+  getPaymentStatus,
+  retryPayment
+} from '../controllers/paymentController.js';
+import authUser from '../middleware/auth.js';
 
-// const router = express.Router();
+const paymentRouter = express.Router();
 
-// // Initiate payment
-// router.post('/initiate', authenticateToken, paymentController.initiatePayment);
+// Create Razorpay order from cart
+paymentRouter.post('/create-order', authUser, createPaymentOrder);
 
-// // Payment callback (no auth required)
-// router.post('/callback', paymentController.paymentCallback);
+// Verify payment after successful payment
+paymentRouter.post('/verify', authUser, verifyPayment);
 
-// // Verify payment status
-// router.get('/status/:orderId', authenticateToken, paymentController.verifyPaymentStatus);
+// Get payment status for an order
+paymentRouter.get('/status/:orderId', authUser, getPaymentStatus);
 
-// export default router;
+// Retry payment for failed orders
+paymentRouter.post('/retry/:orderId', authUser, retryPayment);
+
+export default paymentRouter;

@@ -1,162 +1,221 @@
-// // controllers/paymentController.js
-// import PaytmChecksum from '../utils/PaytmChecksum.js';
-// import PaytmConfig from '../config/paytmConfig.js';
-// import axios from 'axios';
+import {
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  getOrderPaymentStatus,
+  retryFailedPayment
+} from '../services/paymentService.js';
 
-// // Generate unique order ID
-// const generateOrderId = () => `ORDER_${Date.now()}_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+// Utility function to convert BigInt to Number safely
+const serializeBigInt = (obj) => {
+  return JSON.parse(JSON.stringify(obj, (key, value) =>
+    typeof value === 'bigint' ? Number(value) : value
+  ));
+};
 
-// // Helper function to make Paytm API call for initiating transaction
-// const makePaytmAPICall = async (paytmParams, orderId) => {
-//     const url = `https://securestage.paytmpayments.com/theia/api/v1/initiateTransaction?mid=${PaytmConfig.MID}&orderId=${orderId}`;
-//     try {
-//         const response = await axios.post(url, paytmParams, {
-//             headers: { 'Content-Type': 'application/json' },
-//         });
-//         return response.data;
-//     } catch (error) {
-//         const errorMessage = error.response?.data?.body?.resultInfo?.resultMsg || 'Failed to communicate with Paytm API';
-//         throw new Error(errorMessage);
-//     }
-// };
+// Alternative utility for nested objects
+const convertBigIntFields = (data) => {
+  if (data === null || data === undefined) return data;
+  
+  if (Array.isArray(data)) {
+    return data.map(convertBigIntFields);
+  }
+  
+  if (typeof data === 'object') {
+    const converted = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (typeof value === 'bigint') {
+        converted[key] = Number(value);
+      } else if (typeof value === 'object') {
+        converted[key] = convertBigIntFields(value);
+      } else {
+        converted[key] = value;
+      }
+    }
+    return converted;
+  }
+  
+  return typeof data === 'bigint' ? Number(data) : data;
+};
 
-// // Helper function to verify payment status
-// const verifyPaymentStatus = async (orderId) => {
-//     const paytmParams = {
-//         body: {
-//             mid: PaytmConfig.MID,
-//             orderId: orderId,
-//         },
-//     };
+/**
+ * Create Razorpay order from cart items
+ */
+export const createPaymentOrder = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { items, amount, address, notes } = req.body;
 
-//     const checksum = await PaytmChecksum.generateSignature(
-//         JSON.stringify(paytmParams.body),
-//         PaytmConfig.MERCHANT_KEY
-//     );
+    // Validate required fields
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Items are required and must be a non-empty array' 
+      });
+    }
 
-//     paytmParams.head = {
-//         signature: checksum,
-//     };
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Amount must be greater than 0' 
+      });
+    }
 
-//     const response = await axios.post(PaytmConfig.STATUS_QUERY_URL, paytmParams, {
-//         headers: { 'Content-Type': 'application/json' },
-//     });
+    if (!address) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Address is required' 
+      });
+    }
 
-//     return response.data;
-// };
+    const orderData = await createRazorpayOrder({
+      userId: Number(userId),
+      items,
+      amount: parseFloat(amount),
+      address,
+      notes
+    });
 
-// // 1. Initiate Payment
-// export const initiatePayment = async (req, res) => {
-//     try {
-//         const { amount, customerId, customerEmail, customerPhone } = req.body;
+    // Convert BigInt fields to Numbers
+    const serializedOrderData = convertBigIntFields(orderData);
 
-//         if (!amount || amount <= 0) {
-//             return res.status(400).json({ success: false, message: 'Invalid amount' });
-//         }
+    res.status(201).json({
+      success: true,
+      message: 'Payment order created successfully',
+      data: serializedOrderData
+    });
+  } catch (error) {
+    console.error('Create Payment Order Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};
 
-//         const orderId = generateOrderId();
+/**
+ * Verify Razorpay payment and complete order
+ */
+export const verifyPayment = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { 
+      razorpay_order_id, 
+      razorpay_payment_id, 
+      razorpay_signature 
+    } = req.body;
 
-//         const paytmParams = {
-//             body: {
-//                 requestType: "Payment",
-//                 mid: PaytmConfig.MID,
-//                 websiteName: PaytmConfig.WEBSITE,
-//                 orderId: orderId,
-//                 callbackUrl: PaytmConfig.CALLBACK_URL,
-//                 txnAmount: {
-//                     value: amount.toString(),
-//                     currency: "INR",
-//                 },
-//                 userInfo: {
-//                     custId: customerId || `CUST_${Date.now()}`,
-//                     email: customerEmail,
-//                     mobile: customerPhone,
-//                 },
-//             },
-//         };
+    // Validation
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required payment verification data'
+      });
+    }
 
-//         const checksum = await PaytmChecksum.generateSignature(
-//             JSON.stringify(paytmParams.body),
-//             PaytmConfig.MERCHANT_KEY
-//         );
+    const result = await verifyRazorpayPayment({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      userId: Number(userId)
+    });
 
-//         paytmParams.head = { signature: checksum };
+    if (result.verified) {
+      // Convert BigInt fields in the result
+      const serializedResult = convertBigIntFields(result);
+      
+      res.json({
+        success: true,
+        message: 'Payment verified and order completed successfully',
+        orderId: serializedResult.orderId,
+        orderDetails: serializedResult.orderDetails
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: result.message
+      });
+    }
+  } catch (error) {
+    console.error('Verify Payment Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};
 
-//         const response = await makePaytmAPICall(paytmParams, orderId);
+/**
+ * Get payment status for an order
+ */
+export const getPaymentStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { orderId } = req.params;
 
-//         if (response.body.resultInfo.resultCode === "0000") {
-//             res.json({
-//                 success: true,
-//                 data: {
-//                     orderId,
-//                     txnToken: response.body.txnToken,
-//                     amount,
-//                     mid: PaytmConfig.MID,
-//                     paytmConfig: {
-//                         mid: PaytmConfig.MID,
-//                         orderId,
-//                         txnToken: response.body.txnToken,
-//                         amount: amount.toString(),
-//                         callbackUrl: PaytmConfig.CALLBACK_URL,
-//                         isStaging: true, // Set false for production
-//                     },
-//                 },
-//             });
-//         } else {
-//             throw new Error(response.body.resultInfo.resultMsg);
-//         }
-//     } catch (error) {
-//         console.error('Payment initiation error:', error);
-//         res.status(500).json({
-//             success: false,
-//             message: error.message || 'Payment initiation failed',
-//         });
-//     }
-// };
+    if (!orderId || orderId === 'undefined') {
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID is required'
+      });
+    }
 
-// // 2. Handle Payment Callback
-// export const paymentCallback = async (req, res) => {
-//     try {
-//         const receivedData = req.body;
-//         const isChecksumVerified = PaytmChecksum.verifySignature(
-//             receivedData,
-//             PaytmConfig.MERCHANT_KEY,
-//             receivedData.CHECKSUMHASH
-//         );
+    const orderIdNumber = Number(orderId);
+    if (isNaN(orderIdNumber) || orderIdNumber <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid Order ID format'
+      });
+    }
 
-//         if (!isChecksumVerified) {
-//             return res.redirect(`${process.env.FRONTEND_URL}/payment/failed?error=checksum_failed`);
-//         }
+    const status = await getOrderPaymentStatus(orderIdNumber, Number(userId));
 
-//         const orderId = receivedData.ORDERID;
-//         const statusResponse = await verifyPaymentStatus(orderId);
+    // Convert BigInt fields to Numbers
+    const serializedStatus = convertBigIntFields(status);
 
-//         if (statusResponse.body.resultInfo.resultCode === "01") {
-//             // Payment successful
-//             res.redirect(`${process.env.FRONTEND_URL}/payment/success?orderId=${orderId}&txnId=${receivedData.TXNID}`);
-//         } else {
-//             // Payment failed
-//             res.redirect(`${process.env.FRONTEND_URL}/payment/failed?orderId=${orderId}`);
-//         }
-//     } catch (error) {
-//         console.error('Payment callback error:', error);
-//         res.redirect(`${process.env.FRONTEND_URL}/payment/failed?error=callback_error`);
-//     }
-// };
+    res.json({
+      success: true,
+      data: serializedStatus
+    });
+  } catch (error) {
+    console.error('Get Payment Status Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};
 
-// // 3. Verify Payment Status API Endpoint
-// export const getPaymentStatus = async (req, res) => {
-//     try {
-//         const { orderId } = req.params;
-//         const statusResponse = await verifyPaymentStatus(orderId);
-//         res.json({
-//             success: true,
-//             data: statusResponse.body,
-//         });
-//     } catch (error) {
-//         res.status(500).json({
-//             success: false,
-//             message: error.message,
-//         });
-//     }
-// };
+/**
+ * Retry payment for a failed order
+ */
+export const retryPayment = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { orderId } = req.params;
+
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID is required'
+      });
+    }
+
+    const orderIdNumber = Number(orderId);
+    const retryData = await retryFailedPayment(orderIdNumber, Number(userId));
+
+    // Convert BigInt fields to Numbers
+    const serializedRetryData = convertBigIntFields(retryData);
+
+    res.json({
+      success: true,
+      message: 'New payment order created for retry',
+      data: serializedRetryData
+    });
+  } catch (error) {
+    console.error('Retry Payment Error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+};

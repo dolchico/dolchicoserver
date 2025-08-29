@@ -13,6 +13,7 @@ import yaml          from 'yaml';           // <- one parser, one name
 import morgan        from 'morgan';
 import session       from 'express-session';
 import passport      from 'passport';
+import cookieParser  from 'cookie-parser';  // <- Added for OAuth cookie handling
 import logger              from './logger.js';
 import connectCloudinary   from './config/cloudinary.js';
 import helmet              from './middleware/helmet.js';
@@ -24,9 +25,11 @@ import productRouter       from './routes/productRoute.js';
 import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
-import OAuthRouter          from './routes/OAuthRoute.js';
-import wishlistRoutes from './routes/wishlistRoutes.js';
-import addressRoutes from './routes/addressRoute.js';
+import OAuthRouter         from './routes/oauth.js';
+import wishlistRoutes      from './routes/wishlistRoutes.js';
+import addressRoutes       from './routes/addressRoute.js';
+import paymentRouter from './routes/paymentRoutes.js';
+import authUser from './middleware/auth.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 
 import './config/passport-setup.js';
@@ -40,17 +43,15 @@ dotenv.config();
 const app  = express();
 const port = process.env.PORT || 4000;
 
-
 /**
  * =============================
- * Swagger – Specs & Routes
+ * Swagger – Specs & Routes  
  * =============================
  */
 const coreSpecRaw  = fs.readFileSync('./swagger.yaml', 'utf8');
 const coreSpec     = yaml.parse(coreSpecRaw);
 
 const authSpecPath = path.resolve('docs', 'swagger-auth.yaml'); // absolute
-
 const authSpec = yaml.parse(fs.readFileSync(authSpecPath, 'utf8'));
 
 app.use('/api-docs-auth', swaggerUi.serve, swaggerUi.setup(authSpec));
@@ -68,29 +69,48 @@ connectCloudinary();
  * Middleware
  * =============================
  */
-// app.use('/api', apiLimiter);
+// Trust proxy for OAuth callbacks (important for production)
+app.set('trust proxy', 1);
+
+// Basic middleware
 app.use(helmet());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // <- Added for form handling
+app.use(cookieParser()); // <- Added for OAuth cookie support
 
+// Updated CORS for OAuth support
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001', 
+    'http://localhost:4000',
+    process.env.FRONTEND_URL,
+    process.env.CLIENT_URL
+  ].filter(Boolean), // Remove undefined values
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  credentials: true // <- Changed to true for OAuth cookies
 }));
 
-// Sessions & OAuth
+// Enhanced Sessions & OAuth configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'your-fallback-secret-key',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
-    httpOnly: true
-  }
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+  },
+  name: 'oauth.session' // Custom session name
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Rate limiting (keeping your existing setup)
+// app.use('/api', apiLimiter);
 
 // Logging
 app.use(morgan('combined', {
@@ -99,7 +119,7 @@ app.use(morgan('combined', {
 
 /**
  * =============================
- * Routes
+ * Routes (Your existing routes unchanged)
  * =============================
  */
 app.use('/api/auth',    OAuthRouter);
@@ -110,26 +130,59 @@ app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/payment', authUser, paymentRouter);
 // app.use('/api/payment', paymentRoutes);
 
-// Simple error-test route
+// Simple error-test route (unchanged)
 app.get('/error', (req, res) => {
   logger.error('This is an error log!');
   res.status(500).send('Error logged');
 });
 
-// Root
+// Root (unchanged)
 app.get('/', (req, res) => {
   res.send('API Working');
   console.log('DATABASE_URL at runtime:', process.env.DATABASE_URL);
 });
 
+// OAuth health check endpoint (new addition for testing)
+app.get('/api/auth/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'OAuth service is running',
+    user: req.user ? { id: req.user.id, email: req.user.email } : null,
+    session: req.session?.passport ? 'Active' : 'Inactive'
+  });
+});
+
 /**
  * =============================
- * Server Start
+ * Error Handling Middleware (OAuth-enhanced)
+ * =============================
+ */
+app.use((err, req, res, next) => {
+  // Log OAuth-specific errors
+  if (err.message && err.message.includes('OAuth')) {
+    logger.error('OAuth Error:', err);
+  }
+  
+  logger.error('Global error handler:', err);
+  res.status(500).json({ 
+    success: false, 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+/**
+ * =============================
+ * Server Start (unchanged)
  * =============================
  */
 app.listen(port, () => {
   console.log(`🚀 Server started: http://localhost:${port}`);
+  console.log(`📖 API Docs: http://localhost:${port}/api-docs`);
+  console.log(`🔐 Auth Docs: http://localhost:${port}/api-docs-auth`);
+  console.log(`🌐 OAuth Health: http://localhost:${port}/api/auth/health`);
   logger.info(`🚀 Server started on PORT: ${port}`);
 });

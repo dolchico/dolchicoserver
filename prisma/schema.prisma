@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -14,6 +14,7 @@ model User {
   fullName          String?                  @db.VarChar(100)        // Add this
   email             String?                  @unique @db.VarChar(255)
   password          String?
+  payments          Payment[] 
   role              UserRole                 @default(USER)
   createdAt         DateTime                 @default(now())
   updatedAt         DateTime                 @updatedAt
@@ -231,6 +232,7 @@ model Order {
   updatedAt     DateTime    @updatedAt
   items         OrderItem[]
   user          User        @relation(fields: [userId], references: [id])
+  paymentDetails       Payment?
 
   @@index([userId])
   @@index([status])
@@ -376,4 +378,42 @@ model SavedUpi {
 
   @@index([userId])
   @@map("saved_upis")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  razorpayPaymentId String?       @unique // Razorpay payment_id
+  razorpayOrderId   String        @unique // Razorpay order_id  
+  razorpaySignature String?       // Payment verification signature
+  amount            Int           // Amount in paise (100 paise = 1 INR)
+  currency          String        @default("INR")
+  status            PaymentStatus @default(PENDING)
+  method            String?       @db.VarChar(50) // card, netbanking, wallet, upi
+  gateway           String        @default("RAZORPAY") @db.VarChar(50)
+  gatewayResponse   Json?         // Store full gateway response for debugging
+  failureReason     String?       @db.VarChar(500)
+  orderId           Int           @unique // Links to your existing Order
+  userId            Int           // <- ADD THIS FIELD
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade) // <- ADD THIS
+
+  @@index([razorpayOrderId])
+  @@index([razorpayPaymentId])
+  @@index([status])
+  @@index([userId])       // <- ADD THIS INDEX
+  @@index([createdAt])
+  @@map("payments")
+}
+
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  CANCELLED
+  REFUNDED
 }

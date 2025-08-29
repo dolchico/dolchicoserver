@@ -1,80 +1,76 @@
-import dotenv from 'dotenv';
-dotenv.config();
+// config/passport-setup.js
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { PrismaClient } from '@prisma/client';
+import { 
+  findUserByEmail, 
+  findUserById, 
+  createUser, 
+  updateProfile 
+} from '../services/userService.js';
 
-const prisma = new PrismaClient();
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
+  scope: ['profile', 'email']
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails?.[0]?.value;
+    const name = profile.displayName;
+    const googleId = profile.id;
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID || "69958377939-skj6h49evepgqfnplerdkl2aqujcq64p.apps.googleusercontent.com",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.CALLBACK_URL,
-      scope: ['profile', 'email'],
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        // Check if this Google account is already linked
-        const account = await prisma.account.findUnique({
-          where: {
-            provider_providerAccountId: {
-              provider: 'google',
-              providerAccountId: profile.id,
-            },
-          },
-        });
-
-        if (account) {
-          // Account exists, fetch the associated user
-          const user = await prisma.user.findUnique({ where: { id: account.userId } });
-          return done(null, user);
-        }
-
-        // No linked account: find user by email or create a new user
-        let user = await prisma.user.findUnique({
-          where: { email: profile.emails[0].value },
-        });
-
-        if (!user) {
-          user = await prisma.user.create({
-            data: {
-              email: profile.emails[0].value,
-              name: profile.displayName,
-            },
-          });
-        }
-
-        // Link Google account to user
-        await prisma.account.create({
-          data: {
-            provider: 'google',
-            providerAccountId: profile.id,
-            userId: user.id,
-          },
-        });
-
-        return done(null, user);
-      } catch (error) {
-        console.error('Google OAuth error:', error);
-        return done(error, false);
-      }
+    if (!email) {
+      return done(new Error('No email found in Google profile'), null);
     }
-  )
-);
 
-// Serialize user ID into session
+    // Use your existing findUserByEmail function
+    let user = await findUserByEmail(email);
+    
+    if (user) {
+      // User exists - update with OAuth info using your updateProfile function
+      try {
+        user = await updateProfile(user.id, {
+          name: user.name || name,
+          emailVerified: true,
+          isProfileComplete: true
+        });
+        console.log('Updated existing user via Google OAuth:', user.id);
+      } catch (updateError) {
+        console.log('User exists, continuing with existing data');
+        // Continue with existing user data if update fails
+      }
+    } else {
+      // Create new user using your existing createUser function
+      user = await createUser({
+        email: email,
+        name: name,
+        emailVerified: true,
+        isProfileComplete: true,
+        role: 'USER'
+      });
+      console.log('Created new user via Google OAuth:', user.id);
+    }
+
+    return done(null, user);
+    
+  } catch (error) {
+    console.error('Google OAuth Strategy Error:', error);
+    return done(error, null);
+  }
+}));
+
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize user from session
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+    // Use your existing findUserById function
+    const user = await findUserById(id);
     done(null, user);
   } catch (error) {
     done(error, null);
   }
 });
+
+export default passport;
