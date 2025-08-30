@@ -4233,3 +4233,4 @@
 2025-08-29T17:51:57.549Z [INFO]: ::1 - - [29/Aug/2025:17:51:57 +0000] "POST /api/payment/verify HTTP/1.1" 400 57 "-" "PostmanRuntime/7.45.0"
 2025-08-29T17:52:35.368Z [INFO]: ::1 - - [29/Aug/2025:17:52:35 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-08-29T17:52:35.946Z [INFO]: ::1 - - [29/Aug/2025:17:52:35 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-08-30T09:26:48.286Z [INFO]: 🚀 Server started on PORT: 4000
