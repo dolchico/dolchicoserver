@@ -1,46 +1,61 @@
+import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-// Find account by provider + providerAccountId
-export async function findAccount(provider, providerAccountId) {
-  return prisma.account.findUnique({
-    where: {
-      provider_providerAccountId: {
-        provider,
-        providerAccountId,
-      }
+export class AuthService {
+  static generateJWT(user) {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured');
     }
-  });
-}
 
-// Find user by id
-export async function findUserById(id) {
-  return prisma.user.findUnique({ where: { id: Number(id) } });
-}
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      role: user.role || 'USER',
+      loginMethod: 'google',
+      emailVerified: user.emailVerified,
+      phoneVerified: user.phoneVerified,
+    };
 
-// Find user by email
-export async function findUserByEmail(email) {
-  return prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } });
-}
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+  }
 
-// Create a new user
-export async function createUser({ email, name, emailVerified }) {
-  return prisma.user.create({
-    data: {
-      email,
-      name,
-      emailVerified: !!emailVerified
-    }
-  });
-}
+  static verifyJWT(token) {
+    return jwt.verify(token, process.env.JWT_SECRET);
+  }
 
-// Link a Google account to a user
-export async function linkAccountToUser({ provider, providerAccountId, userId }) {
-  return prisma.account.create({
-    data: {
-      provider,
-      providerAccountId,
-      userId
-    }
-  });
+  static isUserFullyVerified(user) {
+    // Check if user needs any verification
+    const emailNeedsVerification = user.email && !user.emailVerified;
+    const phoneNeedsVerification = user.phoneNumber && !user.phoneVerified;
+    
+    return !emailNeedsVerification && !phoneNeedsVerification && user.isActive;
+  }
+
+  static async getUserProfile(userId) {
+    return await prisma.user.findUnique({
+      where: { id: Number(userId) },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        role: true,
+        isActive: true,
+      },
+    });
+  }
+
+  static getCookieOptions(isProduction) {
+    return {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    };
+  }
 }
