@@ -4,15 +4,14 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "build": "npx prisma generate",
+    "postinstall": "npx prisma generate",
     "ready": "npm i && npx prisma generate",
     "start": "node server.js",
     "dev": "nodemon server.js",
     "server": "nodemon server.js",
     "seed": "npx prisma db seed",
-    "migrate": "npx prisma migrate dev",
-    "studio": "npx prisma studio",
-    "reset": "npx prisma migrate reset",
-    "generate": "npx prisma generate"
+    "pushprod": "npx prisma format"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -22,10 +21,11 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.12.0",
-    "@quixo3/prisma-session-store": "^3.1.13",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.4.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.6.1",
@@ -43,8 +43,9 @@
     "passport": "^0.7.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
-    "razorpay": "^2.9.4",
-    "resend": "^4.7.0",
+    "paytmchecksum": "^1.5.1",
+    "pg": "^8.16.3",
+    "razorpay": "^2.9.6",
     "stripe": "^16.8.0",
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.7.3",
@@ -54,6 +55,10 @@
     "yaml": "^2.8.0"
   },
   "devDependencies": {
-    "prisma": "^6.12.0"
+    "@jest/globals": "^30.0.5",
+    "@types/node": "^24.3.0",
+    "jest": "^30.0.5",
+    "prisma": "^6.12.0",
+    "supertest": "^7.1.4"
   }
 }

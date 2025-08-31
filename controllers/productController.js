@@ -5,6 +5,7 @@ import {
   getAllProducts,
   deleteProductById,
   getProductById,
+  searchProductsService, // Add this import
 } from '../services/productService.js';
 
 // ✅ Add Product
@@ -49,7 +50,6 @@ const addProduct = async (req, res) => {
   }
 };
 
-
 const listProducts = async (req, res) => {
   try {
     const products = await getAllProducts();
@@ -86,11 +86,8 @@ const removeProduct = async (req, res) => {
   }
 };
 
-
-
 const singleProduct = async (req, res) => {
   try {
-    
     const { productId } = req.params; 
 
     // CHANGE START: Explicitly check if productId is the string "undefined" or not a valid number
@@ -98,14 +95,12 @@ const singleProduct = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or missing product ID provided.' });
     }
 
-
     const product = await getProductById(Number(productId)); // Number("undefined") would result in NaN
 
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    
     const safeProduct = {
       ...product,
       date: product.date?.toString() || null,
@@ -117,4 +112,89 @@ const singleProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-export { listProducts, addProduct, removeProduct, singleProduct };
+
+// ✅ Search Products - Updated for Prisma/PostgreSQL
+const searchProducts = async (req, res) => {
+  try {
+    const { 
+      q, 
+      page = 1, 
+      limit = 20, 
+      category, 
+      subCategory, 
+      minPrice, 
+      maxPrice, 
+      sortBy = 'relevance' 
+    } = req.query;
+    
+    // Validate search query
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Search query is required" 
+      });
+    }
+
+    // Validate pagination parameters
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    
+    if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid pagination parameters"
+      });
+    }
+
+    // Build search parameters
+    const searchParams = {
+      query: q.trim(),
+      page: pageNum,
+      limit: limitNum,
+      filters: {
+        ...(category && { category }),
+        ...(subCategory && { subCategory }),
+        ...(minPrice && { minPrice: parseFloat(minPrice) }),
+        ...(maxPrice && { maxPrice: parseFloat(maxPrice) })
+      },
+      sortBy
+    };
+
+    // Call service layer
+    const searchResult = await searchProductsService(searchParams);
+
+    // Convert BigInt dates to strings for JSON serialization
+    const safeProducts = searchResult.products.map((product) => ({
+      ...product,
+      date: product.date?.toString() || null,
+    }));
+
+    // Return successful response
+    res.json({ 
+      success: true, 
+      data: {
+        products: safeProducts,
+        pagination: searchResult.pagination,
+        metadata: searchResult.metadata
+      }
+    });
+
+  } catch (error) {
+    console.error('Search error:', error);
+    
+    // Return appropriate error response
+    if (error.message.includes('Invalid')) {
+      return res.status(400).json({ 
+        success: false, 
+        message: error.message 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error during search" 
+    });
+  }
+};
+
+export { listProducts, addProduct, removeProduct, singleProduct, searchProducts };

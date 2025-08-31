@@ -1,6 +1,5 @@
-export default {
+module.exports = {
   testEnvironment: 'node',
-  verbose: true,
-  detectOpenHandles: true,
-  rootDir: './tests'
+  setupFilesAfterEnv: ['./tests/setup.js'],
+  testMatch: ['**/tests/**/*.test.js'],
 };
