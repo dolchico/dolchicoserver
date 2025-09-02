@@ -10,6 +10,10 @@ import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from '..
 import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from '../services/msg91Service.js';
 import jwt from 'jsonwebtoken';
 
+// controllers/authController.js (excerpt additions)
+import { sendEmailVerification } from '../services/userService.js';
+import { findUserByEmail, createUser } from '../services/userService.js';
+
 
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
@@ -388,3 +392,48 @@ const updateUserVerification = async (userId) => {
     // Don't throw error here as verification is successful
   }
 };
+
+
+
+export async function registerWithEmail(req, res) {
+  try {
+    const { name, email, password } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
+
+    // create user or find existing
+    let user = await findUserByEmail(email);
+    if (!user) {
+      user = await createUser({ name, email, password });
+    }
+
+    await sendEmailVerification(user.id, user.email, user.name, /* otp */ null);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Registration started. Check your email to verify.'
+    });
+  } catch (e) {
+    console.error('registerWithEmail error:', e);
+    return res.status(500).json({ success: false, message: 'Failed to start registration.' });
+  }
+}
+
+export async function resendVerificationEmail(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ success: false, message: 'Email is required.' });
+    const user = await findUserByEmail(email);
+    if (!user) {
+      // Generic response to avoid enumeration
+      return res.status(200).json({ success: true, message: 'If the email exists, a verification email was sent.' });
+    }
+    if (user.emailVerified) {
+      return res.status(200).json({ success: true, message: 'Email already verified.' });
+    }
+    await sendEmailVerification(user.id, user.email, user.name, null);
+    return res.status(200).json({ success: true, message: 'Verification email sent.' });
+  } catch (e) {
+    console.error('resendVerificationEmail error:', e);
+    return res.status(500).json({ success: false, message: 'Failed to send verification email.' });
+  }
+}

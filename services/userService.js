@@ -447,3 +447,9 @@ export const getUserAuthStatus = async (userId) => {
   }
 };
 
+export async function sendEmailVerification(userId, email, userName, otp = null) {
+  const { token } = await createEmailVerificationToken(userId, 60);
+  // sendVerificationEmail(toEmail, token, otp, userName)
+  await sendVerificationEmail(email, token, otp, userName || 'User');
+  return { success: true };
+}

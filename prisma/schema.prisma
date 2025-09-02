@@ -231,15 +231,15 @@ model Order {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   items         OrderItem[]
-  user          User        @relation(fields: [userId], references: [id])
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade) // ← Add this
   paymentDetails       Payment?
-
   @@index([userId])
   @@index([status])
   @@index([payment])
   @@index([createdAt])
   @@map("orders")
 }
+
 
 model CartItem {
   id        Int      @id @default(autoincrement())

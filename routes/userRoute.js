@@ -19,6 +19,11 @@ import {
   getUserProfile 
 } from '../controllers/userController.js';
 
+import { verifyEmailByLink } from '../controllers/emailVerificationController.js';
+
+import { registerWithEmail} from '../controllers/authController.js';
+
+
 import { requestAccountDeletion, verifyAccountDeletion } from '../controllers/userController.js';
 import { 
   forgotPassword, 
@@ -249,6 +254,15 @@ router.post('/verify-email-change',  ensureAuth, verifyEmailChange);
 router.post('/request-account-deletion', ensureAuth, requestAccountDeletion);
 router.post('/verify-account-deletion', ensureAuth, verifyAccountDeletion);
 
+
+// Start email registration flow (if distinct from your existing registerUser)
+router.post('/register-email', registerWithEmail);
+
+// Public link verification endpoint (button click)
+router.get('/verify-email', verifyEmailByLink);
+
+// Resend email verification
+router.post('/resend-verification', resendVerificationEmail);
 
 
 export default router;
