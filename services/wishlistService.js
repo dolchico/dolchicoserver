@@ -3,20 +3,20 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Product selection fields
-const productSelectFields = {
+// REVISED: Define a standard way to include product data with its new relations
+const productInclude = {
   id: true,
   name: true,
   description: true,
   price: true,
   image: true,
-  category: true,
-  subCategory: true,
   sizes: true,
   bestseller: true,
   isActive: true,
   stock: true,
-  createdAt: true
+  createdAt: true,
+  category: true,    // Include the full category object { id, name, ... }
+  subcategory: true, // Include the full subcategory object { id, name, ... }
 };
 
 // Add product to wishlist
@@ -63,7 +63,7 @@ export const addToWishlistService = async (userId, productId) => {
       },
       include: {
         product: {
-          select: productSelectFields
+          select: productInclude
         }
       }
     });
@@ -120,7 +120,7 @@ export const getWishlistService = async (userId, options = {}) => {
     };
 
     if (category) {
-      where.product.category = category;
+      where.product.category = { name: { equals: category, mode: 'insensitive' } };
     }
 
     // Build order by clause
@@ -142,7 +142,7 @@ export const getWishlistService = async (userId, options = {}) => {
       where,
       include: { 
         product: {
-          select: productSelectFields
+          select: productInclude
         }
       },
       orderBy
@@ -244,7 +244,7 @@ export const getWishlistWithPaginationService = async (userId, page = 1, limit =
     };
 
     if (category) {
-      where.product.category = category;
+      where.product.category = { name: { equals: category, mode: 'insensitive' } };
     }
 
     // Build order by clause
@@ -263,7 +263,7 @@ export const getWishlistWithPaginationService = async (userId, page = 1, limit =
         where,
         include: { 
           product: {
-            select: productSelectFields
+            select: productInclude
           }
         },
         orderBy,
@@ -387,7 +387,7 @@ export const getWishlistSummaryService = async (userId) => {
         product: {
           select: {
             category: true,
-            subCategory: true,
+            subcategory: true,
             price: true
           }
         }
@@ -406,13 +406,14 @@ export const getWishlistSummaryService = async (userId) => {
       summary.averagePrice = summary.totalValue / wishlist.length;
       
       wishlist.forEach(item => {
-        const { category, subCategory } = item.product;
+        const categoryName = item.product.category.name;
+        const subCategoryName = item.product.subcategory.name;
         
-        // Count by category
-        summary.categories[category] = (summary.categories[category] || 0) + 1;
+        // Count by category name
+        summary.categories[categoryName] = (summary.categories[categoryName] || 0) + 1;
         
-        // Count by subcategory
-        summary.subCategories[subCategory] = (summary.subCategories[subCategory] || 0) + 1;
+        // Count by subcategory name
+        summary.subCategories[subCategoryName] = (summary.subCategories[subCategoryName] || 0) + 1;
       });
     }
 

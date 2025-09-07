@@ -23,6 +23,18 @@ const getUserId = (req) => {
   return userId;
 };
 
+// NEW: Helper to format wishlist items for a consistent API response.
+const formatWishlistItems = (items) => {
+    return items.map(item => ({
+        ...item,
+        product: {
+            ...item.product,
+            // Safely convert BigInt to string for JSON serialization
+            date: item.product.date ? item.product.date.toString() : null,
+        }
+    }));
+};
+
 
 // Add a product to wishlist
 export const addToWishlist = async (req, res) => {
@@ -52,7 +64,8 @@ export const addToWishlist = async (req, res) => {
     res.status(201).json({ 
       success: true, 
       data: {
-        wishlistItem: item,
+        // Use the helper to format the single item before sending
+        wishlistItem: formatWishlistItems([item])[0],
         userId,
         productId: Number(productId)
       },
@@ -173,7 +186,9 @@ export const getWishlist = async (req, res) => {
       return res.json({ 
         success: true, 
         data: {
-          ...result,
+          // Format the wishlist array inside the result
+          wishlist: formatWishlistItems(result.wishlist),
+          pagination: result.pagination,
           user: req.userStatus ? {
             id: req.userStatus.id,
             name: req.userStatus.name || null,
@@ -190,7 +205,8 @@ export const getWishlist = async (req, res) => {
     res.json({ 
       success: true, 
       data: {
-        wishlist,
+        // Format the wishlist array
+        wishlist: formatWishlistItems(wishlist),
         count: wishlist.length,
         user: req.userStatus ? {
           id: req.userStatus.id,
