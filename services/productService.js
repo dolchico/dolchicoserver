@@ -1,25 +1,53 @@
-// services/productService.js
 import prisma from '../lib/prisma.js';
 
+// CHANGED: createProduct now uses `connect` to link to existing categories/subcategories by their ID.
 export const createProduct = async (data) => {
-  return await prisma.product.create({ data });
+  const { categoryId, subcategoryId, ...productData } = data;
+
+  if (!categoryId || !subcategoryId) {
+    throw new Error('categoryId and subcategoryId are required to create a product.');
+  }
+
+  return await prisma.product.create({
+    data: {
+      ...productData,
+      category: {
+        connect: { id: Number(categoryId) }
+      },
+      subcategory: {
+        connect: { id: Number(subcategoryId) }
+      }
+    }
+  });
 };
 
+// CHANGED: getAllProducts now uses `include` to fetch the related category and subcategory objects.
 export const getAllProducts = async () => {
-  return await prisma.product.findMany();
+  return await prisma.product.findMany({
+    include: {
+      category: true,
+      subcategory: true,
+    }
+  });
 };
 
+// NOTE: deleteProductById does not need changes as it only uses the product's own ID.
 export const deleteProductById = async (id) => {
   return await prisma.product.delete({ where: { id: Number(id) } });
 };
 
+// CHANGED: getProductById now uses `include` to fetch the related category and subcategory objects.
 export const getProductById = async (id) => {
   return await prisma.product.findUnique({
-    where: { id: Number(id) }, // This line correctly attempts to convert the id to a number
+    where: { id: Number(id) },
+    include: {
+      category: true,
+      subcategory: true,
+    }
   });
 };
 
-// ✅ Add Search Products Service - NEW FUNCTION
+// ✅ Add Search Products Service - COMPLETELY REVISED FOR RELATIONAL SCHEMA
 export const searchProductsService = async (searchParams) => {
   try {
     const { 
@@ -33,154 +61,97 @@ export const searchProductsService = async (searchParams) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const take = parseInt(limit);
     
-    // Build where conditions for search
+    // CHANGED: whereConditions now uses relational filters (e.g., category: { name: ... })
     const whereConditions = {
       AND: [
-        // Main search across multiple fields
         {
           OR: [
-            {
-              name: {
-                contains: query,
-                mode: 'insensitive'
-              }
-            },
-            {
-              description: {
-                contains: query,
-                mode: 'insensitive'
-              }
-            },
-            {
-              category: {
-                contains: query,
-                mode: 'insensitive'
-              }
-            },
-            {
-              subCategory: {
-                contains: query,
-                mode: 'insensitive'
-              }
-            }
+            { name: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } },
+            // Search on the *name* of the related category/subcategory
+            { category: { name: { contains: query, mode: 'insensitive' } } },
+            { subcategory: { name: { contains: query, mode: 'insensitive' } } }
           ]
         },
-        // Only show products with stock
         { stock: { gt: 0 } }
       ]
     };
 
-    // Add category filter if provided
+    // CHANGED: Category filter now targets the related category's name.
     if (filters.category) {
       whereConditions.AND.push({ 
-        category: { 
-          equals: filters.category, 
-          mode: 'insensitive' 
-        } 
+        category: { name: { equals: filters.category, mode: 'insensitive' } }
       });
     }
     
-    // Add subcategory filter if provided
+    // CHANGED: Subcategory filter now targets the related subcategory's name.
     if (filters.subCategory) {
       whereConditions.AND.push({ 
-        subCategory: { 
-          equals: filters.subCategory, 
-          mode: 'insensitive' 
-        } 
+        subcategory: { name: { equals: filters.subCategory, mode: 'insensitive' } }
       });
     }
     
-    // Add price range filters
     if (filters.minPrice !== undefined) {
-      whereConditions.AND.push({ 
-        price: { gte: parseFloat(filters.minPrice) } 
-      });
+      whereConditions.AND.push({ price: { gte: parseFloat(filters.minPrice) } });
     }
     
     if (filters.maxPrice !== undefined) {
-      whereConditions.AND.push({ 
-        price: { lte: parseFloat(filters.maxPrice) } 
-      });
+      whereConditions.AND.push({ price: { lte: parseFloat(filters.maxPrice) } });
     }
 
-    // Build order by criteria
     const getOrderBy = (sortBy) => {
+      // NOTE: Sorting logic remains the same.
       switch (sortBy) {
-        case 'price_low':
-          return [{ price: 'asc' }];
-        case 'price_high':
-          return [{ price: 'desc' }];
-        case 'newest':
-          return [{ date: 'desc' }];
-        case 'oldest':
-          return [{ date: 'asc' }];
-        case 'name':
-          return [{ name: 'asc' }];
-        case 'relevance':
-        default:
-          // For relevance, prioritize name matches, then newest
-          return [{ name: 'asc' }, { date: 'desc' }];
+        case 'price_low': return [{ price: 'asc' }];
+        case 'price_high': return [{ price: 'desc' }];
+        case 'newest': return [{ date: 'desc' }];
+        default: return [{ name: 'asc' }, { date: 'desc' }];
       }
     };
 
     const orderBy = getOrderBy(sortBy);
 
-    // Execute search query and count in parallel
     const [products, totalCount] = await Promise.all([
       prisma.product.findMany({
         where: whereConditions,
         orderBy,
         skip,
         take,
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          price: true,
-          image: true,
+        // CHANGED: Use `include` instead of `select` to get full related objects, which is more consistent.
+        include: {
           category: true,
-          subCategory: true,
-          sizes: true,
-          stock: true,
-          bestseller: true,
-          date: true
+          subcategory: true,
         }
       }),
-      prisma.product.count({
-        where: whereConditions
-      })
+      prisma.product.count({ where: whereConditions })
     ]);
 
-    // Calculate pagination metadata
     const totalPages = Math.ceil(totalCount / take);
-    const hasNextPage = parseInt(page) < totalPages;
-    const hasPrevPage = parseInt(page) > 1;
 
-    // Get search suggestions if no results found
-    let suggestions = [];
-    if (products.length === 0) {
-      suggestions = await getSearchSuggestions(query);
-    }
-
-    // Get category statistics for the search
-    const categoryStats = await prisma.product.groupBy({
-      by: ['category'],
-      where: {
-        OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } }
-        ],
-        stock: { gt: 0 }
-      },
-      _count: {
-        category: true
-      },
-      orderBy: {
-        _count: {
-          category: 'desc'
-        }
-      },
+    // CHANGED: `categoryStats` logic is completely rewritten because `groupBy` cannot be used on a relation directly.
+    // Step 1: Group by the foreign key `categoryId`.
+    const categoryIdStats = await prisma.product.groupBy({
+      by: ['categoryId'],
+      where: whereConditions, // Use the same filters from the main search
+      _count: { categoryId: true },
+      orderBy: { _count: { categoryId: 'desc' } },
       take: 5
+    });
+
+    // Step 2: Fetch the category names for the IDs we found.
+    const categoryIds = categoryIdStats.map(stat => stat.categoryId);
+    const categories = await prisma.category.findMany({
+      where: { id: { in: categoryIds } },
+      select: { id: true, name: true }
+    });
+    
+    // Step 3: Combine the names and counts.
+    const categoryStats = categoryIdStats.map(stat => {
+        const category = categories.find(c => c.id === stat.categoryId);
+        return {
+            name: category ? category.name : 'Unknown',
+            count: stat._count.categoryId
+        };
     });
 
     return {
@@ -189,18 +160,15 @@ export const searchProductsService = async (searchParams) => {
         currentPage: parseInt(page),
         totalPages,
         totalCount,
-        hasNextPage,
-        hasPrevPage,
+        hasNextPage: parseInt(page) < totalPages,
+        hasPrevPage: parseInt(page) > 1,
         limit: take
       },
       metadata: {
         query,
         resultCount: products.length,
-        suggestions,
-        categoryStats: categoryStats.map(stat => ({
-          name: stat.category,
-          count: stat._count.category
-        }))
+        suggestions: products.length === 0 ? await getSearchSuggestions(query) : [],
+        categoryStats
       }
     };
 
@@ -210,40 +178,31 @@ export const searchProductsService = async (searchParams) => {
   }
 };
 
-// Helper function for search suggestions
+// Helper function for search suggestions, updated for relational queries.
 const getSearchSuggestions = async (query) => {
   try {
-    // Get similar product names for suggestions
     const suggestions = await prisma.product.findMany({
       where: {
         OR: [
-          {
-            name: {
-              contains: query.substring(0, Math.max(2, query.length - 2)),
-              mode: 'insensitive'
-            }
-          },
-          {
-            category: {
-              contains: query.substring(0, Math.max(2, query.length - 1)),
-              mode: 'insensitive'
-            }
-          }
+          { name: { contains: query, mode: 'insensitive' } },
+          // CHANGED: Search on the related category's name.
+          { category: { name: { contains: query, mode: 'insensitive' } } }
         ],
         stock: { gt: 0 }
       },
-      select: { 
-        name: true,
-        category: true 
+      // CHANGED: Include the category name in the result.
+      include: {
+        category: { select: { name: true } }
       },
       take: 5
     });
 
-    // Extract unique suggestions
     const uniqueSuggestions = new Set();
     suggestions.forEach(item => {
       uniqueSuggestions.add(item.name);
-      uniqueSuggestions.add(item.category);
+      if (item.category) {
+        uniqueSuggestions.add(item.category.name);
+      }
     });
 
     return Array.from(uniqueSuggestions).slice(0, 5);

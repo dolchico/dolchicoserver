@@ -21,7 +21,7 @@ import {
 
 import { verifyEmailByLink } from '../controllers/emailVerificationController.js';
 
-import { registerWithEmail} from '../controllers/authController.js';
+import { registerWithEmail , verifyEmailToken} from '../controllers/authController.js';
 
 
 import { requestAccountDeletion, verifyAccountDeletion } from '../controllers/userController.js';
@@ -261,8 +261,14 @@ router.post('/register-email', registerWithEmail);
 // Public link verification endpoint (button click)
 router.get('/verify-email', verifyEmailByLink);
 
+// Token-based email verification (for frontend POST requests)
+router.post('/verify-email', verifyEmailToken);
+
 // Resend email verification
 router.post('/resend-verification', resendVerificationEmail);
+// Add this route to your auth routes
+router.post('/verify-email-token', verifyEmailToken);
+
 
 
 export default router;

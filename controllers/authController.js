@@ -1,18 +1,29 @@
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
 import { 
   forgotPasswordService, 
   resetPasswordService, 
   verifyOTP as verifyEmailOTP, 
   clearOTP 
 } from '../services/authService.js';
+import { 
+  hashToken,
+  findEmailVerificationToken, 
+  markEmailTokenUsed,
+  createEmailVerificationToken,
+  deleteEmailVerificationToken
+} from '../services/tokenService.js';
 import { sendOTPEmail } from '../services/mailService.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
-import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from '../services/userService.js';
+import { determineAuthFlow, findOrCreateUser, updateProfileCompletion} from '../services/userService.js';
 import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from '../services/msg91Service.js';
 import jwt from 'jsonwebtoken';
 
 // controllers/authController.js (excerpt additions)
-import { sendEmailVerification } from '../services/userService.js';
-import { findUserByEmail, createUser } from '../services/userService.js';
+import { sendEmailVerification, findUserByEmail, createUser } from '../services/userService.js';
+import * as userService from '../services/userService.js'; // Adjust path as needed
+
 
 
 export const forgotPassword = async (req, res) => {
@@ -206,7 +217,7 @@ export const verifyOTPEndpoint = async (req, res) => {
 
   try {
     // Verify OTP using service
-    const { user, otpType } = await verifyOTP(phoneNumber, otp);
+    const { user, otpType } = await verifyPhoneOTP(phoneNumber, otp);
     
     // Update user verification status
     await updateUserVerification(user.id);
@@ -437,3 +448,130 @@ export async function resendVerificationEmail(req, res) {
     return res.status(500).json({ success: false, message: 'Failed to send verification email.' });
   }
 }
+export const verifyEmailToken = async (req, res) => {
+  const { token } = req.body;
+
+  console.log('=== EMAIL VERIFICATION DEBUG ===');
+  console.log('Received token:', token);
+
+  if (!token) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Verification token is required.',
+      errorCode: 'MISSING_TOKEN'
+    });
+  }
+
+  try {
+    // Use the function from tokenService.js
+    const verificationToken = await findEmailVerificationToken(token);
+    
+    if (!verificationToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification token.',
+        errorCode: 'INVALID_TOKEN'
+      });
+    }
+
+    // Check expiry and usage
+    if (verificationToken.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification token has expired.',
+        errorCode: 'TOKEN_EXPIRED'
+      });
+    }
+
+    if (verificationToken.usedAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'This verification link has already been used.',
+        errorCode: 'TOKEN_USED'
+      });
+    }
+
+    // Get user details
+    const user = await prisma.user.findUnique({
+      where: { id: verificationToken.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        role: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.',
+        errorCode: 'USER_NOT_FOUND'
+      });
+    }
+
+    // Use transaction for atomic operations
+    const result = await prisma.$transaction(async (tx) => {
+      // Update user email verification status
+      const updatedUser = await tx.user.update({
+        where: { id: verificationToken.userId },
+        data: { 
+          emailVerified: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phoneNumber: true,
+          emailVerified: true,
+          phoneVerified: true,
+          isProfileComplete: true,
+          role: true
+        }
+      });
+
+      // Mark token as used - now hashToken is properly imported
+      await tx.emailVerificationToken.update({
+        where: { token: hashToken(token) },
+        data: { usedAt: new Date() }
+      });
+
+      return updatedUser;
+    });
+
+    // Generate JWT token
+    const authToken = jwt.sign(
+      { 
+        userId: result.id, 
+        email: result.email,
+        role: result.role,
+        emailVerified: true
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Always require profile completion
+return res.status(200).json({
+      success: true,
+      message: 'Email verified successfully!',
+      token: authToken,
+      user: result,
+      requiresProfileCompletion: true, // Always true for email verification
+      nextStep: 'profile-completion',
+      flowType: 'email-verification' // Add this flag
+    });
+
+  } catch (error) {
+    console.error('Email Token Verification Error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'An internal server error occurred during verification.',
+      errorCode: 'INTERNAL_ERROR'
+    });
+  }
+};

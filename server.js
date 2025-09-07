@@ -30,6 +30,7 @@ import wishlistRoutes      from './routes/wishlistRoutes.js';
 import addressRoutes       from './routes/addressRoute.js';
 import paymentRouter from './routes/paymentRoutes.js';
 import authUser from './middleware/auth.js';
+import categoryRoutes from './routes/category.routes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 
 import './config/passport-setup.js';
@@ -130,6 +131,7 @@ app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/payment', authUser, paymentRouter);
+app.use('/api', categoryRoutes);
 // app.use('/api/payment', paymentRoutes);
 
 // Simple error-test route (unchanged)

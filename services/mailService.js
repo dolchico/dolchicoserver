@@ -82,7 +82,8 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
  * @param {String} userName - Optional user name (can be empty for new registrations)
  */
 export const sendVerificationEmail = async (toEmail, token, otp, userName = null) => {
-  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verifyemail?token=${token}`;
+  // Make sure this matches your actual frontend route
+  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verify-email?token=${token}&email=${encodeURIComponent(toEmail)}`;
   
   const displayName = userName || 'Valued Customer';
   
@@ -102,26 +103,35 @@ export const sendVerificationEmail = async (toEmail, token, otp, userName = null
         </p>
         
         <div style="text-align: center; margin: 32px 0;">
-          <a href="${verificationUrl}" style="background: #d9673f; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-size: 1.1em; font-weight: bold; display: inline-block;">
+          <a href="${verificationUrl}" style="background: #ff6b35; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-size: 1.1em; font-weight: bold; display: inline-block; text-align: center;">
             Verify Email Address
           </a>
         </div>
         
         <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 24px 0; text-align: center;">
           <p style="font-size: 1em; color: #333; margin-bottom: 8px;">
-            <strong>Your verification code:</strong>
+            <strong>Alternative: Enter this verification code manually:</strong>
           </p>
-          <p style="font-size: 2em; font-weight: bold; color: #d9673f; letter-spacing: 4px; margin: 0;">
+          <p style="font-size: 2em; font-weight: bold; color: #ff6b35; letter-spacing: 4px; margin: 0; font-family: 'Courier New', monospace;">
             ${otp}
           </p>
           <p style="font-size: 0.9em; color: #666; margin-top: 8px;">
-            This code expires in ${OTP_EXPIRATION_MINUTES} minutes
+            This code expires in 10 minutes
           </p>
         </div>
         
-        <p style="font-size: 1em; color: #666; line-height: 1.6;">
-          You can either click the button above or enter the verification code manually in the app.
+        <p style="font-size: 1em; color: #666; line-height: 1.6; text-align: center;">
+          You can either click the button above or enter the verification code manually on our website.
         </p>
+        
+        <div style="text-align: center; margin: 24px 0;">
+          <p style="font-size: 0.9em; color: #666;">
+            Can't click the button? Copy and paste this link:
+          </p>
+          <p style="font-size: 0.8em; color: #007bff; word-break: break-all; background: #f8f9fa; padding: 8px; border-radius: 4px;">
+            ${verificationUrl}
+          </p>
+        </div>
         
         <hr style="margin: 32px 0; border: none; border-top: 1px solid #ddd;" />
         
@@ -134,12 +144,19 @@ export const sendVerificationEmail = async (toEmail, token, otp, userName = null
         <p style="font-size: 0.9em; color: #888; margin-top: 24px; text-align: center;">
           This email was sent by Dolchi Co. If you have questions, contact our support team.
         </p>
+        
+        <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #ddd;">
+          <p style="font-size: 0.8em; color: #999;">
+            © 2025 Dolchi Co. All rights reserved.
+          </p>
+        </div>
       </div>
     `,
   };
   
   await sendEmail(mailOptions);
 };
+
 
 // ===========================
 // OTP-Only Email (for cases where you only need to send OTP)

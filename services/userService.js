@@ -244,7 +244,7 @@ export const resendEmailVerificationService = async (email) => {
       });
 
       const newToken = await createEmailVerificationToken(user.id);
-      await sendVerificationEmail(user.email, user.name || 'User', newToken);
+      await sendVerificationEmail(user.email, newToken, null, user.name || 'User');
     });
 
     return { success: true, userFound: true, alreadyVerified: false };
@@ -448,8 +448,155 @@ export const getUserAuthStatus = async (userId) => {
 };
 
 export async function sendEmailVerification(userId, email, userName, otp = null) {
-  const { token } = await createEmailVerificationToken(userId, 60);
+  const token = await createEmailVerificationToken(userId);
   // sendVerificationEmail(toEmail, token, otp, userName)
   await sendVerificationEmail(email, token, otp, userName || 'User');
   return { success: true };
 }
+
+// Get all verification tokens for debugging
+export const getAllEmailVerificationTokens = async () => {
+  try {
+    const tokens = await prisma.emailVerificationToken.findMany({
+      select: {
+        id: true,
+        token: true,
+        expiresAt: true,
+        usedAt: true,
+        createdAt: true,
+        user: {
+          select: {
+            email: true
+          }
+        }
+      }
+    });
+    return { success: true, tokens };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Clean up expired tokens
+export const cleanupExpiredTokens = async () => {
+  try {
+    const result = await prisma.emailVerificationToken.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date()
+        }
+      }
+    });
+    return { success: true, deletedCount: result.count };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+
+
+export const verifyUserEmailToken = async (token) => {
+  try {
+    // Find the verification token in database
+    const verificationToken = await prisma.emailVerificationToken.findUnique({
+      where: { token },
+      include: { 
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            emailVerified: true,
+            phoneVerified: true,
+            isProfileComplete: true,
+            role: true
+          }
+        }
+      }
+    });
+
+    // Check if token exists
+    if (!verificationToken) {
+      return {
+        success: false,
+        error: 'TOKEN_NOT_FOUND'
+      };
+    }
+
+    // Check if token has expired
+    if (verificationToken.expiresAt < new Date()) {
+      return {
+        success: false,
+        error: 'TOKEN_EXPIRED'
+      };
+    }
+
+    // Check if token was already used
+    if (verificationToken.usedAt) {
+      return {
+        success: false,
+        error: 'TOKEN_ALREADY_USED'
+      };
+    }
+
+    // Start database transaction for data integrity
+    const result = await prisma.$transaction(async (tx) => {
+      // Update user email verification status
+      const updatedUser = await tx.user.update({
+        where: { id: verificationToken.userId },
+        data: { 
+          emailVerified: true
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phoneNumber: true,
+          emailVerified: true,
+          phoneVerified: true,
+          isProfileComplete: true,
+          role: true
+        }
+      });
+
+      // Mark token as used
+      await tx.emailVerificationToken.update({
+        where: { id: verificationToken.id },
+        data: { usedAt: new Date() }
+      });
+
+      return updatedUser;
+    });
+
+    // Generate JWT token for auto-login after verification
+    const authToken = jwt.sign(
+      { 
+        userId: result.id, 
+        email: result.email,
+        role: result.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Determine if user needs profile completion
+    const requiresProfileCompletion = !result.isProfileComplete;
+
+    return {
+      success: true,
+      user: result,
+      authToken: authToken,
+      requiresProfileCompletion: requiresProfileCompletion,
+      nextStep: requiresProfileCompletion ? 'profile-completion' : 'dashboard'
+    };
+
+  } catch (error) {
+    console.error('Database error in verifyUserEmailToken:', error);
+    return {
+      success: false,
+      error: 'DATABASE_ERROR',
+      details: error.message
+    };
+  }
+};
+
