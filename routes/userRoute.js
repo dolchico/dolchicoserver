@@ -16,6 +16,8 @@ import {
   sendPhoneOTPToExisting,
   requestEmailChange,
   verifyEmailChange,
+  requestPhoneChange,
+  verifyPhoneChange,
   getUserProfile 
 } from '../controllers/userController.js';
 
@@ -248,6 +250,10 @@ router.post('/login/resend-otp',
 // routes/user.js
 router.post('/request-email-change', ensureAuth, requestEmailChange);
 router.post('/verify-email-change',  ensureAuth, verifyEmailChange);
+
+// Phone change routes
+router.post('/request-phone-change', ensureAuth, requestPhoneChange);
+router.post('/verify-phone-change', ensureAuth, verifyPhoneChange);
 
 
 

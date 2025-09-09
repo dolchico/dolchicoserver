@@ -877,9 +877,218 @@ export const verifyEmailChange = async (req, res) => {
   }
 };
 
+/* ===========================================================================
+   7. Phone Change Functions
+============================================================================ */
+
+export const requestPhoneChange = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { newPhoneNumber } = req.body;
+
+    // Input validation
+    if (!newPhoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'New phone number is required.' 
+      });
+    }
+
+    // Validate phone number format
+    if (!validator.isMobilePhone(newPhoneNumber)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid phone number format.' 
+      });
+    }
+
+    // Check if phone number is already in use
+    const existingUser = await prisma.user.findUnique({
+      where: { phoneNumber: newPhoneNumber }
+    });
+
+    if (existingUser && existingUser.id !== userId) {
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Phone number already in use.' 
+      });
+    }
+
+    // Get current user
+    const user = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'User not found.' 
+      });
+    }
+
+    // Check if user is trying to set the same phone number
+    if (user.phoneNumber === newPhoneNumber) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'New phone number cannot be the same as current phone number.' 
+      });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Clear any existing phone OTPs for this user
+    await prisma.phoneOTP.deleteMany({ where: { userId: Number(userId) } });
+    
+    // Store OTP in database using PhoneOTP model
+    await prisma.phoneOTP.create({
+      data: {
+        userId: Number(userId),
+        otp: otp,
+        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+        type: 'PHONE_CHANGE',
+        attempts: 0,
+        isUsed: false,
+        maxAttempts: 3
+      }
+    });
+
+    // Store new phone number in user's resetToken field with prefix
+    await prisma.user.update({
+      where: { id: Number(userId) },
+      data: { resetToken: `PHONE_CHANGE:${newPhoneNumber}` }
+    });
+
+    // Send OTP via SMS
+    await sendOTP(newPhoneNumber, otp, 'phone-change');
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'OTP sent to new phone number successfully.' 
+    });
+
+  } catch (err) {
+    console.error('requestPhoneChange error:', err);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+};
+
+export const verifyPhoneChange = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { otp } = req.body;
+
+    // Input validation
+    if (!otp) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'OTP is required.' 
+      });
+    }
+
+    // Find the OTP record in PhoneOTP model
+    const otpRecord = await prisma.phoneOTP.findFirst({
+      where: {
+        userId: Number(userId),
+        otp: otp,
+        type: 'PHONE_CHANGE',
+        isUsed: false,
+        expiresAt: {
+          gt: new Date()
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid or expired OTP.' 
+      });
+    }
+
+    // Get the user to retrieve the new phone number from resetToken
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) }
+    });
+
+    if (!user || !user.resetToken || !user.resetToken.startsWith('PHONE_CHANGE:')) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Phone change session not found.' 
+      });
+    }
+
+    const newPhoneNumber = user.resetToken.replace('PHONE_CHANGE:', '');
+
+    // Check if the new phone number is still available
+    const existingUser = await prisma.user.findUnique({
+      where: { phoneNumber: newPhoneNumber }
+    });
+
+    if (existingUser && existingUser.id !== userId) {
+      // Delete the OTP record and clear resetToken
+      await prisma.$transaction([
+        prisma.phoneOTP.update({
+          where: { id: otpRecord.id },
+          data: { isUsed: true }
+        }),
+        prisma.user.update({
+          where: { id: Number(userId) },
+          data: { resetToken: null }
+        })
+      ]);
+
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Phone number is no longer available.' 
+      });
+    }
+
+    // Update user's phone number, mark OTP as used, and clear resetToken
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: Number(userId) },
+        data: { 
+          phoneNumber: newPhoneNumber,
+          resetToken: null 
+        }
+      }),
+      prisma.phoneOTP.update({
+        where: { id: otpRecord.id },
+        data: { isUsed: true }
+      })
+    ]);
+
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Phone number updated successfully.' 
+    });
+
+  } catch (err) {
+    console.error('verifyPhoneChange error:', err);
+    
+    if (err.code === 'P2002') {
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Phone number already in use' 
+      });
+    }
+    
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
+};
 
 /* ===========================================================================
-   7. Resend Email Verification
+   8. Resend Email Verification
 ============================================================================ */
 export const resendVerificationEmail = async (req, res) => {
   try {

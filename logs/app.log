@@ -5945,3 +5945,51 @@
 2025-09-07T21:40:09.313Z [INFO]: ::1 - - [07/Sep/2025:21:40:09 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:08.659Z [INFO]: ::1 - - [07/Sep/2025:21:41:08 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:11.588Z [INFO]: ::1 - - [07/Sep/2025:21:41:11 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-09T16:52:46.828Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:11:38.689Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:12:07.418Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:13:32.426Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:13:40.988Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:14:39.620Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:09.456Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:28.328Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:41.144Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:51.398Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:17:37.253Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:17:41.717Z [INFO]: ::1 - - [09/Sep/2025:17:17:41 +0000] "POST /api/auth/forgot-password HTTP/1.1" 404 164 "-" "curl/8.7.1"
+2025-09-09T17:17:55.923Z [INFO]: ::1 - - [09/Sep/2025:17:17:55 +0000] "POST /api/user/forgot-password HTTP/1.1" 400 68 "-" "curl/8.7.1"
+2025-09-09T17:18:57.267Z [INFO]: ::1 - - [09/Sep/2025:17:18:57 +0000] "POST /api/user/forgot-password HTTP/1.1" 200 126 "-" "curl/8.7.1"
+2025-09-09T17:20:03.020Z [INFO]: ::1 - - [09/Sep/2025:17:20:03 +0000] "POST /api/user/reset-password HTTP/1.1" 200 66 "-" "curl/8.7.1"
+2025-09-09T17:21:55.394Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:56.268Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:56.872Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:58.321Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:25:20.910Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:25:36.577Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:29:30.579Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:30:28.055Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:30:40.726Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:32:37.450Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:33:02.674Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:36:47.197Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:36:52.682Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:37:24.657Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:38:08.492Z [INFO]: ::1 - - [09/Sep/2025:17:38:08 +0000] "POST /api/user/login HTTP/1.1" 400 64 "-" "curl/8.7.1"
+2025-09-09T17:38:45.416Z [INFO]: ::1 - - [09/Sep/2025:17:38:45 +0000] "POST /api/user/login HTTP/1.1" 200 317 "-" "curl/8.7.1"
+2025-09-09T17:44:20.465Z [INFO]: ::1 - - [09/Sep/2025:17:44:20 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T17:45:06.875Z [INFO]: ::1 - - [09/Sep/2025:17:45:06 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:45:23.616Z [INFO]: ::1 - - [09/Sep/2025:17:45:23 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:45:28.354Z [INFO]: ::1 - - [09/Sep/2025:17:45:28 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T17:46:00.267Z [INFO]: ::1 - - [09/Sep/2025:17:46:00 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:51:29.701Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:51:35.965Z [INFO]: ::1 - - [09/Sep/2025:17:51:35 +0000] "POST /api/user/login HTTP/1.1" 200 317 "-" "curl/8.7.1"
+2025-09-09T18:26:04.115Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T18:26:13.310Z [INFO]: ::1 - - [09/Sep/2025:18:26:13 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T18:26:55.585Z [INFO]: ::1 - - [09/Sep/2025:18:26:55 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 200 63 "-" "curl/8.7.1"
+2025-09-09T18:28:10.511Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:26:44.722Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:27:02.229Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:27:18.165Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T20:52:17.526Z [INFO]: ::1 - - [09/Sep/2025:20:52:17 +0000] "POST /api/user/request-account-deletion HTTP/1.1" 200 110 "-" "curl/8.7.1"
+2025-09-09T20:53:39.536Z [INFO]: ::1 - - [09/Sep/2025:20:53:39 +0000] "POST /api/user/verify-account-deletion HTTP/1.1" 200 57 "-" "curl/8.7.1"
+2025-09-09T20:55:39.708Z [INFO]: 🚀 Server started on PORT: 4000

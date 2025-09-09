@@ -16,75 +16,387 @@ import {
 } from '../services/tokenService.js';
 import { sendOTPEmail } from '../services/mailService.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
-import { determineAuthFlow, findOrCreateUser, updateProfileCompletion} from '../services/userService.js';
+import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from '../services/userService.js';
 import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from '../services/msg91Service.js';
 import jwt from 'jsonwebtoken';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
 
-// controllers/authController.js (excerpt additions)
-import { sendEmailVerification, findUserByEmail, createUser } from '../services/userService.js';
+// Import user service functions
+import { 
+  sendEmailVerification, 
+  findUserByEmail, 
+  findUserByPhone,
+  createUser 
+} from '../services/userService.js';
+
+// Import SMS service
+import { sendOTP as sendSMSOTP } from '../services/smsService.js';
 import * as userService from '../services/userService.js'; // Adjust path as needed
 
 
 
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const { emailOrPhone } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ success: false, message: 'Email is required.' });
+  if (!emailOrPhone) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Email or phone number is required.' 
+    });
   }
 
   try {
-    const result = await forgotPasswordService(email);
+    // Determine if input is phone or email
+    const isPhone = /^\+91[6-9]\d{9}$/.test(emailOrPhone.trim());
+    let user;
+    let contactType;
 
-    // If a user was found, the service returns data needed to send the email.
-    if (result) {
-      try {
-        // The forgotPasswordService already generates and stores the OTP
-        // Just send the OTP email using the OTP from the result
-        await sendOTPEmail(result.email, result.userName, result.otp);
-      } catch (mailError) {
-        // Log the email error for debugging, but do not expose it to the client.
-        console.error('CRITICAL: Failed to send OTP email:', mailError);
+    if (isPhone) {
+      // Validate phone number format
+      const phoneRegex = /^\+91[6-9]\d{9}$/;
+      if (!phoneRegex.test(emailOrPhone.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid phone number format. Use +91XXXXXXXXXX format.'
+        });
+      }
+
+      user = await findUserByPhone(emailOrPhone.trim());
+      contactType = 'phone';
+      
+      if (!user) {
+        return res.status(200).json({
+          success: true,
+          message: 'If an account with that phone number exists, an OTP has been sent.'
+        });
+      }
+
+      if (!user.phoneVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please verify your phone number first.'
+        });
+      }
+    } else {
+      // Validate email format
+      if (!validator.isEmail(emailOrPhone.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid email format.'
+        });
+      }
+
+      const cleanEmail = emailOrPhone.trim().toLowerCase();
+      user = await findUserByEmail(cleanEmail);
+      contactType = 'email';
+      
+      if (!user) {
+        return res.status(200).json({
+          success: true,
+          message: 'If an account with that email exists, an OTP has been sent.'
+        });
+      }
+
+      if (!user.emailVerified) {
+        return res.status(400).json({
+          success: false,
+          message: 'Please verify your email address first.'
+        });
       }
     }
 
-    // Always return a generic success message to prevent attackers from guessing emails.
+    // Check rate limiting
+    const recentOTPs = isPhone 
+      ? await prisma.phoneOTP.count({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            createdAt: {
+              gte: new Date(Date.now() - 60000) // Last 1 minute
+            }
+          }
+        })
+      : await prisma.emailOTP.count({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            createdAt: {
+              gte: new Date(Date.now() - 60000) // Last 1 minute
+            }
+          }
+        });
+
+    if (recentOTPs >= 3) {
+      return res.status(429).json({
+        success: false,
+        message: 'Too many OTP requests. Please try again in a minute.'
+      });
+    }
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    if (isPhone) {
+      // Clear existing password reset OTPs for this user
+      await prisma.phoneOTP.deleteMany({
+        where: {
+          userId: user.id,
+          type: 'PASSWORD_RESET'
+        }
+      });
+
+      // Store phone OTP
+      await prisma.phoneOTP.create({
+        data: {
+          userId: user.id,
+          otp,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+          type: 'PASSWORD_RESET',
+          attempts: 0,
+          isUsed: false,
+          maxAttempts: 3
+        }
+      });
+
+      // Send OTP via SMS/WhatsApp
+      try {
+        await sendSMSOTP(user.phoneNumber, otp, 'password-reset');
+        console.log('Password reset OTP sent via SMS to:', user.phoneNumber);
+      } catch (smsError) {
+        console.error('Failed to send SMS OTP:', smsError);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to send OTP. Please try again.'
+        });
+      }
+    } else {
+      // Clear existing password reset OTPs for this user
+      await prisma.emailOTP.deleteMany({
+        where: {
+          userId: user.id,
+          type: 'PASSWORD_RESET'
+        }
+      });
+
+      // Store email OTP
+      await prisma.emailOTP.create({
+        data: {
+          userId: user.id,
+          otp,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+          type: 'PASSWORD_RESET',
+          attempts: 0,
+          isUsed: false,
+          maxAttempts: 3
+        }
+      });
+
+      // Send OTP via email
+      try {
+        await sendOTPEmail(user.email, user.name || 'User', otp, 'password reset');
+        console.log('Password reset OTP sent via email to:', user.email);
+      } catch (emailError) {
+        console.error('Failed to send email OTP:', emailError);
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to send OTP. Please try again.'
+        });
+      }
+    }
+
+    // Always return a generic success message to prevent user enumeration
     return res.status(200).json({
       success: true,
-      message: 'If an account with that email exists, an OTP has been sent.',
+      message: `If an account with that ${contactType} exists, an OTP has been sent.`,
+      contactType,
+      expiresIn: 600 // 10 minutes
     });
+
   } catch (error) {
     console.error('Forgot Password Controller Error:', error);
-    return res.status(500).json({ success: false, message: 'An internal server error occurred.' });
+    return res.status(500).json({ 
+      success: false, 
+      message: 'An internal server error occurred.' 
+    });
   }
 };
 export const resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+  const { emailOrPhone, otp, newPassword } = req.body;
 
   // Validate required fields
-  if (!email || !otp || !newPassword) {
+  if (!emailOrPhone || !otp || !newPassword) {
     return res.status(400).json({ 
       success: false, 
-      message: 'Email, OTP, and new password are required.' 
+      message: 'Email/phone number, OTP, and new password are required.' 
+    });
+  }
+
+  // Validate OTP format
+  if (!validator.isLength(otp.trim(), { min: 6, max: 6 }) || !validator.isNumeric(otp.trim())) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Invalid OTP format. OTP must be 6 digits.' 
+    });
+  }
+
+  // Validate password strength
+  if (!validator.isLength(newPassword, { min: 6 })) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Password must be at least 6 characters long.' 
     });
   }
 
   try {
-    // Verify OTP first - using the renamed function
-    const isValidOTP = await verifyEmailOTP(email, otp);
-    
-    if (!isValidOTP) {
+    // Determine if input is phone or email
+    const isPhone = /^\+91[6-9]\d{9}$/.test(emailOrPhone.trim());
+    let user;
+    let otpRecord;
+
+    if (isPhone) {
+      // Validate phone number format
+      const phoneRegex = /^\+91[6-9]\d{9}$/;
+      if (!phoneRegex.test(emailOrPhone.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid phone number format. Use +91XXXXXXXXXX format.'
+        });
+      }
+
+      user = await findUserByPhone(emailOrPhone.trim());
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found with this phone number.'
+        });
+      }
+
+      // Verify phone OTP
+      otpRecord = await prisma.phoneOTP.findFirst({
+        where: {
+          userId: user.id,
+          otp: otp.trim(),
+          type: 'PASSWORD_RESET',
+          isUsed: false,
+          expiresAt: {
+            gt: new Date()
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
+    } else {
+      // Validate email format
+      if (!validator.isEmail(emailOrPhone.trim())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid email format.'
+        });
+      }
+
+      const cleanEmail = emailOrPhone.trim().toLowerCase();
+      user = await findUserByEmail(cleanEmail);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found with this email address.'
+        });
+      }
+
+      // Verify email OTP
+      otpRecord = await prisma.emailOTP.findFirst({
+        where: {
+          userId: user.id,
+          otp: otp.trim(),
+          type: 'PASSWORD_RESET',
+          isUsed: false,
+          expiresAt: {
+            gt: new Date()
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      });
+    }
+
+    if (!otpRecord) {
       return res.status(400).json({ 
         success: false, 
         message: 'Invalid or expired OTP.' 
       });
     }
 
-    // Reset password using email instead of token
-    await resetPasswordService(email, newPassword);
-    
-    // Clear the OTP after successful password reset
-    await clearOTP(email);
+    // Check if max attempts exceeded
+    if (otpRecord.attempts >= otpRecord.maxAttempts) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has exceeded maximum attempts. Please request a new one.'
+      });
+    }
+
+    // Hash the new password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(newPassword.trim(), saltRounds);
+
+    // Update password and mark OTP as used in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Update user password
+      await tx.user.update({
+        where: { id: user.id },
+        data: { 
+          password: hashedPassword,
+          updatedAt: new Date()
+        }
+      });
+
+      // Mark OTP as used
+      if (isPhone) {
+        await tx.phoneOTP.update({
+          where: { id: otpRecord.id },
+          data: { 
+            isUsed: true,
+            attempts: otpRecord.attempts + 1
+          }
+        });
+
+        // Mark all other password reset OTPs as used
+        await tx.phoneOTP.updateMany({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            isUsed: false
+          },
+          data: {
+            isUsed: true
+          }
+        });
+      } else {
+        await tx.emailOTP.update({
+          where: { id: otpRecord.id },
+          data: { 
+            isUsed: true,
+            attempts: otpRecord.attempts + 1
+          }
+        });
+
+        // Mark all other password reset OTPs as used
+        await tx.emailOTP.updateMany({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            isUsed: false
+          },
+          data: {
+            isUsed: true
+          }
+        });
+      }
+    });
+
+    console.log('Password reset successfully for user:', user.id);
 
     res.status(200).json({ 
       success: true, 
@@ -94,16 +406,19 @@ export const resetPassword = async (req, res) => {
   } catch (err) {
     console.error('Reset Password Controller Error:', err);
 
-    // Handle specific errors thrown by the service layer
-    if (err instanceof ValidationError) {
-      return res.status(err.statusCode).json({ success: false, message: err.message });
-    }
-    if (err instanceof NotFoundError) {
-      return res.status(err.statusCode).json({ success: false, message: err.message });
+    // Handle specific errors
+    if (err.code === 'P2002') {
+      return res.status(409).json({
+        success: false,
+        message: 'User data conflict occurred.'
+      });
     }
 
     // Fallback for any other unexpected errors
-    res.status(500).json({ success: false, message: 'An internal server error occurred.' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'An internal server error occurred.' 
+    });
   }
 };
 
