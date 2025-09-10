@@ -720,7 +720,8 @@ export const updateUserProfile = async (req, res) => {
             });
         }
 
-        // ADD THIS: Username validation
+
+        // Username validation
         if (updateFields.username !== undefined) {
             if (updateFields.username && updateFields.username.length < 3) {
                 return res.status(400).json({
@@ -728,7 +729,6 @@ export const updateUserProfile = async (req, res) => {
                     message: "Username must be at least 3 characters long.",
                 });
             }
-
             if (updateFields.username) {
                 const existingUsername = await prisma.user.findFirst({
                     where: {
@@ -736,7 +736,6 @@ export const updateUserProfile = async (req, res) => {
                         NOT: { id: Number(userId) },
                     },
                 });
-
                 if (existingUsername) {
                     return res.status(409).json({
                         success: false,
@@ -744,6 +743,18 @@ export const updateUserProfile = async (req, res) => {
                     });
                 }
             }
+        }
+
+        // D.O.B. validation (optional)
+        if (updateFields.dob !== undefined && updateFields.dob !== null && updateFields.dob !== "") {
+            const date = new Date(updateFields.dob);
+            if (isNaN(date.getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid date of birth format. Use YYYY-MM-DD.",
+                });
+            }
+            updateFields.dob = date.toISOString();
         }
 
         await updateProfile(userId, updateFields);

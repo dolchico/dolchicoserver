@@ -24,6 +24,7 @@ model User {
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
   resetToken        String?                  @db.VarChar(255)
+  dob               DateTime?                // Optional date of birth
   
   // Add these new profile fields
   country           String?                  @db.VarChar(100)        // Add this

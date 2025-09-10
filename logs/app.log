@@ -5993,3 +5993,8 @@
 2025-09-09T20:52:17.526Z [INFO]: ::1 - - [09/Sep/2025:20:52:17 +0000] "POST /api/user/request-account-deletion HTTP/1.1" 200 110 "-" "curl/8.7.1"
 2025-09-09T20:53:39.536Z [INFO]: ::1 - - [09/Sep/2025:20:53:39 +0000] "POST /api/user/verify-account-deletion HTTP/1.1" 200 57 "-" "curl/8.7.1"
 2025-09-09T20:55:39.708Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T21:28:03.100Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T21:28:05.560Z [INFO]: ::1 - - [10/Sep/2025:21:28:05 +0000] "POST /api/user/login HTTP/1.1" 400 64 "-" "curl/8.7.1"
+2025-09-10T21:28:24.144Z [INFO]: ::1 - - [10/Sep/2025:21:28:24 +0000] "POST /api/user/login HTTP/1.1" 200 328 "-" "curl/8.7.1"
+2025-09-10T21:29:14.228Z [INFO]: ::1 - - [10/Sep/2025:21:29:14 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 474 "-" "curl/8.7.1"
+2025-09-10T21:29:23.565Z [INFO]: ::1 - - [10/Sep/2025:21:29:23 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 474 "-" "curl/8.7.1"

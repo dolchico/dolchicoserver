@@ -144,16 +144,17 @@ export const verifyUserPhone = async (userId) => {
 export const updateProfile = async (userId, updateData) => {
     const allowedFields = [
         "name",
-        "username", // Add this
-        "fullName", // Add this
+        "username",
+        "fullName",
         "email",
         "phoneNumber",
-        "country", // Add this
-        "state", // Add this
-        "zip", // Add this
+        "country",
+        "state",
+        "zip",
         "emailVerified",
         "phoneVerified",
         "isProfileComplete",
+        "dob" // Add D.O.B. as optional
     ];
 
     const data = {};
@@ -173,6 +174,13 @@ export const updateProfile = async (userId, updateData) => {
     if (data.country) data.country = data.country.trim();
     if (data.state) data.state = data.state.trim();
     if (data.zip) data.zip = data.zip.trim();
+    if (data.dob) {
+        // Accepts ISO string or Date object
+        data.dob = new Date(data.dob);
+        if (isNaN(data.dob.getTime())) {
+            throw new Error("Invalid date of birth format. Use YYYY-MM-DD.");
+        }
+    }
 
     if (Object.keys(data).length === 0) {
         throw new Error("No fields provided for update.");
