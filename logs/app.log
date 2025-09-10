@@ -5945,3 +5945,102 @@
 2025-09-07T21:40:09.313Z [INFO]: ::1 - - [07/Sep/2025:21:40:09 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:08.659Z [INFO]: ::1 - - [07/Sep/2025:21:41:08 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:11.588Z [INFO]: ::1 - - [07/Sep/2025:21:41:11 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-09T16:07:00.188Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T16:07:05.404Z [INFO]: ::1 - - [09/Sep/2025:16:07:05 +0000] "GET / HTTP/1.1" 200 11 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-09T16:07:06.795Z [INFO]: ::1 - - [09/Sep/2025:16:07:06 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-09T16:07:39.250Z [INFO]: ::1 - - [09/Sep/2025:16:07:39 +0000] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-09T16:18:15.494Z [INFO]: ::1 - - [09/Sep/2025:16:18:15 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:42:45.688Z [INFO]: ::1 - - [09/Sep/2025:16:42:45 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:43:16.399Z [INFO]: ::1 - - [09/Sep/2025:16:43:16 +0000] "POST /api/user/request-email-change HTTP/1.1" 400 26 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:43:53.548Z [INFO]: ::1 - - [09/Sep/2025:16:43:53 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:45:25.667Z [INFO]: ::1 - - [09/Sep/2025:16:45:25 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:48:51.167Z [INFO]: ::1 - - [09/Sep/2025:16:48:51 +0000] "GET /api/user/verify-email-change HTTP/1.1" 404 167 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:49:59.568Z [INFO]: ::1 - - [09/Sep/2025:16:49:59 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:50:17.541Z [INFO]: ::1 - - [09/Sep/2025:16:50:17 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:53:16.896Z [INFO]: ::1 - - [09/Sep/2025:16:53:16 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-09T16:53:41.744Z [INFO]: ::1 - - [09/Sep/2025:16:53:41 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T03:46:56.413Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T03:47:21.374Z [INFO]: ::1 - - [10/Sep/2025:03:47:21 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-10T03:48:12.090Z [INFO]: ::1 - - [10/Sep/2025:03:48:12 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T03:50:30.616Z [INFO]: ::1 - - [10/Sep/2025:03:50:30 +0000] "POST /api/user/verify-email-change HTTP/1.1" 401 102 "-" "PostmanRuntime/7.39.1"
+2025-09-10T03:51:23.258Z [INFO]: ::1 - - [10/Sep/2025:03:51:23 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T04:51:49.781Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T04:51:56.647Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T04:52:29.744Z [INFO]: ::1 - - [10/Sep/2025:04:52:29 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T04:52:44.321Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T04:52:53.777Z [INFO]: ::1 - - [10/Sep/2025:04:52:53 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:17:03.970Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:17:10.867Z [INFO]: ::1 - - [10/Sep/2025:05:17:10 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:18:06.229Z [INFO]: ::1 - - [10/Sep/2025:05:18:06 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:18:58.148Z [INFO]: ::1 - - [10/Sep/2025:05:18:58 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:22:41.281Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:23:29.353Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:23:40.228Z [INFO]: ::1 - - [10/Sep/2025:05:23:40 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:24:11.856Z [INFO]: ::1 - - [10/Sep/2025:05:24:11 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:24:23.797Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:24:55.884Z [INFO]: ::1 - - [10/Sep/2025:05:24:55 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:25:17.629Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:25:42.878Z [INFO]: ::1 - - [10/Sep/2025:05:25:42 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:25:56.525Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:26:03.072Z [INFO]: ::1 - - [10/Sep/2025:05:26:03 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:26:31.173Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:27:03.897Z [INFO]: ::1 - - [10/Sep/2025:05:27:03 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T05:28:02.822Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T05:28:25.044Z [INFO]: ::1 - - [10/Sep/2025:05:28:25 +0000] "POST /api/user/request-email-change HTTP/1.1" 500 33 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:21:25.937Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:22:08.210Z [INFO]: ::1 - - [10/Sep/2025:11:22:08 +0000] "POST /api/user/login HTTP/1.1" 200 325 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:22:52.934Z [INFO]: ::1 - - [10/Sep/2025:11:22:52 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:23:48.811Z [INFO]: ::1 - - [10/Sep/2025:11:23:48 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:28:11.048Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:28:26.816Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:28:52.575Z [INFO]: ::1 - - [10/Sep/2025:11:28:52 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:29:04.752Z [INFO]: ::1 - - [10/Sep/2025:11:29:04 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:29:27.489Z [INFO]: ::1 - - [10/Sep/2025:11:29:27 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:40:20.895Z [INFO]: ::1 - - [10/Sep/2025:11:40:20 +0000] "POST /api/user/login HTTP/1.1" 200 326 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:40:51.548Z [INFO]: ::1 - - [10/Sep/2025:11:40:51 +0000] "POST /api/user/request-email-change HTTP/1.1" 409 32 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:41:36.036Z [INFO]: ::1 - - [10/Sep/2025:11:41:36 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:43:30.854Z [INFO]: ::1 - - [10/Sep/2025:11:43:30 +0000] "POST /api/user/login HTTP/1.1" 200 328 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:44:05.169Z [INFO]: ::1 - - [10/Sep/2025:11:44:05 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:47:36.735Z [INFO]: ::1 - - [10/Sep/2025:11:47:36 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:48:42.314Z [INFO]: ::1 - - [10/Sep/2025:11:48:42 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:50:00.729Z [INFO]: ::1 - - [10/Sep/2025:11:50:00 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:55:47.903Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:56:11.855Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:57:37.032Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:57:45.391Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:57:56.529Z [INFO]: ::1 - - [10/Sep/2025:11:57:56 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:58:18.822Z [INFO]: ::1 - - [10/Sep/2025:11:58:18 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T11:59:27.029Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:59:36.306Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T11:59:49.780Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:00:05.655Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:00:34.433Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:02:07.249Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:03:13.086Z [INFO]: ::1 - - [10/Sep/2025:12:03:13 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:03:57.840Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:04:30.062Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:05:15.218Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:05:23.283Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:05:47.898Z [INFO]: ::1 - - [10/Sep/2025:12:05:47 +0000] "POST /api/user/login HTTP/1.1" 200 328 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:06:23.114Z [INFO]: ::1 - - [10/Sep/2025:12:06:23 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:07:06.019Z [INFO]: ::1 - - [10/Sep/2025:12:07:06 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 41 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:07:46.536Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:08:08.197Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:08:40.243Z [INFO]: ::1 - - [10/Sep/2025:12:08:40 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:08:49.913Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:09:41.943Z [INFO]: ::1 - - [10/Sep/2025:12:09:41 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:10:09.370Z [INFO]: ::1 - - [10/Sep/2025:12:10:09 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 85 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:10:24.836Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:11:33.205Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:11:41.596Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:11:57.177Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:12:41.703Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:12:45.561Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:13:52.195Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T12:14:23.046Z [INFO]: ::1 - - [10/Sep/2025:12:14:23 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:15:51.318Z [INFO]: ::1 - - [10/Sep/2025:12:15:51 +0000] "POST /api/user/verify-email-change HTTP/1.1" 400 34 "-" "PostmanRuntime/7.39.1"
+2025-09-10T12:21:36.811Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T15:02:01.985Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T15:28:10.810Z [INFO]: ::1 - - [10/Sep/2025:15:28:10 +0000] "POST /api/user/login HTTP/1.1" 200 319 "-" "PostmanRuntime/7.39.1"
+2025-09-10T15:30:07.309Z [INFO]: ::1 - - [10/Sep/2025:15:30:07 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
+2025-09-10T15:35:01.318Z [INFO]: ::1 - - [10/Sep/2025:15:35:01 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 78 "-" "PostmanRuntime/7.39.1"
