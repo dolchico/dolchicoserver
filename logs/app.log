@@ -6044,3 +6044,13 @@
 2025-09-10T15:28:10.810Z [INFO]: ::1 - - [10/Sep/2025:15:28:10 +0000] "POST /api/user/login HTTP/1.1" 200 319 "-" "PostmanRuntime/7.39.1"
 2025-09-10T15:30:07.309Z [INFO]: ::1 - - [10/Sep/2025:15:30:07 +0000] "POST /api/user/request-email-change HTTP/1.1" 200 36 "-" "PostmanRuntime/7.39.1"
 2025-09-10T15:35:01.318Z [INFO]: ::1 - - [10/Sep/2025:15:35:01 +0000] "POST /api/user/verify-email-change HTTP/1.1" 200 78 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:13:31.174Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-11T11:15:04.935Z [INFO]: ::1 - - [11/Sep/2025:11:15:04 +0000] "POST /api/user/login HTTP/1.1" 200 320 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:16:12.286Z [INFO]: ::1 - - [11/Sep/2025:11:16:12 +0000] "POST /api/user/checkUserExistence HTTP/1.1" 404 167 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:16:32.318Z [INFO]: ::1 - - [11/Sep/2025:11:16:32 +0000] "POST /api/user/checkUserExistence HTTP/1.1" 404 167 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:19:04.365Z [INFO]: ::1 - - [11/Sep/2025:11:19:04 +0000] "POST /api/user/check-user HTTP/1.1" 200 121 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:19:31.291Z [INFO]: ::1 - - [11/Sep/2025:11:19:31 +0000] "POST /api/user/check-user HTTP/1.1" 200 121 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:20:33.189Z [INFO]: ::1 - - [11/Sep/2025:11:20:33 +0000] "POST /api/user/sendEmailOTPToExisting HTTP/1.1" 404 171 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:22:10.858Z [INFO]: ::1 - - [11/Sep/2025:11:22:10 +0000] "POST /api/user/send-email-otp HTTP/1.1" 200 64 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:23:50.927Z [INFO]: ::1 - - [11/Sep/2025:11:23:50 +0000] "POST /api/user/verifyEmailOtp HTTP/1.1" 404 163 "-" "PostmanRuntime/7.39.1"
+2025-09-11T11:24:40.318Z [INFO]: ::1 - - [11/Sep/2025:11:24:40 +0000] "POST /api/user/verify-email-otp HTTP/1.1" 200 320 "-" "PostmanRuntime/7.39.1"

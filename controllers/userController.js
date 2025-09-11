@@ -1002,11 +1002,14 @@ export const checkUserExistence = async (req, res) => {
         if (!emailOrPhone) {
             return res
                 .status(400)
-                .json({ message: "Email or phone number is required." });
+                .json({ message: "Email or phone is required." });
         }
 
+        // Only check existence, do NOT send OTP here
         const result = await checkUserExistenceService(emailOrPhone);
 
+        // Return available login methods (e.g., password, otp)
+        // Do NOT send OTP automatically
         return res.status(200).json(result);
     } catch (error) {
         console.error("Error in checkUserExistence:", error);
@@ -1155,21 +1158,19 @@ export const sendEmailOTPToExisting = async (req, res) => {
         const { email } = req.body;
 
         if (!email) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is required.",
-            });
+            return res
+                .status(400)
+                .json({ success: false, message: "Email is required." });
         }
 
         const user = await findUserByEmail(email.trim().toLowerCase());
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found with this email address.",
-            });
+            return res
+                .status(404)
+                .json({ success: false, message: "User not found." });
         }
 
-        // Generate and send OTP
+        // Generate and send OTP only when this endpoint is called
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         await storeEmailOTP(user.id, otp);
 
@@ -1188,10 +1189,7 @@ export const sendEmailOTPToExisting = async (req, res) => {
         });
     } catch (error) {
         console.error("Send email OTP error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to send OTP",
-        });
+        res.status(500).json({ success: false, message: "Failed to send OTP" });
     }
 };
 
