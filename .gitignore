@@ -6,3 +6,5 @@ logs
 /generated/prisma
 app.log
 *app.log
+/logs/app.log
+/logs/*.log
