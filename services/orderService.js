@@ -1,6 +1,28 @@
 import prisma from "../lib/prisma.js";
 import { serializeBigInts } from "../utils/serializeBigInt.js";
 
+// Cancel order by user (before shipment)
+export const cancelOrderByUserService = async (orderId, userId) => {
+    // Fetch order
+    const order = await prisma.order.findUnique({ where: { id: orderId } });
+    if (!order) {
+        throw new Error("Order not found");
+    }
+    if (order.userId !== userId) {
+        throw new Error("Unauthorized: You can only cancel your own orders");
+    }
+    if (order.status !== "ORDER_PLACED" && order.status !== "CONFIRMED") {
+        throw new Error("Order cannot be cancelled at this stage");
+    }
+    // Update status to CANCELLED
+    const cancelledOrder = await prisma.order.update({
+        where: { id: orderId },
+        data: { status: "CANCELLED" },
+        include: { items: { include: { product: true } } },
+    });
+    return serializeBigInts(cancelledOrder);
+};
+
 // ✅ Fixed createOrder with timeout configuration
 export const createOrder = async (orderData) => {
     const order = await prisma.$transaction(
