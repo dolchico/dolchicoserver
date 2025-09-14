@@ -187,3 +187,26 @@ app.listen(port, () => {
   console.log(`🌐 OAuth Health: http://localhost:${port}/api/auth/health`);
   logger.info(`🚀 Server started on PORT: ${port}`);
 });
+
+export const findUserByPhone = async (phoneNumber) => {
+    if (!phoneNumber) return null;
+    try {
+        return await prisma.user.findUnique({
+            where: { phoneNumber: phoneNumber.trim() },
+        });
+    } catch (error) {
+        // Check if the error is related to the missing dob column
+        if (error.code === 'P2022' && error.meta?.column === 'users.dob') {
+            // Fallback query without automatically selecting the problematic field
+            return await prisma.$queryRaw`
+                SELECT id, name, email, password, "phoneNumber", "emailVerified", 
+                "phoneVerified", "isProfileComplete", "isActive", role, "createdAt", 
+                "updatedAt", "resetToken", "resetTokenExpiry", "pendingEmail", 
+                "pendingEmailOtp", "pendingEmailExpiry", country, state, zip,
+                "pendingDeleteOtp", "pendingDeleteExpiry", username, "fullName"
+                FROM "users" WHERE "phoneNumber" = ${phoneNumber.trim()} LIMIT 1
+            `;
+        }
+        throw error;
+    }
+};
