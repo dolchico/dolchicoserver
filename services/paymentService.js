@@ -112,8 +112,11 @@ export const verifyRazorpayPayment = async (data) => {
 
     console.log('Signature verification:', {
       body,
+      secretKeyLength: process.env.RAZORPAY_KEY_SECRET?.length,
       expectedSignature: `${expectedSignature.substring(0, 10)}...`,
       receivedSignature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'NULL',
+      fullExpectedSignature: expectedSignature, // Full signature for debugging
+      fullReceivedSignature: razorpay_signature, // Full signature for debugging
       matches: expectedSignature === razorpay_signature
     });
 

@@ -4,6 +4,7 @@ import {
   getOrderPaymentStatus,
   retryFailedPayment
 } from '../services/paymentService.js';
+import { verifyPaymentWithAPI } from '../services/alternativePaymentVerification.js';
 
 // Utility function to convert BigInt to Number safely
 const serializeBigInt = (obj) => {
@@ -294,6 +295,155 @@ export const testRazorpayConfig = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message
+    });
+  }
+};
+
+/**
+ * Test signature generation - DEBUGGING ONLY
+ */
+export const testSignatureGeneration = async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, expected_signature } = req.body;
+    
+    if (!razorpay_order_id || !razorpay_payment_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'razorpay_order_id and razorpay_payment_id are required for testing'
+      });
+    }
+
+    const crypto = await import('crypto');
+    
+    // Generate signature exactly as done in the payment service
+    const body = razorpay_order_id + '|' + razorpay_payment_id;
+    const generatedSignature = crypto.default
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest('hex');
+
+    console.log('=== SIGNATURE GENERATION TEST ===');
+    console.log('Order ID:', razorpay_order_id);
+    console.log('Payment ID:', razorpay_payment_id);
+    console.log('Body for signature:', body);
+    console.log('Generated signature:', generatedSignature);
+    console.log('Expected signature:', expected_signature);
+    console.log('Signatures match:', generatedSignature === expected_signature);
+
+    res.json({
+      success: true,
+      test_data: {
+        order_id: razorpay_order_id,
+        payment_id: razorpay_payment_id,
+        body_string: body,
+        generated_signature: generatedSignature,
+        expected_signature: expected_signature || 'NOT_PROVIDED',
+        signatures_match: expected_signature ? generatedSignature === expected_signature : 'NO_EXPECTED_SIGNATURE',
+        secret_key_length: process.env.RAZORPAY_KEY_SECRET?.length || 0
+      }
+    });
+  } catch (error) {
+    console.error('Signature test error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
+/**
+ * Alternative payment verification using Razorpay API (no signature needed)
+ */
+export const verifyPaymentAPI = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { 
+      razorpay_order_id, 
+      razorpay_payment_id
+    } = req.body;
+
+    console.log("=== API-BASED PAYMENT VERIFICATION CONTROLLER ===");
+    console.log("User ID:", userId);
+    console.log("Payment data received:", {
+      razorpay_order_id,
+      razorpay_payment_id
+    });
+
+    // Validation
+    if (!razorpay_order_id || !razorpay_payment_id) {
+      const missingFields = [];
+      if (!razorpay_order_id) missingFields.push("razorpay_order_id");
+      if (!razorpay_payment_id) missingFields.push("razorpay_payment_id");
+      
+      console.error("❌ Missing required fields:", missingFields);
+      
+      return res.status(400).json({
+        success: false,
+        message: `Missing required payment verification data: ${missingFields.join(", ")}`,
+        receivedData: {
+          razorpay_order_id: !!razorpay_order_id,
+          razorpay_payment_id: !!razorpay_payment_id
+        }
+      });
+    }
+
+    console.log("✅ All required fields present, proceeding with API verification...");
+
+    const result = await verifyPaymentWithAPI({
+      razorpay_order_id,
+      razorpay_payment_id,
+      userId: Number(userId)
+    });
+
+    console.log("API Verification result:", {
+      verified: result.verified,
+      message: result.message,
+      orderId: result.orderId,
+      paymentMethod: result.paymentMethod
+    });
+
+    if (result.verified) {
+      // Convert BigInt fields in the result
+      const serializedResult = convertBigIntFields(result);
+      
+      console.log("✅ Payment verified successfully via API, sending success response");
+      
+      res.json({
+        success: true,
+        message: "Payment verified successfully via Razorpay API",
+        orderId: serializedResult.orderId,
+        orderDetails: serializedResult.orderDetails,
+        paymentMethod: result.paymentMethod,
+        verificationMethod: "api"
+      });
+    } else {
+      console.log("❌ Payment API verification failed, sending error response");
+      
+      res.status(400).json({
+        success: false,
+        message: result.message,
+        verificationFailed: true,
+        verificationMethod: "api",
+        apiResponse: result.apiResponse
+      });
+    }
+  } catch (error) {
+    console.error("❌ API Payment verification controller error:", {
+      message: error.message,
+      stack: error.stack,
+      userId,
+      requestBody: req.body
+    });
+    
+    res.status(500).json({ 
+      success: false, 
+      message: `API payment verification failed: ${error.message}`,
+      verificationMethod: "api",
+      error: process.env.NODE_ENV === "development" ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
     });
   }
 };
