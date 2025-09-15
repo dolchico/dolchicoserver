@@ -1,5 +1,15 @@
 /**
- * =============================
+ * ==============import userRouter          from './routes/userRoute.js';
+import productRouter       from './routes/productRoute.js';
+import cartRouter          from './routes/cartRoute.js';
+import orderRouter         from './routes/orderRoute.js';
+import adminRouter         from './routes/adminRoute.js';
+import OAuthRouter         from './routes/oauth.js';
+import wishlistRoutes      from './routes/wishlistRoutes.js';
+import addressRoutes       from './routes/addressRoute.js';
+import paymentRouter from './routes/paymentRoutes.js';
+import categoryRoutes from './routes/category.routes.js';
+// import paymentRoutes from './routes/paymentRoutes.js';===
  * External Packages
  * =============================
  */
@@ -136,6 +146,29 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
 // app.use('/api/payment', paymentRoutes);
+
+// Root health check (for deployment platforms)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Dolchico E-commerce API Server is running',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      docs: '/api-docs',
+      authDocs: '/api-docs-auth'
+    }
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Server is healthy',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Simple error-test route (unchanged)
 app.get('/error', (req, res) => {
