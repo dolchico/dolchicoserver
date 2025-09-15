@@ -5945,3 +5945,4 @@
 2025-09-07T21:40:09.313Z [INFO]: ::1 - - [07/Sep/2025:21:40:09 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:08.659Z [INFO]: ::1 - - [07/Sep/2025:21:41:08 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:11.588Z [INFO]: ::1 - - [07/Sep/2025:21:41:11 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+2025-09-15T21:19:36.514Z [INFO]: 🚀 Server started on PORT: 4000
