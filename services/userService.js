@@ -108,6 +108,7 @@ export const findUserById = async (id) => {
             pendingEmail: true, // Add this for email change
             pendingEmailOtp: true, // Add this for email change
             pendingEmailExpiry: true, // Add this for email change
+            dob: true
         },
     });
 };

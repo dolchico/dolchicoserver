@@ -721,13 +721,40 @@ export const updateUserProfile = async (req, res) => {
         }
 
 
-    // Username is no longer required/validated by this endpoint. If present, it will be
-    // forwarded to the service which handles uniqueness constraints via Prisma errors.
+        // Username validation
+        if (updateFields.username !== undefined) {
+            if (updateFields.username && updateFields.username.length < 3) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username must be at least 3 characters long.",
+                });
+            }
+            if (updateFields.username) {
+                const existingUsername = await prisma.user.findFirst({
+                    where: {
+                        username: updateFields.username.trim().toLowerCase(),
+                        NOT: { id: Number(userId) },
+                    },
+                });
+                if (existingUsername) {
+                    return res.status(409).json({
+                        success: false,
+                        message: "Username is already taken.",
+                    });
+                }
+            }
+        }
 
-        // Accept dateOfBirth from clients and map to internal `dob` field
-        if (updateFields.dateOfBirth !== undefined) {
-            updateFields.dob = updateFields.dateOfBirth;
-            delete updateFields.dateOfBirth;
+        // D.O.B. validation (optional)
+        if (updateFields.dob !== undefined && updateFields.dob !== null && updateFields.dob !== "") {
+            const date = new Date(updateFields.dob);
+            if (isNaN(date.getTime())) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid date of birth format. Use YYYY-MM-DD.",
+                });
+            }
+            updateFields.dob = date.toISOString();
         }
 
         await updateProfile(userId, updateFields);
@@ -746,7 +773,9 @@ export const updateUserProfile = async (req, res) => {
         // Enhanced error handling for P2002 constraints
         if (err.code === "P2002") {
             const target = err.meta?.target;
-            if (target?.includes("email")) {
+            if (target?.includes("username")) {
+                msg = "Username is already taken.";
+            } else if (target?.includes("email")) {
                 msg = "Email already exists.";
             } else if (target?.includes("phoneNumber")) {
                 msg = "Phone number already exists.";
@@ -1481,6 +1510,7 @@ export const getUserProfile = async (req, res) => {
             name: user.name,
             username: user.username || "", // Fallback for missing field
             fullName: user.fullName || "", // Fallback for missing field
+            dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : null,
             email: user.email,
             phoneNumber: user.phoneNumber,
             emailVerified: user.emailVerified,
