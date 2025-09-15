@@ -1,9 +1,11 @@
+import logger from '../logger.js';
 import {
   createRazorpayOrder,
   verifyRazorpayPayment,
   getOrderPaymentStatus,
   retryFailedPayment
 } from '../services/paymentService.js';
+import { verifyPaymentWithAPI } from '../services/alternativePaymentVerification.js';
 
 // Utility function to convert BigInt to Number safely
 const serializeBigInt = (obj) => {
@@ -97,20 +99,44 @@ export const createPaymentOrder = async (req, res) => {
  */
 export const verifyPayment = async (req, res) => {
   try {
-    const userId = req.user.id;
+  let userId = undefined;
+  if (req && req.user && req.user.id) userId = req.user.id;
     const { 
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature 
     } = req.body;
 
+    logger.info('=== PAYMENT VERIFICATION CONTROLLER ===');
+    logger.debug(`User ID: ${userId}`);
+    logger.debug(`Request body keys: ${JSON.stringify(Object.keys(req.body))}`);
+    logger.debug('Payment data received', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'MISSING'
+    });
+
     // Validation
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      const missingFields = [];
+      if (!razorpay_order_id) missingFields.push('razorpay_order_id');
+      if (!razorpay_payment_id) missingFields.push('razorpay_payment_id');
+      if (!razorpay_signature) missingFields.push('razorpay_signature');
+      
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
+      
       return res.status(400).json({
         success: false,
-        message: 'Missing required payment verification data'
+        message: `Missing required payment verification data: ${missingFields.join(', ')}`,
+        receivedData: {
+          razorpay_order_id: !!razorpay_order_id,
+          razorpay_payment_id: !!razorpay_payment_id,
+          razorpay_signature: !!razorpay_signature
+        }
       });
     }
+
+  logger.info('All required fields present, proceeding with verification');
 
     const result = await verifyRazorpayPayment({
       razorpay_order_id,
@@ -119,9 +145,17 @@ export const verifyPayment = async (req, res) => {
       userId: Number(userId)
     });
 
+    logger.debug('Verification result', {
+      verified: result.verified,
+      message: result.message,
+      orderId: result.orderId
+    });
+
     if (result.verified) {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
+      
+  logger.info('Payment verified successfully, sending success response');
       
       res.json({
         success: true,
@@ -130,16 +164,29 @@ export const verifyPayment = async (req, res) => {
         orderDetails: serializedResult.orderDetails
       });
     } else {
+  logger.warn('Payment verification failed, sending error response');
+      
       res.status(400).json({
         success: false,
-        message: result.message
+        message: result.message,
+        verificationFailed: true
       });
     }
   } catch (error) {
-    console.error('Verify Payment Error:', error);
+    logger.error('Payment verification controller error', {
+      message: error.message,
+      stack: error.stack,
+      userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
+      requestBody: req && req.body ? req.body : 'NO_BODY'
+    });
+    
     res.status(500).json({ 
       success: false, 
-      message: error.message 
+      message: `Payment verification failed: ${error.message}`,
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
     });
   }
 };
@@ -218,4 +265,203 @@ export const retryPayment = async (req, res) => {
       message: error.message 
     });
   }
+};
+
+
+/**
+ * Test endpoint to check Razorpay configuration
+ */
+export const testRazorpayConfig = async (req, res) => {
+  try {
+    const hasKeyId = !!process.env.RAZORPAY_KEY_ID;
+    const hasKeySecret = !!process.env.RAZORPAY_KEY_SECRET;
+    
+    console.log("Razorpay Config Check:", {
+      hasKeyId,
+      hasKeySecret,
+      keyIdLength: process.env.RAZORPAY_KEY_ID?.length || 0,
+      keySecretLength: process.env.RAZORPAY_KEY_SECRET?.length || 0
+    });
+    
+    res.json({
+      success: true,
+      config: {
+        hasKeyId,
+        hasKeySecret,
+        keyIdPreview: process.env.RAZORPAY_KEY_ID ? `${process.env.RAZORPAY_KEY_ID.substring(0, 6)}...` : "MISSING",
+        keySecretPreview: process.env.RAZORPAY_KEY_SECRET ? `${process.env.RAZORPAY_KEY_SECRET.substring(0, 6)}...` : "MISSING"
+      }
+    });
+  } catch (error) {
+    console.error("Config test error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Test signature generation - DEBUGGING ONLY
+ */
+export const testSignatureGeneration = async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, expected_signature } = req.body;
+    
+    if (!razorpay_order_id || !razorpay_payment_id) {
+      return res.status(400).json({
+        success: false,
+        message: 'razorpay_order_id and razorpay_payment_id are required for testing'
+      });
+    }
+
+    const crypto = await import('crypto');
+    
+    // Generate signature exactly as done in the payment service
+    const body = razorpay_order_id + '|' + razorpay_payment_id;
+    const generatedSignature = crypto.default
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(body.toString())
+      .digest('hex');
+
+    console.log('=== SIGNATURE GENERATION TEST ===');
+    console.log('Order ID:', razorpay_order_id);
+    console.log('Payment ID:', razorpay_payment_id);
+    console.log('Body for signature:', body);
+    console.log('Generated signature:', generatedSignature);
+    console.log('Expected signature:', expected_signature);
+    console.log('Signatures match:', generatedSignature === expected_signature);
+
+    res.json({
+      success: true,
+      test_data: {
+        order_id: razorpay_order_id,
+        payment_id: razorpay_payment_id,
+        body_string: body,
+        generated_signature: generatedSignature,
+        expected_signature: expected_signature || 'NOT_PROVIDED',
+        signatures_match: expected_signature ? generatedSignature === expected_signature : 'NO_EXPECTED_SIGNATURE',
+        secret_key_length: process.env.RAZORPAY_KEY_SECRET?.length || 0
+      }
+    });
+  } catch (error) {
+    console.error('Signature test error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
+/**
+ * Alternative payment verification using Razorpay API (no signature needed)
+ */
+export const verifyPaymentAPI = async (req, res) => {
+  try {
+    let userId = undefined;
+    if (req && req.user && req.user.id) userId = req.user.id;
+    const { 
+      razorpay_order_id, 
+      razorpay_payment_id
+    } = req.body;
+
+  logger.info('=== API-BASED PAYMENT VERIFICATION CONTROLLER ===');
+  logger.debug(`User ID: ${userId}`);
+  logger.debug('Payment data received', { razorpay_order_id, razorpay_payment_id });
+
+    // Validation
+    if (!razorpay_order_id || !razorpay_payment_id) {
+      const missingFields = [];
+      if (!razorpay_order_id) missingFields.push("razorpay_order_id");
+      if (!razorpay_payment_id) missingFields.push("razorpay_payment_id");
+      
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
+      
+      return res.status(400).json({
+        success: false,
+        message: `Missing required payment verification data: ${missingFields.join(", ")}`,
+        receivedData: {
+          razorpay_order_id: !!razorpay_order_id,
+          razorpay_payment_id: !!razorpay_payment_id
+        }
+      });
+    }
+
+  logger.info('All required fields present, proceeding with API verification');
+
+    const result = await verifyPaymentWithAPI({
+      razorpay_order_id,
+      razorpay_payment_id,
+      userId: Number(userId)
+    });
+
+    logger.debug('API Verification result', {
+      verified: result.verified,
+      message: result.message,
+      orderId: result.orderId,
+      paymentMethod: result.paymentMethod
+    });
+
+    if (result.verified) {
+      // Convert BigInt fields in the result
+      const serializedResult = convertBigIntFields(result);
+      
+  logger.info('Payment verified successfully via API, sending success response');
+      
+      res.json({
+        success: true,
+        message: "Payment verified successfully via Razorpay API",
+        orderId: serializedResult.orderId,
+        orderDetails: serializedResult.orderDetails,
+        paymentMethod: result.paymentMethod,
+        verificationMethod: "api"
+      });
+    } else {
+  logger.warn('Payment API verification failed, sending error response');
+      
+      res.status(400).json({
+        success: false,
+        message: result.message,
+        verificationFailed: true,
+        verificationMethod: "api",
+        apiResponse: result.apiResponse
+      });
+    }
+  } catch (error) {
+    logger.error('API Payment verification controller error', {
+      message: error.message,
+      stack: error.stack,
+  userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
+  requestBody: req && req.body ? req.body : 'NO_BODY'
+    });
+    
+    res.status(500).json({ 
+      success: false, 
+      message: `API payment verification failed: ${error.message}`,
+      verificationMethod: "api",
+      error: process.env.NODE_ENV === "development" ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
+    });
+  }
+};
+
+// Test CORS configuration endpoint
+export const testCORS = (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'CORS is working properly',
+    origin: req.get('Origin'),
+    timestamp: new Date().toISOString(),
+    allowedOrigins: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:4000',
+      'https://dolchico.com',
+      'https://www.dolchico.com',
+      'https://valyris-i.onrender.com'
+    ]
+  });
 };

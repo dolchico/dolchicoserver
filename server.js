@@ -1,5 +1,15 @@
 /**
- * =============================
+ * ==============import userRouter          from './routes/userRoute.js';
+import productRouter       from './routes/productRoute.js';
+import cartRouter          from './routes/cartRoute.js';
+import orderRouter         from './routes/orderRoute.js';
+import adminRouter         from './routes/adminRoute.js';
+import OAuthRouter         from './routes/oauth.js';
+import wishlistRoutes      from './routes/wishlistRoutes.js';
+import addressRoutes       from './routes/addressRoute.js';
+import paymentRouter from './routes/paymentRoutes.js';
+import categoryRoutes from './routes/category.routes.js';
+// import paymentRoutes from './routes/paymentRoutes.js';===
  * External Packages
  * =============================
  */
@@ -85,6 +95,9 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:3001', 
     'http://localhost:4000',
+    'https://dolchico.com',
+    'https://www.dolchico.com',
+    'https://valyris-i.onrender.com',
     process.env.FRONTEND_URL,
     process.env.CLIENT_URL
   ].filter(Boolean), // Remove undefined values
@@ -130,9 +143,32 @@ app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
-app.use('/api/payment', authUser, paymentRouter);
+app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
 // app.use('/api/payment', paymentRoutes);
+
+// Root health check (for deployment platforms)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Dolchico E-commerce API Server is running',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      docs: '/api-docs',
+      authDocs: '/api-docs-auth'
+    }
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    message: 'Server is healthy',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Simple error-test route (unchanged)
 app.get('/error', (req, res) => {
@@ -187,3 +223,26 @@ app.listen(port, () => {
   console.log(`🌐 OAuth Health: http://localhost:${port}/api/auth/health`);
   logger.info(`🚀 Server started on PORT: ${port}`);
 });
+
+export const findUserByPhone = async (phoneNumber) => {
+    if (!phoneNumber) return null;
+    try {
+        return await prisma.user.findUnique({
+            where: { phoneNumber: phoneNumber.trim() },
+        });
+    } catch (error) {
+        // Check if the error is related to the missing dob column
+        if (error.code === 'P2022' && error.meta?.column === 'users.dob') {
+            // Fallback query without automatically selecting the problematic field
+            return await prisma.$queryRaw`
+                SELECT id, name, email, password, "phoneNumber", "emailVerified", 
+                "phoneVerified", "isProfileComplete", "isActive", role, "createdAt", 
+                "updatedAt", "resetToken", "resetTokenExpiry", "pendingEmail", 
+                "pendingEmailOtp", "pendingEmailExpiry", country, state, zip,
+                "pendingDeleteOtp", "pendingDeleteExpiry", username, "fullName"
+                FROM "users" WHERE "phoneNumber" = ${phoneNumber.trim()} LIMIT 1
+            `;
+        }
+        throw error;
+    }
+};

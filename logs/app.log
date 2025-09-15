@@ -5945,4 +5945,178 @@
 2025-09-07T21:40:09.313Z [INFO]: ::1 - - [07/Sep/2025:21:40:09 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:08.659Z [INFO]: ::1 - - [07/Sep/2025:21:41:08 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 2025-09-07T21:41:11.588Z [INFO]: ::1 - - [07/Sep/2025:21:41:11 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
-2025-09-15T21:19:36.514Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T16:52:46.828Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:11:38.689Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:12:07.418Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:13:32.426Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:13:40.988Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:14:39.620Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:09.456Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:28.328Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:41.144Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:16:51.398Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:17:37.253Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:17:41.717Z [INFO]: ::1 - - [09/Sep/2025:17:17:41 +0000] "POST /api/auth/forgot-password HTTP/1.1" 404 164 "-" "curl/8.7.1"
+2025-09-09T17:17:55.923Z [INFO]: ::1 - - [09/Sep/2025:17:17:55 +0000] "POST /api/user/forgot-password HTTP/1.1" 400 68 "-" "curl/8.7.1"
+2025-09-09T17:18:57.267Z [INFO]: ::1 - - [09/Sep/2025:17:18:57 +0000] "POST /api/user/forgot-password HTTP/1.1" 200 126 "-" "curl/8.7.1"
+2025-09-09T17:20:03.020Z [INFO]: ::1 - - [09/Sep/2025:17:20:03 +0000] "POST /api/user/reset-password HTTP/1.1" 200 66 "-" "curl/8.7.1"
+2025-09-09T17:21:55.394Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:56.268Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:56.872Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:21:58.321Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:25:20.910Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:25:36.577Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:29:30.579Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:30:28.055Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:30:40.726Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:32:37.450Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:33:02.674Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:36:47.197Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:36:52.682Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:37:24.657Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:38:08.492Z [INFO]: ::1 - - [09/Sep/2025:17:38:08 +0000] "POST /api/user/login HTTP/1.1" 400 64 "-" "curl/8.7.1"
+2025-09-09T17:38:45.416Z [INFO]: ::1 - - [09/Sep/2025:17:38:45 +0000] "POST /api/user/login HTTP/1.1" 200 317 "-" "curl/8.7.1"
+2025-09-09T17:44:20.465Z [INFO]: ::1 - - [09/Sep/2025:17:44:20 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T17:45:06.875Z [INFO]: ::1 - - [09/Sep/2025:17:45:06 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:45:23.616Z [INFO]: ::1 - - [09/Sep/2025:17:45:23 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:45:28.354Z [INFO]: ::1 - - [09/Sep/2025:17:45:28 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T17:46:00.267Z [INFO]: ::1 - - [09/Sep/2025:17:46:00 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 400 53 "-" "curl/8.7.1"
+2025-09-09T17:51:29.701Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T17:51:35.965Z [INFO]: ::1 - - [09/Sep/2025:17:51:35 +0000] "POST /api/user/login HTTP/1.1" 200 317 "-" "curl/8.7.1"
+2025-09-09T18:26:04.115Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T18:26:13.310Z [INFO]: ::1 - - [09/Sep/2025:18:26:13 +0000] "POST /api/user/request-phone-change HTTP/1.1" 200 71 "-" "curl/8.7.1"
+2025-09-09T18:26:55.585Z [INFO]: ::1 - - [09/Sep/2025:18:26:55 +0000] "POST /api/user/verify-phone-change HTTP/1.1" 200 63 "-" "curl/8.7.1"
+2025-09-09T18:28:10.511Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:26:44.722Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:27:02.229Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T19:27:18.165Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-09T20:52:17.526Z [INFO]: ::1 - - [09/Sep/2025:20:52:17 +0000] "POST /api/user/request-account-deletion HTTP/1.1" 200 110 "-" "curl/8.7.1"
+2025-09-09T20:53:39.536Z [INFO]: ::1 - - [09/Sep/2025:20:53:39 +0000] "POST /api/user/verify-account-deletion HTTP/1.1" 200 57 "-" "curl/8.7.1"
+2025-09-09T20:55:39.708Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T21:28:03.100Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-10T21:28:05.560Z [INFO]: ::1 - - [10/Sep/2025:21:28:05 +0000] "POST /api/user/login HTTP/1.1" 400 64 "-" "curl/8.7.1"
+2025-09-10T21:28:24.144Z [INFO]: ::1 - - [10/Sep/2025:21:28:24 +0000] "POST /api/user/login HTTP/1.1" 200 328 "-" "curl/8.7.1"
+2025-09-10T21:29:14.228Z [INFO]: ::1 - - [10/Sep/2025:21:29:14 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 474 "-" "curl/8.7.1"
+2025-09-10T21:29:23.565Z [INFO]: ::1 - - [10/Sep/2025:21:29:23 +0000] "PATCH /api/user/update-profile HTTP/1.1" 200 474 "-" "curl/8.7.1"
+2025-09-14T08:50:11.531Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-14T08:51:35.828Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-14T08:51:53.558Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-14T08:51:55.974Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-14T08:52:23.661Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-14T08:53:19.973Z [INFO]: ::1 - - [14/Sep/2025:08:53:19 +0000] "POST /api/user/login HTTP/1.1" 500 51 "-" "PostmanRuntime/7.46.0"
+2025-09-14T08:54:16.095Z [INFO]: ::1 - - [14/Sep/2025:08:54:16 +0000] "POST /api/user/login HTTP/1.1" 401 69 "-" "PostmanRuntime/7.46.0"
+2025-09-14T08:56:04.736Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:31:29.812Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:32:08.198Z [INFO]: ::1 - - [15/Sep/2025:08:32:08 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:10.541Z [INFO]: ::1 - - [15/Sep/2025:08:32:10 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:16.673Z [INFO]: ::1 - - [15/Sep/2025:08:32:16 +0000] "POST /api/user/auth/send-otp HTTP/1.1" 200 90 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:22.382Z [INFO]: ::1 - - [15/Sep/2025:08:32:22 +0000] "POST /api/user/login HTTP/1.1" 200 327 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:22.991Z [INFO]: ::1 - - [15/Sep/2025:08:32:22 +0000] "GET /api/cart HTTP/1.1" 200 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:23.038Z [INFO]: ::1 - - [15/Sep/2025:08:32:23 +0000] "GET /api/user/wishlist HTTP/1.1" - - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:23.041Z [INFO]: ::1 - - [15/Sep/2025:08:32:23 +0000] "GET /api/cart HTTP/1.1" - - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:23.042Z [INFO]: ::1 - - [15/Sep/2025:08:32:23 +0000] "GET /api/user/wishlist HTTP/1.1" - - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:26.063Z [INFO]: ::1 - - [15/Sep/2025:08:32:26 +0000] "GET /api/cart HTTP/1.1" 200 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:26.519Z [INFO]: ::1 - - [15/Sep/2025:08:32:26 +0000] "GET /api/user/wishlist HTTP/1.1" 200 161 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:32:33.995Z [INFO]: ::1 - - [15/Sep/2025:08:32:33 +0000] "GET /api/user/get-user HTTP/1.1" 200 296 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:34:17.082Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:34:41.387Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:36:21.246Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:36:33.294Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:36:43.199Z [INFO]: ::1 - - [15/Sep/2025:08:36:43 +0000] "GET /api/payment/test-config HTTP/1.1" 401 76 "-" "curl/8.7.1"
+2025-09-15T08:37:02.798Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:37:21.570Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:38:46.352Z [INFO]: ::1 - - [15/Sep/2025:08:38:46 +0000] "GET /api/payment/test-config HTTP/1.1" 200 121 "-" "curl/8.7.1"
+2025-09-15T08:39:18.888Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:39:40.255Z [INFO]: ::1 - - [15/Sep/2025:08:39:40 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:40.547Z [INFO]: ::1 - - [15/Sep/2025:08:39:40 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:43.938Z [INFO]: ::1 - - [15/Sep/2025:08:39:43 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 200 10801 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:44.834Z [INFO]: ::1 - - [15/Sep/2025:08:39:44 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:45.421Z [INFO]: ::1 - - [15/Sep/2025:08:39:45 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:46.352Z [INFO]: ::1 - - [15/Sep/2025:08:39:46 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:49.244Z [INFO]: ::1 - - [15/Sep/2025:08:39:49 +0000] "POST /api/cart/items HTTP/1.1" 201 205 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:50.473Z [INFO]: ::1 - - [15/Sep/2025:08:39:50 +0000] "GET /api/cart HTTP/1.1" 200 507 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:54.878Z [INFO]: ::1 - - [15/Sep/2025:08:39:54 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:54.881Z [INFO]: ::1 - - [15/Sep/2025:08:39:54 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:56.105Z [INFO]: ::1 - - [15/Sep/2025:08:39:56 +0000] "GET /api/product/list HTTP/1.1" 200 10801 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:57.818Z [INFO]: ::1 - - [15/Sep/2025:08:39:57 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:58.113Z [INFO]: ::1 - - [15/Sep/2025:08:39:58 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:58.606Z [INFO]: ::1 - - [15/Sep/2025:08:39:58 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:39:59.181Z [INFO]: ::1 - - [15/Sep/2025:08:39:59 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:40:10.461Z [INFO]: ::1 - - [15/Sep/2025:08:40:10 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:40:11.038Z [INFO]: ::1 - - [15/Sep/2025:08:40:11 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:07.480Z [INFO]: ::1 - - [15/Sep/2025:08:41:07 +0000] "GET /api/cart HTTP/1.1" 200 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:08.077Z [INFO]: ::1 - - [15/Sep/2025:08:41:08 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:28.960Z [INFO]: ::1 - - [15/Sep/2025:08:41:28 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:29.578Z [INFO]: ::1 - - [15/Sep/2025:08:41:29 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:29.856Z [INFO]: ::1 - - [15/Sep/2025:08:41:29 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:30.158Z [INFO]: ::1 - - [15/Sep/2025:08:41:30 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:30.286Z [INFO]: ::1 - - [15/Sep/2025:08:41:30 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:33.491Z [INFO]: ::1 - - [15/Sep/2025:08:41:33 +0000] "GET /api/product/2/reviews HTTP/1.1" 404 160 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:33.494Z [INFO]: ::1 - - [15/Sep/2025:08:41:33 +0000] "GET /api/product/2/reviews HTTP/1.1" 404 160 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:34.410Z [INFO]: ::1 - - [15/Sep/2025:08:41:34 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:35.331Z [INFO]: ::1 - - [15/Sep/2025:08:41:35 +0000] "GET /api/product/single/2 HTTP/1.1" 200 1001 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:35.336Z [INFO]: ::1 - - [15/Sep/2025:08:41:35 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:36.294Z [INFO]: ::1 - - [15/Sep/2025:08:41:36 +0000] "GET /api/user/wishlist/check/2 HTTP/1.1" 200 121 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:37.106Z [INFO]: ::1 - - [15/Sep/2025:08:41:37 +0000] "GET /api/product/single/2 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:37.715Z [INFO]: ::1 - - [15/Sep/2025:08:41:37 +0000] "GET /api/user/wishlist/check/2 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:54.645Z [INFO]: ::1 - - [15/Sep/2025:08:41:54 +0000] "POST /api/cart/items HTTP/1.1" 201 205 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:55.222Z [INFO]: ::1 - - [15/Sep/2025:08:41:55 +0000] "GET /api/cart HTTP/1.1" 200 503 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:58.964Z [INFO]: ::1 - - [15/Sep/2025:08:41:58 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:59.604Z [INFO]: ::1 - - [15/Sep/2025:08:41:59 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:41:59.893Z [INFO]: ::1 - - [15/Sep/2025:08:41:59 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:02.364Z [INFO]: ::1 - - [15/Sep/2025:08:42:02 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:02.651Z [INFO]: ::1 - - [15/Sep/2025:08:42:02 +0000] "GET /api/addresses HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:02.831Z [INFO]: ::1 - - [15/Sep/2025:08:42:02 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:03.491Z [INFO]: ::1 - - [15/Sep/2025:08:42:03 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:10.103Z [INFO]: ::1 - - [15/Sep/2025:08:42:10 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:42:10.372Z [INFO]: ::1 - - [15/Sep/2025:08:42:10 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-15T08:57:06.880Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T08:58:38.776Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T12:58:56.696Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:38:05.537Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:39:55.130Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:22.365Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:33.361Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:58.117Z [INFO]: ::1 - - [15/Sep/2025:20:40:58 +0000] "POST /api/payment/verify-api HTTP/1.1" 401 76 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:41:54.011Z [INFO]: ::1 - - [15/Sep/2025:20:41:54 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.46.0"
+2025-09-15T20:43:10.299Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:43:16.206Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:43:16.207Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:43:16.207Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:43:16.814Z [ERROR]: API-based payment verification error
+2025-09-15T20:43:19.705Z [ERROR]: Failed to update payment status after API error
+2025-09-15T20:44:38.349Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:44:52.448Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:44:52.448Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:44:52.449Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:44:53.027Z [ERROR]: API-based payment verification error
+2025-09-15T20:44:56.050Z [ERROR]: Failed to update payment status after API error
+2025-09-15T20:44:56.051Z [ERROR]: API Payment verification controller error API-based payment verification failed: undefined
+2025-09-15T20:44:56.057Z [INFO]: ::1 - - [15/Sep/2025:20:44:56 +0000] "POST /api/payment/verify-api HTTP/1.1" 500 138 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:45:49.773Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:46:04.623Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:46:04.623Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:46:04.623Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:46:05.386Z [ERROR]: Failed to fetch payment from Razorpay API
+2025-09-15T20:46:05.387Z [WARN]: Payment API verification failed, sending error response
+2025-09-15T20:46:05.391Z [INFO]: ::1 - - [15/Sep/2025:20:46:05 +0000] "POST /api/payment/verify-api HTTP/1.1" 400 150 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:46:24.056Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:46:34.275Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:46:34.276Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:46:34.276Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:46:34.799Z [ERROR]: Failed to fetch payment from Razorpay API
+2025-09-15T20:46:34.799Z [WARN]: Payment API verification failed, sending error response
+2025-09-15T20:46:34.803Z [INFO]: ::1 - - [15/Sep/2025:20:46:34 +0000] "POST /api/payment/verify-api HTTP/1.1" 400 366 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:48:17.732Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:53:51.527Z [INFO]: ::1 - - [15/Sep/2025:20:53:51 +0000] "POST /api/payment/verify-api HTTP/1.1" 401 66 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:55:11.356Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:55:16.276Z [INFO]: ::1 - - [15/Sep/2025:20:55:16 +0000] "GET /api/health HTTP/1.1" 404 149 "-" "curl/8.7.1"
+2025-09-15T20:55:24.693Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:58:49.136Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:00:12.469Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:05:48.237Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:06:31.270Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:11:45.435Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:11:54.727Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:12:34.491Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:12:35.334Z [INFO]: 🚀 Server started on PORT: 4000

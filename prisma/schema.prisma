@@ -24,6 +24,7 @@ model User {
   isProfileComplete Boolean                  @default(false)
   isActive          Boolean                  @default(true)
   resetToken        String?                  @db.VarChar(255)
+  dob               DateTime?                // Optional date of birth
   
   // Add these new profile fields
   country           String?                  @db.VarChar(100)        // Add this
@@ -313,6 +314,7 @@ enum OTPType {
   EMAIL_VERIFICATION
   PHONE_VERIFICATION
   EMAIL_CHANGE
+  PHONE_CHANGE
   ACCOUNT_DELETE
 
 }
@@ -400,6 +402,7 @@ model Payment {
   @@index([status])
   @@index([userId])       // <- ADD THIS INDEX
   @@index([createdAt])
+  @@unique([userId, razorpayOrderId], name: "userId_razorpayOrderId")
   @@map("payments")
 }
 
@@ -411,6 +414,7 @@ enum PaymentStatus {
   CANCELLED
   REFUNDED
 }
+
 model Category {
   id            Int      @id @default(autoincrement())
   name          String   @unique @db.VarChar(100)

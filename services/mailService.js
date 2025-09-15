@@ -164,10 +164,11 @@ export const sendVerificationEmail = async (toEmail, token, otp, userName = null
 /**
  * Send an email with OTP only (no verification link)
  * @param {String} toEmail - Recipient email
+ * @param {String} userName - User's name (optional)
  * @param {String} otp - OTP code
  * @param {String} purpose - Purpose of OTP (verification, login, etc.)
  */
-export const sendOTPEmail = async (toEmail, otp, purpose = 'verification') => {
+export const sendOTPEmail = async (toEmail, userName = 'User', otp, purpose = 'verification') => {
   const mailOptions = {
     from: `"Dolchi Co" <${process.env.EMAIL_USER}>`,
     to: toEmail,
@@ -175,7 +176,8 @@ export const sendOTPEmail = async (toEmail, otp, purpose = 'verification') => {
     html: `
       <div style="font-family: Arial, sans-serif; color: #222; max-width: 600px; margin: auto; background: #faf9f6; padding: 32px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 32px;">
-          <h1 style="color: #1a202c;">Your Verification Code</h1>
+          <h1 style="color: #1a202c;">Hello ${userName}!</h1>
+          <h2 style="color: #1a202c;">Your Verification Code</h2>
         </div>
         
         <p style="font-size: 1.1em; line-height: 1.6; color: #333; text-align: center;">
