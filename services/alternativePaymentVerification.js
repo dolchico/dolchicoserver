@@ -49,16 +49,26 @@ export const verifyPaymentWithAPI = async (data) => {
       const result = await prisma.$transaction(async (tx) => {
         // Find the order matching the razorpay_order_id (Razorpay order_xxx typically stored in order.razorpayOrderId)
         // Try both common fields to be resilient: razorpayOrderId or paymentId depending on how data was stored.
-        const foundOrder = await tx.order.findFirst({
-          where: {
-            userId,
-            OR: [
-              { razorpayOrderId: razorpay_order_id },
-              { paymentId: razorpay_order_id }
-            ]
-          },
+        // First try to find the order directly by stored paymentId
+        let foundOrder = await tx.order.findFirst({
+          where: { userId, paymentId: razorpay_order_id },
           include: { items: { include: { product: true } }, paymentDetails: true }
         });
+
+        // If not found, try to find a Payment record that references this razorpay order id
+        if (!foundOrder) {
+          const paymentRecord = await tx.payment.findUnique({ where: { razorpayOrderId: razorpay_order_id } });
+          if (paymentRecord && paymentRecord.orderId) {
+            const orderById = await tx.order.findUnique({
+              where: { id: paymentRecord.orderId },
+              include: { items: { include: { product: true } }, paymentDetails: true }
+            });
+            // ensure the order belongs to the user
+            if (orderById && orderById.userId === userId) {
+              foundOrder = orderById;
+            }
+          }
+        }
 
         if (!foundOrder) {
           throw new Error(`Order not found for userId=${userId} and razorpay_order_id=${razorpay_order_id}`);

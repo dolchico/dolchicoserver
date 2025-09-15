@@ -152,16 +152,20 @@ export const verifyRazorpayPayment = async (data) => {
       // Update database records transactionally. Use findFirst to locate the order (non-unique),
       // then update by unique id to avoid Prisma WhereUniqueInput errors.
       const result = await prisma.$transaction(async (tx) => {
-        const foundOrder = await tx.order.findFirst({
-          where: {
-            userId,
-            OR: [
-              { paymentId: razorpay_order_id },
-              { razorpayOrderId: razorpay_order_id }
-            ]
-          },
+        // First try to locate the order by paymentId stored on the order
+        let foundOrder = await tx.order.findFirst({
+          where: { userId, paymentId: razorpay_order_id },
           include: { paymentDetails: true }
         });
+
+        // Fallback: look up Payment record by razorpayOrderId and then fetch the order by orderId
+        if (!foundOrder) {
+          const paymentRecord = await tx.payment.findUnique({ where: { razorpayOrderId: razorpay_order_id } });
+          if (paymentRecord && paymentRecord.orderId) {
+            const orderById = await tx.order.findUnique({ where: { id: paymentRecord.orderId }, include: { paymentDetails: true } });
+            if (orderById && orderById.userId === userId) foundOrder = orderById;
+          }
+        }
 
         if (!foundOrder) {
           console.error('❌ Order not found for verification (transaction):', { razorpay_order_id, userId });
