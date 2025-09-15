@@ -149,22 +149,36 @@ export const verifyRazorpayPayment = async (data) => {
         paymentDetailsStatus: existingOrder.paymentDetails?.status
       });
 
-      // Update database records
+      // Update database records transactionally. Use findFirst to locate the order (non-unique),
+      // then update by unique id to avoid Prisma WhereUniqueInput errors.
       const result = await prisma.$transaction(async (tx) => {
-        // Update order status
+        const foundOrder = await tx.order.findFirst({
+          where: {
+            userId,
+            OR: [
+              { paymentId: razorpay_order_id },
+              { razorpayOrderId: razorpay_order_id }
+            ]
+          },
+          include: { paymentDetails: true }
+        });
+
+        if (!foundOrder) {
+          console.error('❌ Order not found for verification (transaction):', { razorpay_order_id, userId });
+          throw new Error('Order not found for payment verification');
+        }
+
+        // Idempotency: if already paid/confirmed, return existing order without updating
+        if (foundOrder.payment === true || foundOrder.status === 'CONFIRMED') {
+          console.log('ℹ️ Order already confirmed - skipping update', { orderId: foundOrder.id });
+          return foundOrder;
+        }
+
+        // Update the order by unique id
         const updatedOrder = await tx.order.update({
-          where: { 
-            paymentId: razorpay_order_id,
-            userId
-          },
-          data: { 
-            payment: true,
-            status: 'CONFIRMED'
-          },
-          include: { 
-            items: { include: { product: true } },
-            paymentDetails: true 
-          }
+          where: { id: foundOrder.id },
+          data: { payment: true, status: 'CONFIRMED' },
+          include: { items: { include: { product: true } }, paymentDetails: true }
         });
 
         console.log('📦 Updated order:', {
@@ -173,22 +187,36 @@ export const verifyRazorpayPayment = async (data) => {
           newPaymentStatus: updatedOrder.payment
         });
 
-        // Update payment record
-        const updatedPayment = await tx.payment.update({
-          where: { razorpayOrderId: razorpay_order_id },
-          data: {
-            razorpayPaymentId: razorpay_payment_id,
-            razorpaySignature: razorpay_signature,
-            status: 'SUCCESS',
-            method: 'online'
+        // Update or create payment record linked to the order
+        try {
+          const existingPayment = await tx.payment.findFirst({ where: { razorpayOrderId: razorpay_order_id } });
+          if (existingPayment) {
+            await tx.payment.update({
+              where: { id: existingPayment.id },
+              data: {
+                razorpayPaymentId: razorpay_payment_id,
+                razorpaySignature: razorpay_signature,
+                status: 'SUCCESS',
+                method: 'online'
+              }
+            });
+          } else {
+            await tx.payment.create({
+              data: {
+                razorpayPaymentId: razorpay_payment_id,
+                razorpayOrderId: razorpay_order_id,
+                amount: Math.round((updatedOrder.amount || 0) * 100),
+                currency: 'INR',
+                status: 'SUCCESS',
+                method: 'online',
+                orderId: updatedOrder.id,
+                userId
+              }
+            });
           }
-        });
-
-        console.log('💳 Updated payment record:', {
-          paymentId: updatedPayment.id,
-          newStatus: updatedPayment.status,
-          razorpayPaymentId: updatedPayment.razorpayPaymentId
-        });
+        } catch (payErr) {
+          console.error('Failed to update/create payment record in transaction:', payErr);
+        }
 
         return updatedOrder;
       });
