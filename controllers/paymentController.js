@@ -104,13 +104,36 @@ export const verifyPayment = async (req, res) => {
       razorpay_signature 
     } = req.body;
 
+    console.log('=== PAYMENT VERIFICATION CONTROLLER ===');
+    console.log('User ID:', userId);
+    console.log('Request body keys:', Object.keys(req.body));
+    console.log('Payment data received:', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'MISSING'
+    });
+
     // Validation
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      const missingFields = [];
+      if (!razorpay_order_id) missingFields.push('razorpay_order_id');
+      if (!razorpay_payment_id) missingFields.push('razorpay_payment_id');
+      if (!razorpay_signature) missingFields.push('razorpay_signature');
+      
+      console.error('❌ Missing required fields:', missingFields);
+      
       return res.status(400).json({
         success: false,
-        message: 'Missing required payment verification data'
+        message: `Missing required payment verification data: ${missingFields.join(', ')}`,
+        receivedData: {
+          razorpay_order_id: !!razorpay_order_id,
+          razorpay_payment_id: !!razorpay_payment_id,
+          razorpay_signature: !!razorpay_signature
+        }
       });
     }
+
+    console.log('✅ All required fields present, proceeding with verification...');
 
     const result = await verifyRazorpayPayment({
       razorpay_order_id,
@@ -119,9 +142,17 @@ export const verifyPayment = async (req, res) => {
       userId: Number(userId)
     });
 
+    console.log('Verification result:', {
+      verified: result.verified,
+      message: result.message,
+      orderId: result.orderId
+    });
+
     if (result.verified) {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
+      
+      console.log('✅ Payment verified successfully, sending success response');
       
       res.json({
         success: true,
@@ -130,16 +161,29 @@ export const verifyPayment = async (req, res) => {
         orderDetails: serializedResult.orderDetails
       });
     } else {
+      console.log('❌ Payment verification failed, sending error response');
+      
       res.status(400).json({
         success: false,
-        message: result.message
+        message: result.message,
+        verificationFailed: true
       });
     }
   } catch (error) {
-    console.error('Verify Payment Error:', error);
+    console.error('❌ Payment verification controller error:', {
+      message: error.message,
+      stack: error.stack,
+      userId,
+      requestBody: req.body
+    });
+    
     res.status(500).json({ 
       success: false, 
-      message: error.message 
+      message: `Payment verification failed: ${error.message}`,
+      error: process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : undefined
     });
   }
 };
@@ -216,6 +260,40 @@ export const retryPayment = async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: error.message 
+    });
+  }
+};
+
+
+/**
+ * Test endpoint to check Razorpay configuration
+ */
+export const testRazorpayConfig = async (req, res) => {
+  try {
+    const hasKeyId = !!process.env.RAZORPAY_KEY_ID;
+    const hasKeySecret = !!process.env.RAZORPAY_KEY_SECRET;
+    
+    console.log("Razorpay Config Check:", {
+      hasKeyId,
+      hasKeySecret,
+      keyIdLength: process.env.RAZORPAY_KEY_ID?.length || 0,
+      keySecretLength: process.env.RAZORPAY_KEY_SECRET?.length || 0
+    });
+    
+    res.json({
+      success: true,
+      config: {
+        hasKeyId,
+        hasKeySecret,
+        keyIdPreview: process.env.RAZORPAY_KEY_ID ? `${process.env.RAZORPAY_KEY_ID.substring(0, 6)}...` : "MISSING",
+        keySecretPreview: process.env.RAZORPAY_KEY_SECRET ? `${process.env.RAZORPAY_KEY_SECRET.substring(0, 6)}...` : "MISSING"
+      }
+    });
+  } catch (error) {
+    console.error("Config test error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 };

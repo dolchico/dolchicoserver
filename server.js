@@ -130,7 +130,7 @@ app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
-app.use('/api/payment', authUser, paymentRouter);
+app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
 // app.use('/api/payment', paymentRoutes);
 

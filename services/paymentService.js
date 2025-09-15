@@ -89,6 +89,20 @@ export const verifyRazorpayPayment = async (data) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId } = data;
 
+    console.log('=== PAYMENT VERIFICATION DEBUG ===');
+    console.log('Input data:', {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'NULL',
+      userId
+    });
+
+    // Check if Razorpay secret is available
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      console.error('RAZORPAY_KEY_SECRET environment variable is missing!');
+      throw new Error('Payment verification configuration error');
+    }
+
     // Generate expected signature
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
@@ -96,20 +110,53 @@ export const verifyRazorpayPayment = async (data) => {
       .update(body.toString())
       .digest('hex');
 
+    console.log('Signature verification:', {
+      body,
+      expectedSignature: `${expectedSignature.substring(0, 10)}...`,
+      receivedSignature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'NULL',
+      matches: expectedSignature === razorpay_signature
+    });
+
     const isAuthentic = expectedSignature === razorpay_signature;
 
     if (isAuthentic) {
+      console.log('✅ Payment signature verified successfully');
+      
+      // First, check if the order exists
+      const existingOrder = await prisma.order.findFirst({
+        where: { 
+          paymentId: razorpay_order_id,
+          userId
+        },
+        include: { paymentDetails: true }
+      });
+
+      if (!existingOrder) {
+        console.error('❌ Order not found for verification:', {
+          razorpay_order_id,
+          userId
+        });
+        throw new Error('Order not found for payment verification');
+      }
+
+      console.log('📋 Found order for verification:', {
+        orderId: existingOrder.id,
+        currentStatus: existingOrder.status,
+        currentPaymentStatus: existingOrder.payment,
+        paymentDetailsStatus: existingOrder.paymentDetails?.status
+      });
+
       // Update database records
       const result = await prisma.$transaction(async (tx) => {
         // Update order status
         const updatedOrder = await tx.order.update({
           where: { 
             paymentId: razorpay_order_id,
-            userId // Ensure user owns this order
+            userId
           },
           data: { 
-            payment: true, // Keep existing boolean field
-            status: 'CONFIRMED' // Update order status
+            payment: true,
+            status: 'CONFIRMED'
           },
           include: { 
             items: { include: { product: true } },
@@ -117,20 +164,34 @@ export const verifyRazorpayPayment = async (data) => {
           }
         });
 
+        console.log('📦 Updated order:', {
+          orderId: updatedOrder.id,
+          newStatus: updatedOrder.status,
+          newPaymentStatus: updatedOrder.payment
+        });
+
         // Update payment record
-        await tx.payment.update({
+        const updatedPayment = await tx.payment.update({
           where: { razorpayOrderId: razorpay_order_id },
           data: {
             razorpayPaymentId: razorpay_payment_id,
             razorpaySignature: razorpay_signature,
             status: 'SUCCESS',
-            method: 'online' // You can enhance this with actual payment method
+            method: 'online'
           }
+        });
+
+        console.log('💳 Updated payment record:', {
+          paymentId: updatedPayment.id,
+          newStatus: updatedPayment.status,
+          razorpayPaymentId: updatedPayment.razorpayPaymentId
         });
 
         return updatedOrder;
       });
 
+      console.log('✅ Payment verification completed successfully');
+      
       return { 
         verified: true, 
         message: 'Payment verified successfully',
@@ -138,20 +199,53 @@ export const verifyRazorpayPayment = async (data) => {
         orderDetails: result
       };
     } else {
-      // Mark payment as failed
-      await prisma.payment.update({
-        where: { razorpayOrderId: razorpay_order_id },
-        data: { status: 'FAILED' }
-      });
+      console.log('❌ Payment signature verification failed');
+      
+      // Try to find and update payment record
+      try {
+        await prisma.payment.update({
+          where: { razorpayOrderId: razorpay_order_id },
+          data: { 
+            status: 'FAILED',
+            failureReason: 'Signature verification failed'
+          }
+        });
+        console.log('📝 Marked payment as failed in database');
+      } catch (updateError) {
+        console.error('Failed to update payment status to FAILED:', updateError);
+      }
 
       return { 
         verified: false, 
-        message: 'Payment verification failed' 
+        message: 'Payment signature verification failed'
       };
     }
   } catch (error) {
-    console.error('Error verifying payment:', error);
-    throw new Error('Payment verification failed');
+    console.error('❌ Payment verification error:', {
+      message: error.message,
+      stack: error.stack,
+      input: {
+        razorpay_order_id: data?.razorpay_order_id,
+        userId: data?.userId
+      }
+    });
+    
+    // Try to mark payment as failed if we have the order ID
+    if (data?.razorpay_order_id) {
+      try {
+        await prisma.payment.update({
+          where: { razorpayOrderId: data.razorpay_order_id },
+          data: { 
+            status: 'FAILED',
+            failureReason: `Verification error: ${error.message}`
+          }
+        });
+      } catch (updateError) {
+        console.error('Failed to update payment status after error:', updateError);
+      }
+    }
+    
+    throw new Error(`Payment verification failed: ${error.message}`);
   }
 };
 
