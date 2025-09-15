@@ -6108,3 +6108,9 @@
 2025-09-15T20:46:34.799Z [WARN]: Payment API verification failed, sending error response
 2025-09-15T20:46:34.803Z [INFO]: ::1 - - [15/Sep/2025:20:46:34 +0000] "POST /api/payment/verify-api HTTP/1.1" 400 366 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
 2025-09-15T20:48:17.732Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:53:51.527Z [INFO]: ::1 - - [15/Sep/2025:20:53:51 +0000] "POST /api/payment/verify-api HTTP/1.1" 401 66 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:55:11.356Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:55:16.276Z [INFO]: ::1 - - [15/Sep/2025:20:55:16 +0000] "GET /api/health HTTP/1.1" 404 149 "-" "curl/8.7.1"
+2025-09-15T20:55:24.693Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:58:49.136Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T21:00:12.469Z [INFO]: 🚀 Server started on PORT: 4000

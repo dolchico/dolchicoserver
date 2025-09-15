@@ -402,6 +402,7 @@ model Payment {
   @@index([status])
   @@index([userId])       // <- ADD THIS INDEX
   @@index([createdAt])
+  @@unique([userId, razorpayOrderId], name: "userId_razorpayOrderId")
   @@map("payments")
 }
 
@@ -413,6 +414,7 @@ enum PaymentStatus {
   CANCELLED
   REFUNDED
 }
+
 model Category {
   id            Int      @id @default(autoincrement())
   name          String   @unique @db.VarChar(100)
