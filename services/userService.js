@@ -161,6 +161,10 @@ export const updateProfile = async (userId, updateData) => {
 
     for (const field of allowedFields) {
         if (updateData[field] !== undefined) {
+            // ignore empty string values for username/fullName/name to avoid accidental unique constraint
+            if (typeof updateData[field] === 'string' && updateData[field].trim() === '') {
+                continue;
+            }
             data[field] = updateData[field];
         }
     }
