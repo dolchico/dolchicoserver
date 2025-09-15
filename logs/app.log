@@ -6073,3 +6073,38 @@
 2025-09-15T08:57:06.880Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T08:58:38.776Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T12:58:56.696Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:38:05.537Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:39:55.130Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:22.365Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:33.361Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:40:58.117Z [INFO]: ::1 - - [15/Sep/2025:20:40:58 +0000] "POST /api/payment/verify-api HTTP/1.1" 401 76 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:41:54.011Z [INFO]: ::1 - - [15/Sep/2025:20:41:54 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.46.0"
+2025-09-15T20:43:10.299Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:43:16.206Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:43:16.207Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:43:16.207Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:43:16.814Z [ERROR]: API-based payment verification error
+2025-09-15T20:43:19.705Z [ERROR]: Failed to update payment status after API error
+2025-09-15T20:44:38.349Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:44:52.448Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:44:52.448Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:44:52.449Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:44:53.027Z [ERROR]: API-based payment verification error
+2025-09-15T20:44:56.050Z [ERROR]: Failed to update payment status after API error
+2025-09-15T20:44:56.051Z [ERROR]: API Payment verification controller error API-based payment verification failed: undefined
+2025-09-15T20:44:56.057Z [INFO]: ::1 - - [15/Sep/2025:20:44:56 +0000] "POST /api/payment/verify-api HTTP/1.1" 500 138 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:45:49.773Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:46:04.623Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:46:04.623Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:46:04.623Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:46:05.386Z [ERROR]: Failed to fetch payment from Razorpay API
+2025-09-15T20:46:05.387Z [WARN]: Payment API verification failed, sending error response
+2025-09-15T20:46:05.391Z [INFO]: ::1 - - [15/Sep/2025:20:46:05 +0000] "POST /api/payment/verify-api HTTP/1.1" 400 150 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:46:24.056Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-15T20:46:34.275Z [INFO]: === API-BASED PAYMENT VERIFICATION CONTROLLER ===
+2025-09-15T20:46:34.276Z [INFO]: All required fields present, proceeding with API verification
+2025-09-15T20:46:34.276Z [INFO]: === API-BASED PAYMENT VERIFICATION ===
+2025-09-15T20:46:34.799Z [ERROR]: Failed to fetch payment from Razorpay API
+2025-09-15T20:46:34.799Z [WARN]: Payment API verification failed, sending error response
+2025-09-15T20:46:34.803Z [INFO]: ::1 - - [15/Sep/2025:20:46:34 +0000] "POST /api/payment/verify-api HTTP/1.1" 400 366 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-15T20:48:17.732Z [INFO]: 🚀 Server started on PORT: 4000

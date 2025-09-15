@@ -1,3 +1,4 @@
+import logger from '../logger.js';
 import {
   createRazorpayOrder,
   verifyRazorpayPayment,
@@ -98,17 +99,18 @@ export const createPaymentOrder = async (req, res) => {
  */
 export const verifyPayment = async (req, res) => {
   try {
-    const userId = req.user.id;
+  let userId = undefined;
+  if (req && req.user && req.user.id) userId = req.user.id;
     const { 
       razorpay_order_id, 
       razorpay_payment_id, 
       razorpay_signature 
     } = req.body;
 
-    console.log('=== PAYMENT VERIFICATION CONTROLLER ===');
-    console.log('User ID:', userId);
-    console.log('Request body keys:', Object.keys(req.body));
-    console.log('Payment data received:', {
+    logger.info('=== PAYMENT VERIFICATION CONTROLLER ===');
+    logger.debug(`User ID: ${userId}`);
+    logger.debug(`Request body keys: ${JSON.stringify(Object.keys(req.body))}`);
+    logger.debug('Payment data received', {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature: razorpay_signature ? `${razorpay_signature.substring(0, 10)}...` : 'MISSING'
@@ -121,7 +123,7 @@ export const verifyPayment = async (req, res) => {
       if (!razorpay_payment_id) missingFields.push('razorpay_payment_id');
       if (!razorpay_signature) missingFields.push('razorpay_signature');
       
-      console.error('❌ Missing required fields:', missingFields);
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
       
       return res.status(400).json({
         success: false,
@@ -134,7 +136,7 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
-    console.log('✅ All required fields present, proceeding with verification...');
+  logger.info('All required fields present, proceeding with verification');
 
     const result = await verifyRazorpayPayment({
       razorpay_order_id,
@@ -143,7 +145,7 @@ export const verifyPayment = async (req, res) => {
       userId: Number(userId)
     });
 
-    console.log('Verification result:', {
+    logger.debug('Verification result', {
       verified: result.verified,
       message: result.message,
       orderId: result.orderId
@@ -153,7 +155,7 @@ export const verifyPayment = async (req, res) => {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
       
-      console.log('✅ Payment verified successfully, sending success response');
+  logger.info('Payment verified successfully, sending success response');
       
       res.json({
         success: true,
@@ -162,7 +164,7 @@ export const verifyPayment = async (req, res) => {
         orderDetails: serializedResult.orderDetails
       });
     } else {
-      console.log('❌ Payment verification failed, sending error response');
+  logger.warn('Payment verification failed, sending error response');
       
       res.status(400).json({
         success: false,
@@ -171,11 +173,11 @@ export const verifyPayment = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('❌ Payment verification controller error:', {
+    logger.error('Payment verification controller error', {
       message: error.message,
       stack: error.stack,
-      userId,
-      requestBody: req.body
+      userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
+      requestBody: req && req.body ? req.body : 'NO_BODY'
     });
     
     res.status(500).json({ 
@@ -357,18 +359,16 @@ export const testSignatureGeneration = async (req, res) => {
  */
 export const verifyPaymentAPI = async (req, res) => {
   try {
-    const userId = req.user.id;
+    let userId = undefined;
+    if (req && req.user && req.user.id) userId = req.user.id;
     const { 
       razorpay_order_id, 
       razorpay_payment_id
     } = req.body;
 
-    console.log("=== API-BASED PAYMENT VERIFICATION CONTROLLER ===");
-    console.log("User ID:", userId);
-    console.log("Payment data received:", {
-      razorpay_order_id,
-      razorpay_payment_id
-    });
+  logger.info('=== API-BASED PAYMENT VERIFICATION CONTROLLER ===');
+  logger.debug(`User ID: ${userId}`);
+  logger.debug('Payment data received', { razorpay_order_id, razorpay_payment_id });
 
     // Validation
     if (!razorpay_order_id || !razorpay_payment_id) {
@@ -376,7 +376,7 @@ export const verifyPaymentAPI = async (req, res) => {
       if (!razorpay_order_id) missingFields.push("razorpay_order_id");
       if (!razorpay_payment_id) missingFields.push("razorpay_payment_id");
       
-      console.error("❌ Missing required fields:", missingFields);
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
       
       return res.status(400).json({
         success: false,
@@ -388,7 +388,7 @@ export const verifyPaymentAPI = async (req, res) => {
       });
     }
 
-    console.log("✅ All required fields present, proceeding with API verification...");
+  logger.info('All required fields present, proceeding with API verification');
 
     const result = await verifyPaymentWithAPI({
       razorpay_order_id,
@@ -396,7 +396,7 @@ export const verifyPaymentAPI = async (req, res) => {
       userId: Number(userId)
     });
 
-    console.log("API Verification result:", {
+    logger.debug('API Verification result', {
       verified: result.verified,
       message: result.message,
       orderId: result.orderId,
@@ -407,7 +407,7 @@ export const verifyPaymentAPI = async (req, res) => {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
       
-      console.log("✅ Payment verified successfully via API, sending success response");
+  logger.info('Payment verified successfully via API, sending success response');
       
       res.json({
         success: true,
@@ -418,7 +418,7 @@ export const verifyPaymentAPI = async (req, res) => {
         verificationMethod: "api"
       });
     } else {
-      console.log("❌ Payment API verification failed, sending error response");
+  logger.warn('Payment API verification failed, sending error response');
       
       res.status(400).json({
         success: false,
@@ -429,11 +429,11 @@ export const verifyPaymentAPI = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("❌ API Payment verification controller error:", {
+    logger.error('API Payment verification controller error', {
       message: error.message,
       stack: error.stack,
-      userId,
-      requestBody: req.body
+  userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
+  requestBody: req && req.body ? req.body : 'NO_BODY'
     });
     
     res.status(500).json({ 
