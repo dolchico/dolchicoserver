@@ -447,3 +447,21 @@ export const verifyPaymentAPI = async (req, res) => {
     });
   }
 };
+
+// Test CORS configuration endpoint
+export const testCORS = (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'CORS is working properly',
+    origin: req.get('Origin'),
+    timestamp: new Date().toISOString(),
+    allowedOrigins: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:4000',
+      'https://dolchico.com',
+      'https://www.dolchico.com',
+      'https://valyris-i.onrender.com'
+    ]
+  });
+};

@@ -85,6 +85,9 @@ app.use(cors({
     'http://localhost:3000',
     'http://localhost:3001', 
     'http://localhost:4000',
+    'https://dolchico.com',
+    'https://www.dolchico.com',
+    'https://valyris-i.onrender.com',
     process.env.FRONTEND_URL,
     process.env.CLIENT_URL
   ].filter(Boolean), // Remove undefined values

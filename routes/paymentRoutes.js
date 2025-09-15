@@ -6,7 +6,8 @@ import {
   getPaymentStatus,
   retryPayment,
   testRazorpayConfig,
-  testSignatureGeneration
+  testSignatureGeneration,
+  testCORS
 } from '../controllers/paymentController.js';
 import authUser from '../middleware/auth.js';
 
@@ -15,6 +16,7 @@ const paymentRouter = express.Router();
 // Test endpoints (no auth required for debugging) - must be before authUser middleware
 paymentRouter.get('/test-config', testRazorpayConfig);
 paymentRouter.post('/test-signature', testSignatureGeneration);
+paymentRouter.get('/test-cors', testCORS);
 
 // Apply auth middleware to all other routes
 paymentRouter.use(authUser);
