@@ -319,6 +319,63 @@ enum OTPType {
 
 }
 
+enum TicketCategory {
+  refund
+  replacement
+  mixed
+  general
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  closed
+}
+
+enum TicketResolutionStatus {
+  resolved
+  unresolved
+}
+
+enum TicketProductAction {
+  Refund
+  Replacement
+}
+
+model Ticket {
+  id               String                  @id @default(cuid())
+  ticketId         String                  @unique
+  fullName         String
+  email            String
+  subject          String
+  message          String
+  userId           Int?
+  orderId          Int?
+  category         TicketCategory
+  status           TicketStatus
+  resolutionStatus TicketResolutionStatus
+  priority         String
+  estimatedResponse String
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  products         TicketProduct[]
+
+  @@map("tickets")
+}
+
+model TicketProduct {
+  id         String             @id @default(cuid())
+  ticketId   String
+  ticket     Ticket             @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  productId  Int
+  productName String
+  action     TicketProductAction
+  createdAt  DateTime           @default(now())
+
+  @@index([ticketId])
+  @@map("ticket_products")
+}
+
 model Address {
   id           Int      @id @default(autoincrement())
   userId       Int

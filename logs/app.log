@@ -6127,3 +6127,38 @@
 2025-09-15T22:02:18.895Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T22:02:24.940Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T22:03:34.264Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:16:49.008Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:16:59.836Z [INFO]: ::1 - - [16/Sep/2025:09:16:59 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.46.0"
+2025-09-16T09:18:07.968Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:18:25.414Z [INFO]: ::1 - - [16/Sep/2025:09:18:25 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:18:26.124Z [INFO]: ::1 - - [16/Sep/2025:09:18:26 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:18:26.136Z [INFO]: ::1 - - [16/Sep/2025:09:18:26 +0000] "POST /api/generateticket HTTP/1.1" 401 93 "-" "axios/1.11.0"
+2025-09-16T09:18:26.141Z [INFO]: ::1 - - [16/Sep/2025:09:18:26 +0000] "POST /api/generateticket HTTP/1.1" 400 280 "-" "axios/1.11.0"
+2025-09-16T09:18:26.843Z [INFO]: ::1 - - [16/Sep/2025:09:18:26 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:18:26.851Z [INFO]: ::1 - - [16/Sep/2025:09:18:26 +0000] "POST /api/generateticket HTTP/1.1" 400 107 "-" "axios/1.11.0"
+2025-09-16T09:19:22.832Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:19:36.777Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:19:36.784Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:19:36.789Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 401 93 "-" "axios/1.11.0"
+2025-09-16T09:19:36.791Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 400 280 "-" "axios/1.11.0"
+2025-09-16T09:19:36.794Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 500 107 "-" "axios/1.11.0"
+2025-09-16T09:19:36.795Z [INFO]: ::1 - - [16/Sep/2025:09:19:36 +0000] "POST /api/generateticket HTTP/1.1" 400 107 "-" "axios/1.11.0"
+2025-09-16T09:21:02.056Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:21:39.089Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:21:47.453Z [INFO]: ::1 - - [16/Sep/2025:09:21:47 +0000] "POST /api/generateticket HTTP/1.1" 200 234 "-" "axios/1.11.0"
+2025-09-16T09:21:49.107Z [INFO]: ::1 - - [16/Sep/2025:09:21:49 +0000] "POST /api/generateticket HTTP/1.1" 200 240 "-" "axios/1.11.0"
+2025-09-16T09:21:49.121Z [INFO]: ::1 - - [16/Sep/2025:09:21:49 +0000] "POST /api/generateticket HTTP/1.1" 401 93 "-" "axios/1.11.0"
+2025-09-16T09:21:49.127Z [INFO]: ::1 - - [16/Sep/2025:09:21:49 +0000] "POST /api/generateticket HTTP/1.1" 400 280 "-" "axios/1.11.0"
+2025-09-16T09:21:50.680Z [INFO]: ::1 - - [16/Sep/2025:09:21:50 +0000] "POST /api/generateticket HTTP/1.1" 200 235 "-" "axios/1.11.0"
+2025-09-16T09:21:50.686Z [INFO]: ::1 - - [16/Sep/2025:09:21:50 +0000] "POST /api/generateticket HTTP/1.1" 400 107 "-" "axios/1.11.0"
+2025-09-16T09:23:01.130Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:23:01.588Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:23:02.750Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:23:52.905Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T09:24:40.223Z [INFO]: ::1 - - [16/Sep/2025:09:24:40 +0000] "POST /api/generateticket HTTP/1.1" 200 234 "-" "axios/1.11.0"
+2025-09-16T09:24:41.544Z [INFO]: ::1 - - [16/Sep/2025:09:24:41 +0000] "POST /api/generateticket HTTP/1.1" 200 240 "-" "axios/1.11.0"
+2025-09-16T09:24:41.559Z [INFO]: ::1 - - [16/Sep/2025:09:24:41 +0000] "POST /api/generateticket HTTP/1.1" 401 93 "-" "axios/1.11.0"
+2025-09-16T09:24:41.565Z [INFO]: ::1 - - [16/Sep/2025:09:24:41 +0000] "POST /api/generateticket HTTP/1.1" 400 280 "-" "axios/1.11.0"
+2025-09-16T09:24:42.815Z [INFO]: ::1 - - [16/Sep/2025:09:24:42 +0000] "POST /api/generateticket HTTP/1.1" 200 235 "-" "axios/1.11.0"
+2025-09-16T09:24:42.824Z [INFO]: ::1 - - [16/Sep/2025:09:24:42 +0000] "POST /api/generateticket HTTP/1.1" 400 107 "-" "axios/1.11.0"
+2025-09-16T09:24:54.567Z [INFO]: 🚀 Server started on PORT: 4000
