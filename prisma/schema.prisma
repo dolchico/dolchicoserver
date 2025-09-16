@@ -276,22 +276,7 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model Coupon {
-  id         Int       @id @default(autoincrement())
-  code       String    @unique @db.VarChar(50)
-  discount   Float
-  isActive   Boolean   @default(true)
-  expiresAt  DateTime?
-  usageLimit Int?
-  usageCount Int       @default(0)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@index([code])
-  @@index([isActive])
-  @@index([expiresAt])
-  @@map("coupons")
-}
+// (previous simple Coupon model removed to use enhanced Coupon model appended below)
 
 enum UserRole {
   USER
@@ -470,4 +455,54 @@ model Offer {
   @@index([categoryId])
   @@index([isActive, startDate, endDate])
   @@map("offers")
+}
+
+model Coupon {
+  id                Int       @id @default(autoincrement())
+  code              String    @unique @db.VarChar(50)
+  name              String
+  type              CouponType
+  discountValue     Decimal
+  minOrderValue     Decimal?
+  maxDiscountAmount Decimal?
+  usageLimitTotal   Int?
+  usageLimitPerUser Int?
+  validFrom         DateTime
+  validUntil        DateTime
+  isActive          Boolean   @default(true)
+  isNewUserOnly     Boolean   @default(false)
+  categoryIds       Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  usages            CouponUsage[]
+  orderCoupons      OrderCoupon[]
+
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id        Int      @id @default(autoincrement())
+  couponId  Int
+  userId    Int
+  orderId   Int?
+  usedAt    DateTime @default(now())
+  coupon    Coupon   @relation(fields: [couponId], references: [id])
+
+  @@map("coupon_usages")
+}
+
+model OrderCoupon {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  couponId      Int
+  discountValue Decimal
+  createdAt     DateTime @default(now())
+  coupon        Coupon   @relation(fields: [couponId], references: [id])
+
+  @@map("order_coupons")
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED_AMOUNT
 }

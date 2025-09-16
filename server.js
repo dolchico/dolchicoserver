@@ -41,6 +41,7 @@ import addressRoutes       from './routes/addressRoute.js';
 import paymentRouter from './routes/paymentRoutes.js';
 import authUser from './middleware/auth.js';
 import categoryRoutes from './routes/category.routes.js';
+import couponRoutes from './routes/couponRoutes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 
 import './config/passport-setup.js';
@@ -145,6 +146,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
+app.use('/api', couponRoutes);
 // app.use('/api/payment', paymentRoutes);
 
 // Root health check (for deployment platforms)

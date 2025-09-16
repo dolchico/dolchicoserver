@@ -235,19 +235,31 @@ export const verifyRazorpayPayment = async (data) => {
       };
     } else {
       console.log('❌ Payment signature verification failed');
-      
-      // Try to find and update payment record
+
+      // Try to find and update payment record and mark order as payment-failed
       try {
-        await prisma.payment.update({
+        // Update payment record if exists
+        await prisma.payment.updateMany({
           where: { razorpayOrderId: razorpay_order_id },
           data: { 
             status: 'FAILED',
             failureReason: 'Signature verification failed'
           }
         });
-        console.log('📝 Marked payment as failed in database');
+
+        // Also update the linked order(s) to indicate payment failure
+        // Some orders store paymentId as razorpay order id in paymentId field
+        await prisma.order.updateMany({
+          where: { paymentId: razorpay_order_id },
+          data: {
+            status: 'PAYMENT_FAILED',
+            payment: false
+          }
+        });
+
+        console.log('📝 Marked payment and order(s) as FAILED in database');
       } catch (updateError) {
-        console.error('Failed to update payment status to FAILED:', updateError);
+        console.error('Failed to update payment/order status to FAILED:', updateError);
       }
 
       return { 
@@ -265,18 +277,26 @@ export const verifyRazorpayPayment = async (data) => {
       }
     });
     
-    // Try to mark payment as failed if we have the order ID
+    // Try to mark payment and order as failed if we have the razorpay order id
     if (data?.razorpay_order_id) {
       try {
-        await prisma.payment.update({
+        await prisma.payment.updateMany({
           where: { razorpayOrderId: data.razorpay_order_id },
-          data: { 
+          data: {
             status: 'FAILED',
             failureReason: `Verification error: ${error.message}`
           }
         });
+
+        await prisma.order.updateMany({
+          where: { paymentId: data.razorpay_order_id },
+          data: {
+            status: 'PAYMENT_FAILED',
+            payment: false
+          }
+        });
       } catch (updateError) {
-        console.error('Failed to update payment status after error:', updateError);
+        console.error('Failed to update payment/order status after error:', updateError);
       }
     }
     

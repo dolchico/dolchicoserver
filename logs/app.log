@@ -6120,3 +6120,43 @@
 2025-09-15T21:11:54.727Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T21:12:34.491Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-15T21:12:35.334Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:20:08.560Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:21:53.172Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:22:14.815Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:22:21.190Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:23:11.212Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:26:44.139Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:27:08.847Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:28:22.938Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:31:27.648Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:31:44.717Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:31:51.505Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:32:32.158Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:33:17.796Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:34:03.469Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:38:29.400Z [INFO]: ::1 - - [16/Sep/2025:21:38:29 +0000] "POST /api/admin/login HTTP/1.1" 200 192 "-" "PostmanRuntime/7.46.0"
+2025-09-16T21:39:54.552Z [INFO]: ::1 - - [16/Sep/2025:21:39:54 +0000] "POST /api/user/login HTTP/1.1" 200 327 "-" "PostmanRuntime/7.46.0"
+2025-09-16T21:40:49.896Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:41:51.172Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:41:57.641Z [INFO]: ::1 - - [16/Sep/2025:21:41:57 +0000] "POST /api/admin/coupons HTTP/1.1" 401 88 "-" "axios/1.11.0"
+2025-09-16T21:41:57.646Z [INFO]: ::1 - - [16/Sep/2025:21:41:57 +0000] "POST /api/coupons/validate HTTP/1.1" 404 160 "-" "axios/1.11.0"
+2025-09-16T21:41:57.649Z [INFO]: ::1 - - [16/Sep/2025:21:41:57 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 404 161 "-" "axios/1.11.0"
+2025-09-16T21:41:57.652Z [INFO]: ::1 - - [16/Sep/2025:21:41:57 +0000] "DELETE /api/cart/remove-coupon/9999 HTTP/1.1" 404 169 "-" "axios/1.11.0"
+2025-09-16T21:41:57.656Z [INFO]: ::1 - - [16/Sep/2025:21:41:57 +0000] "POST /api/coupons/validate HTTP/1.1" 404 160 "-" "axios/1.11.0"
+2025-09-16T21:44:16.994Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:44:25.650Z [INFO]: ::1 - - [16/Sep/2025:21:44:25 +0000] "POST /api/api/admin/coupons HTTP/1.1" 201 399 "-" "axios/1.11.0"
+2025-09-16T21:44:28.289Z [INFO]: ::1 - - [16/Sep/2025:21:44:28 +0000] "POST /api/api/coupons/validate HTTP/1.1" 200 30 "-" "axios/1.11.0"
+2025-09-16T21:44:30.659Z [INFO]: ::1 - - [16/Sep/2025:21:44:30 +0000] "POST /api/api/cart/apply-coupon HTTP/1.1" 200 34 "-" "axios/1.11.0"
+2025-09-16T21:44:30.667Z [INFO]: ::1 - - [16/Sep/2025:21:44:30 +0000] "DELETE /api/api/cart/remove-coupon/9999 HTTP/1.1" 200 16 "-" "axios/1.11.0"
+2025-09-16T21:44:30.968Z [INFO]: ::1 - - [16/Sep/2025:21:44:30 +0000] "POST /api/api/coupons/validate HTTP/1.1" 200 36 "-" "axios/1.11.0"
+2025-09-16T21:45:07.106Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:46:00.611Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:46:38.914Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:46:47.437Z [INFO]: ::1 - - [16/Sep/2025:21:46:47 +0000] "POST /api/admin/coupons HTTP/1.1" 401 88 "-" "axios/1.11.0"
+2025-09-16T21:46:51.757Z [INFO]: ::1 - - [16/Sep/2025:21:46:51 +0000] "POST /api/coupons/validate HTTP/1.1" 200 30 "-" "axios/1.11.0"
+2025-09-16T21:46:53.859Z [INFO]: ::1 - - [16/Sep/2025:21:46:53 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 200 34 "-" "axios/1.11.0"
+2025-09-16T21:46:53.868Z [INFO]: ::1 - - [16/Sep/2025:21:46:53 +0000] "DELETE /api/cart/remove-coupon/9999 HTTP/1.1" 200 16 "-" "axios/1.11.0"
+2025-09-16T21:46:54.172Z [INFO]: ::1 - - [16/Sep/2025:21:46:54 +0000] "POST /api/coupons/validate HTTP/1.1" 200 36 "-" "axios/1.11.0"
+2025-09-16T21:47:09.859Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:49:38.074Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-16T21:49:59.793Z [INFO]: 🚀 Server started on PORT: 4000
