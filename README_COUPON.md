@@ -1,8 +1,8 @@
 Coupon API Integration Guide
 
-Base paths used by this project:
+Base paths used by this project (router is mounted at `/api`):
 - Admin operations: POST /api/admin/coupons
-- Public/Cart operations: /api/coupons/validate, /api/cart/apply-coupon, /api/cart/remove-coupon/:cartId
+- Public/Cart operations: POST /api/coupons/validate, POST /api/cart/apply-coupon, DELETE /api/cart/remove-coupon/:cartId
 
 Endpoints
 

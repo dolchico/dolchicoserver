@@ -1,15 +1,15 @@
-const couponService = require('../services/couponService');
+import * as couponService from '../services/couponService.js';
 
-async function createCoupon(req, res, next) {
+export const createCoupon = async (req, res, next) => {
   try {
     const created = await couponService.createCoupon(req.body);
     res.status(201).json(created);
   } catch (err) {
     next(err);
   }
-}
+};
 
-async function validateCoupon(req, res, next) {
+export const validateCoupon = async (req, res, next) => {
   try {
     const { userId, code, cartTotal, categoryIds } = req.body;
     const result = await couponService.validateCoupon({ userId, code, cartTotal, categoryIds });
@@ -17,9 +17,9 @@ async function validateCoupon(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
-async function applyCoupon(req, res, next) {
+export const applyCoupon = async (req, res, next) => {
   try {
     const { userId, cartId, code } = req.body;
     const result = await couponService.applyCoupon({ userId, cartId, code });
@@ -27,9 +27,9 @@ async function applyCoupon(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
+};
 
-async function removeCoupon(req, res, next) {
+export const removeCoupon = async (req, res, next) => {
   try {
     const { cartId } = req.params;
     const result = await couponService.removeCoupon({ cartId });
@@ -37,6 +37,4 @@ async function removeCoupon(req, res, next) {
   } catch (err) {
     next(err);
   }
-}
-
-module.exports = { createCoupon, validateCoupon, applyCoupon, removeCoupon };
+};

@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /*
-  Test script for Coupon API
+  Test script for Coupon API (ESM version)
   Usage:
-    BASE_URL=http://localhost:4000 TEST_JWT=<admin-jwt> node scripts/test_coupon_api.js
+    BASE_URL=http://localhost:4000 TEST_JWT=<admin-jwt> USER_JWT=<user-jwt> node scripts/test_coupon_api.js
 */
 
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
+import axios from 'axios';
 
 const BASE = process.env.BASE_URL || 'http://localhost:4000';
-const ADMIN_JWT = process.env.TEST_JWT || null; // if provided, used for admin create
+// Defaults can be overridden by environment variables
+const ADMIN_JWT = process.env.TEST_JWT || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzU4MDU4NzA5LCJleHAiOjE3NTg2NjM1MDl9.xVPLZqZsWJWVPsphibgAVyXUUUutua_j8fho2nRsp2c'; // user-provided admin token
+const USER_JWT = process.env.USER_JWT || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzU4MDU4Nzk0LCJleHAiOjE3NTg2NjM1OTR9.NKBVXiuyH5WE4F19up_478lvW-FbjymbQw7GnNuBlQ0';
 
 async function post(path, body, token) {
   try {
@@ -62,17 +63,17 @@ async function run() {
   const createResp = await post('/api/admin/coupons', couponPayload, ADMIN_JWT);
   const createdCoupon = createResp.data;
 
-  // 2. Validate coupon (guest or user)
-  await post('/api/coupons/validate', { userId: 10, code: 'TEST10', cartTotal: '120.00', categoryIds: [1] });
+  // 2. Validate coupon (as a user)
+  await post('/api/coupons/validate', { userId: 10, code: 'TEST10', cartTotal: '120.00', categoryIds: [1] }, USER_JWT);
 
-  // 3. Apply coupon (reserve)
-  await post('/api/cart/apply-coupon', { userId: 10, cartId: 9999, code: 'TEST10' });
+  // 3. Apply coupon (reserve) as user
+  await post('/api/cart/apply-coupon', { userId: 10, cartId: 9999, code: 'TEST10' }, USER_JWT);
 
-  // 4. Remove coupon
-  await del('/api/cart/remove-coupon/9999');
+  // 4. Remove coupon (user) - pass user token for auth if required
+  await del('/api/cart/remove-coupon/9999', USER_JWT);
 
-  // 5. Validation negative: expired
-  await post('/api/coupons/validate', { userId: 10, code: 'NO_SUCH_CODE', cartTotal: '120.00' });
+  // 5. Validation negative: expired or not found
+  await post('/api/coupons/validate', { userId: 10, code: 'NO_SUCH_CODE', cartTotal: '120.00' }, USER_JWT);
 
   console.log('Done');
 }
