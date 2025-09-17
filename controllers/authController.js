@@ -884,16 +884,17 @@ export const verifyEmailToken = async (req, res) => {
         });
 
         // Generate JWT token
-        const authToken = jwt.sign(
-            {
-                userId: result.id,
-                email: result.email,
-                role: result.role,
-                emailVerified: true,
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
+const authToken = jwt.sign(
+  {
+    id: result.id,      // use 'id' instead of 'userId'
+    email: result.email,
+    role: result.role,
+    emailVerified: true,
+  },
+  process.env.JWT_SECRET,
+  { expiresIn: "7d" }
+);
+
 
         // Always require profile completion
         return res.status(200).json({
