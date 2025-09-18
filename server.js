@@ -43,6 +43,7 @@ import authUser from './middleware/auth.js';
 import categoryRoutes from './routes/category.routes.js';
 import couponRoutes from './routes/couponRoutes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
 import './config/passport-setup.js';
 
@@ -147,6 +148,7 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
 app.use('/api', couponRoutes);
+app.use('/api/reviews', reviewRoutes);
 // app.use('/api/payment', paymentRoutes);
 
 // Root health check (for deployment platforms)
@@ -218,13 +220,17 @@ app.use((err, req, res, next) => {
  * Server Start (unchanged)
  * =============================
  */
-app.listen(port, () => {
-  console.log(`🚀 Server started: http://localhost:${port}`);
-  console.log(`📖 API Docs: http://localhost:${port}/api-docs`);
-  console.log(`🔐 Auth Docs: http://localhost:${port}/api-docs-auth`);
-  console.log(`🌐 OAuth Health: http://localhost:${port}/api/auth/health`);
-  logger.info(`🚀 Server started on PORT: ${port}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`🚀 Server started: http://localhost:${port}`);
+    console.log(`📖 API Docs: http://localhost:${port}/api-docs`);
+    console.log(`🔐 Auth Docs: http://localhost:${port}/api-docs-auth`);
+    console.log(`🌐 OAuth Health: http://localhost:${port}/api/auth/health`);
+    logger.info(`🚀 Server started on PORT: ${port}`);
+  });
+}
+
+export default app;
 
 export const findUserByPhone = async (phoneNumber) => {
     if (!phoneNumber) return null;
