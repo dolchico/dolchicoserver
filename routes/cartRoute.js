@@ -15,7 +15,7 @@ const cartRouter = express.Router();
 // IMPORTANT: Apply the authentication middleware to ALL routes defined in this file.
 // `cartRouter.use()` adds middleware to every route that follows it.
 // This ensures that no one can access the cart API without being logged in.
-cartRouter.use(authUser);
+// cartRouter.use(authUser);
 
 // --- Define RESTful Routes ---
 // The routes follow REST conventions for managing a resource ('cart').

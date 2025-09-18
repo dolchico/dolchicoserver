@@ -11,38 +11,39 @@ export const ensureAuth = (req, res, next) => {
     
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded; // Contains: { userId, phoneNumber, role }
-      return next();
-    } catch (err) {
-      console.error('JWT verification failed:', err.message);
-      
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ 
+      const userId = decoded.id || decoded.userId;
+
+      if (!userId) {
+        return res.status(401).json({
           success: false,
-          message: 'Token has expired. Please login again.',
-          code: 'TOKEN_EXPIRED'
-        });
-      } else if (err.name === 'JsonWebTokenError') {
-        return res.status(401).json({ 
-          success: false,
-          message: 'Invalid token format.',
-          code: 'INVALID_TOKEN'
+          message: 'Invalid token payload.',
+          code: 'INVALID_TOKEN_PAYLOAD',
         });
       }
-      
-      return res.status(401).json({ 
+
+      req.user = { ...decoded, id: userId, userId };
+      next();
+    } catch (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token expired. Login again.',
+          code: 'TOKEN_EXPIRED',
+        });
+      }
+      return res.status(401).json({
         success: false,
-        message: 'Invalid or expired token',
-        code: 'TOKEN_INVALID'
+        message: 'Invalid token.',
+        code: 'INVALID_TOKEN',
       });
     }
+  } else {
+    return res.status(401).json({
+      success: false,
+      message: 'No token provided',
+      code: 'NO_TOKEN',
+    });
   }
-  
-  return res.status(401).json({ 
-    success: false,
-    message: 'Authentication required. Please provide a valid token.',
-    code: 'NO_TOKEN'
-  });
 };
 
 // NEW: Enhanced auth middleware that also checks user account status

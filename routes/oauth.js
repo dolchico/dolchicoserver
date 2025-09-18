@@ -3,6 +3,8 @@ import passport from '../config/passport-setup.js';
 import { AuthController } from '../controllers/OAuthController.js';
 import jwt from 'jsonwebtoken';
 const router = express.Router();
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 // Start Google OAuth flow
 router.get('/google', 
@@ -87,21 +89,25 @@ const authenticateToken = (req, res, next) => {
 };
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password');
+    const user = await prisma.user.findUnique({
+      where: { id: Number(req.userId) }, // Prisma expects Number if your id is integer
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        isProfileComplete: true,
+      }
+    });
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
     res.json({
       success: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        emailVerified: user.emailVerified,
-        isProfileComplete: user.isProfileComplete
-      }
+      user
     });
   } catch (error) {
     console.error('Profile fetch error:', error);
