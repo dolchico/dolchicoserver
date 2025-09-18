@@ -418,6 +418,191 @@ Verify phone OTP during registration/verification.
 
 Resend email verification link.
 
+---
+
+## Consolidated API Docs (Coupons, Payments, Reviews)
+
+### Coupon API Integration Guide
+
+Base paths used by this project (router is mounted at `/api`):
+- Admin operations: POST /api/admin/coupons
+- Public/Cart operations: POST /api/coupons/validate, POST /api/cart/apply-coupon, DELETE /api/cart/remove-coupon/:cartId
+
+Endpoints
+
+1) Create coupon (Admin)
+- POST /api/admin/coupons
+- Body (example):
+```json
+{
+  "code": "SUMMER20",
+  "name": "Summer Sale 2025",
+  "type": "PERCENTAGE",
+  "discountValue": "20",
+  "minOrderValue": "100.00",
+  "maxDiscountAmount": "50.00",
+  "usageLimitTotal": 1000,
+  "usageLimitPerUser": 2,
+  "validFrom": "2025-09-01T00:00:00.000Z",
+  "validUntil": "2025-10-01T00:00:00.000Z",
+  "isActive": true,
+  "isNewUserOnly": false,
+  "categoryIds": [1,2,3]
+}
+```
+- Success: 201 Created with coupon object
+
+2) Validate coupon
+- POST /api/coupons/validate
+- Body (example):
+```json
+{
+  "userId": 123,
+  "code": "SUMMER20",
+  "cartTotal": "150.00",
+  "categoryIds": [1]
+}
+```
+- Success: { valid: true, discount: "30.00" }
+- Possible error reasons: NOT_FOUND, INACTIVE, NOT_STARTED, EXPIRED, MIN_ORDER_NOT_MET, CATEGORY_MISMATCH, USAGE_LIMIT_EXCEEDED, USER_USAGE_LIMIT_EXCEEDED
+
+3) Apply coupon (reserve usage)
+- POST /api/cart/apply-coupon
+- Body (example):
+```json
+{
+  "userId": 123,
+  "cartId": 456,
+  "code": "SUMMER20"
+}
+```
+- Success: { reservedUsageId: 42, couponId: 7 }
+- The call reserves a CouponUsage row (orderId=null) inside a transaction to avoid races.
+
+4) Remove coupon from cart
+- DELETE /api/cart/remove-coupon/:cartId
+- Success: { removed: true }
+
+Flow notes
+- Frontend should call validate when the user enters a coupon code to show immediate feedback.
+- When applying a coupon to the cart, call apply endpoint to reserve usage; if user proceeds to payment, Order service should link reserved usage to the created order (set orderId on CouponUsage and create OrderCoupon row).
+- If payment fails or the user removes coupon, the reserved CouponUsage should be cleaned up (by order/cancel flow). This implementation returns reservedUsageId which your order flow can use.
+
+Developer notes
+- After adding the Prisma schema you must run `npx prisma generate` and apply migrations before the new models are accessible.
+- The service uses transactions for mutation paths.
+
+---
+
+### Payment Routes - Postman Testing Guide
+
+This section lists payment-related routes and provides Postman-ready details.
+
+Base URL
+- Local: http://localhost:4000
+- Production: (your production URL)
+
+Postman Environment Variables (recommended)
+- base_url = http://localhost:4000
+- AUTH_TOKEN = <JWT token for authenticated routes>
+- RAZORPAY_KEY_ID = <your razorpay key id>
+- RAZORPAY_KEY_SECRET = <your razorpay key secret>
+
+Common headers
+- Content-Type: application/json
+- Authorization: Bearer {{AUTH_TOKEN}} (for protected routes)
+
+Routes
+
+1) Create Razorpay Order
+- POST {{base_url}}/api/payment/create-order
+- Body (application/json):
+```json
+{
+  "cartId": "<cart id>",
+  "amount": 49900,
+  "currency": "INR",
+  "receipt": "order_receipt_123"
+}
+```
+- Expected Response: 201 Created with order object
+
+2) Verify Payment (signature-based)
+- POST {{base_url}}/api/payment/verify
+- Body:
+```json
+{
+  "razorpay_payment_id": "pay_XXXXXXXX",
+  "razorpay_order_id": "order_XXXXXXXX",
+  "razorpay_signature": "<signature-from-razorpay>"
+}
+```
+- Expected Response: 200 OK { success: true, message: "Payment verification successful" }
+
+3) Verify Payment (Razorpay API fallback)
+- POST {{base_url}}/api/payment/verify-api
+- Body same as above but server calls Razorpay API to verify.
+
+4) Retry Failed Payment Verification
+- POST {{base_url}}/api/payment/retry
+- Body: { "orderId": "order_XXXXXXXX" }
+
+5) Test Razorpay Config (debug)
+- GET {{base_url}}/api/payment/test-config
+
+6) Test Signature Generation (debug)
+- POST {{base_url}}/api/payment/test-signature
+
+7) CORS Test Endpoint
+- GET {{base_url}}/api/payment/test-cors
+
+Notes
+- Amounts are in the smallest currency unit (paise for INR).
+- Keep Razorpay secret keys secure; set them as environment variables.
+
+---
+
+### Reviews API — Backend Reference
+
+This document describes the Reviews feature: authentication flow, endpoints, request/response shapes, validation rules, error codes, and frontend integration tips.
+
+> Example test account (dev only):
+>- Email: akashthanda14@gmail.com
+>- Password: Dolchi@0088
+
+Authentication (JWT)
+- All protected endpoints require a Bearer JWT in `Authorization` header.
+- Sign-in: POST /api/auth/signin with { email, password } returns { token, user }.
+
+Review model (conceptual)
+- Unified resource for PRODUCT and DELIVERY reviews. Key fields: id, userId, type, productId, orderId, deliveryAgentId, rating (1..5), title, comment, images[], metadata, isEdited, isDeleted, createdAt.
+
+Endpoints (base path: /api/reviews)
+1) Create review — POST /api/reviews (auth)
+- Validation: type required, rating 1..5 required; productId required for PRODUCT reviews (user must have purchased); orderId required for DELIVERY reviews (must be delivered and owned by user).
+- Success: 201 with created object. Errors: 400,401,403,409,422.
+
+2) Update review — PUT /api/reviews/:id (auth)
+- Only owner or ADMIN/MODERATOR can update.
+
+3) Delete review (soft-delete) — DELETE /api/reviews/:id (auth)
+
+4) Get review — GET /api/reviews/:id
+
+5) List reviews — GET /api/reviews with filters (type, productId, userId, hasImages, date range, pagination)
+
+6) Summaries — GET /api/reviews/product/:productId/summary and GET /api/reviews/delivery/:deliveryAgentId/summary
+
+Frontend notes
+- Use summary endpoints for star/ histogram displays.
+- After mutations, refresh summaries or update optimistically.
+
+---
+
+If you'd like, I can:
+- Add cURL examples for each endpoint, or
+- Produce a Postman collection / OpenAPI snippet for the frontend.
+
 **Request Body:**
 ```json
 {
