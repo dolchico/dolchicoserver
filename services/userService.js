@@ -90,27 +90,29 @@ export const findUserById = async (id) => {
         select: {
             id: true,
             name: true,
-            username: true, // Add this
-            fullName: true, // Add this
+            username: true,
+            fullName: true,
             email: true,
             phoneNumber: true,
             emailVerified: true,
             phoneVerified: true,
             isProfileComplete: true,
-            country: true, // Add this
-            state: true, // Add this
-            zip: true, // Add this
+            country: true,
+            state: true,
+            zip: true,
+            dob: true,          // <-- Add this line to fetch date of birth
             role: true,
             isActive: true,
             createdAt: true,
             updatedAt: true,
-            resetToken: true, // Add this for email change
-            pendingEmail: true, // Add this for email change
-            pendingEmailOtp: true, // Add this for email change
-            pendingEmailExpiry: true, // Add this for email change
+            resetToken: true,
+            pendingEmail: true,
+            pendingEmailOtp: true,
+            pendingEmailExpiry: true,
         },
     });
 };
+
 
 // Update user's emailVerified status
 export const verifyUserEmail = async (userId) => {
@@ -187,30 +189,33 @@ export const updateProfile = async (userId, updateData) => {
     }
 
     try {
-        return await prisma.user.update({
-            where: { id: Number(userId) },
-            data: {
-                ...data,
-                updatedAt: new Date(),
-            },
-            select: {
-                id: true,
-                name: true,
-                username: true,
-                fullName: true,
-                email: true,
-                phoneNumber: true,
-                emailVerified: true,
-                phoneVerified: true,
-                isProfileComplete: true,
-                country: true,
-                state: true,
-                zip: true,
-                role: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
+return await prisma.user.update({
+    where: { id: Number(userId) },
+    data: {
+        ...data,
+        updatedAt: new Date(),
+    },
+    select: {
+        id: true,
+        name: true,
+        username: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        country: true,
+        state: true,
+        zip: true,
+        dob: true,  // <-- Add this line to return DOB
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+    },
+});
+
+
     } catch (err) {
         if (err.code === "P2002") {
             const target = err.meta?.target;

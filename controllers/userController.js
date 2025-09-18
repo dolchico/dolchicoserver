@@ -756,10 +756,11 @@ export const updateUserProfile = async (req, res) => {
             }
             updateFields.dob = date.toISOString();
         }
-
+        console.log('Received updateFields:', updateFields);
         await updateProfile(userId, updateFields);
-
+        
         const user = await findUserById(userId);
+        console.log('User after update:', user);
         if (!user) {
             return res
                 .status(404)
@@ -1518,6 +1519,7 @@ export const getUserProfile = async (req, res) => {
             country: user.country || "INDIA", // Fallback for missing field
             state: user.state || "Punjab", // Fallback for missing field
             zip: user.zip || "144410", // Fallback for missing field
+            dob: user.dob || null,
             createdAt: user.createdAt,
         };
 
