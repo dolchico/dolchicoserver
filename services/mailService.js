@@ -83,7 +83,7 @@ export const sendWelcomeEmail = async (toEmail, userName) => {
  */
 export const sendVerificationEmail = async (toEmail, token, otp, userName = null) => {
   // Make sure this matches your actual frontend route
-  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verify-email?token=${token}&email=${encodeURIComponent(toEmail)}`;
+  const verificationUrl = `${process.env.FRONTEND_URL || 'https://dolchico.com'}/verifyemail?token=${token}&email=${encodeURIComponent(toEmail)}`;
   
   const displayName = userName || 'Valued Customer';
   
