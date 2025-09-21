@@ -55,7 +55,7 @@ export const sendAccountDeletionOtp = async (userId) => {
     );
     
     // Send email OTP
-    otpPromises.push(sendOTPEmail(user.email, otp, 'Account Deletion', user.name || 'User'));
+    otpPromises.push(sendOTPEmail(user.email, user.name || 'User', otp, 'Account Deletion'));
     sentTo.push('email');
   }
 
