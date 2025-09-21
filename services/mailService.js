@@ -10,12 +10,16 @@ const OTP_EXPIRATION_MINUTES = 10; // OTP expiration time
 
 // --- Nodemailer Transporter Setup ---
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // You can adjust the service/provider as needed
+  host: "smtp.hostinger.com",   // Hostinger SMTP server
+  port: 465,                    // Use 465 for SSL or 587 for TLS
+  secure: true,                 // true for port 465, false for 587
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: process.env.EMAIL_USER,     // Your full email address
+    pass: process.env.EMAIL_PASSWORD, // Your email password or app password
   },
-  family: 4,
+  tls: {
+    rejectUnauthorized: false,  // Avoid self-signed cert errors
+  },
 });
 
 // Verify transporter configuration
