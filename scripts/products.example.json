@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Basic White Tee",
+    "description": "Comfortable cotton tee",
+    "price": 299.99,
+    "images": ["https://cdn.example.com/white-tee.jpg"],
+    "category": { "name": "Clothing", "description": "Apparel" },
+    "subcategory": { "name": "T-Shirts", "grouping": "Topwear" },
+    "sizes": ["S","M","L"],
+    "bestseller": false,
+    "isActive": true,
+    "stock": 100
+  },
+  {
+    "name": "Blue Jeans",
+    "description": "Denim jeans",
+    "price": 1499.00,
+    "images": ["https://cdn.example.com/blue-jeans.jpg"],
+    "category": { "name": "Clothing" },
+    "subcategory": { "name": "Bottoms", "grouping": "Bottomwear" },
+    "sizes": ["30","32","34"],
+    "bestseller": true,
+    "isActive": true,
+    "stock": 50
+  }
+]

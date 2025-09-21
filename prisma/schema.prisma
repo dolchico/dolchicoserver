@@ -50,6 +50,7 @@ model User {
   addresses         Address[]
   savedCards        SavedCard[] 
   savedUpis         SavedUpi[]  
+  reviews           Review[]
 
   @@index([email])
   @@index([phoneNumber])
@@ -79,6 +80,9 @@ model Product {
   date        BigInt
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  // Denormalized review aggregates
+  averageRating Float?  @default(0)
+  reviewsCount  Int     @default(0)
 
   // Relations
   category    Category    @relation(fields: [categoryId], references: [id])
@@ -86,12 +90,53 @@ model Product {
   cartItems   CartItem[]
   orderItems  OrderItem[]
   wishlist    Wishlist[]
+  reviews     Review[]
 
   @@index([categoryId])
   @@index([subcategoryId])
   @@index([bestseller])
   @@index([isActive])
   @@map("products")
+}
+
+// Reviews: unified for product and delivery reviews
+model Review {
+  id              String    @id @default(cuid())
+  userId          Int
+  type            ReviewType
+  productId       Int?      
+  orderId         Int?
+  deliveryAgentId Int?
+  rating          Int
+  title           String?   @db.VarChar(100)
+  comment         String?   @db.VarChar(2000)
+  images          String[]  @default([])
+  metadata        Json?
+  isEdited        Boolean   @default(false)
+  isDeleted       Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         Product?  @relation(fields: [productId], references: [id])
+  order           Order?    @relation(fields: [orderId], references: [id])
+
+  @@index([type, productId])
+  @@index([type, orderId])
+  @@index([userId, type])
+  @@index([productId])
+  @@index([orderId])
+  @@index([deliveryAgentId])
+
+  @@unique([userId, productId, type], name: "unique_product_review")
+  @@unique([userId, orderId, type], name: "unique_delivery_review")
+  @@map("reviews")
+}
+
+enum ReviewType {
+  PRODUCT
+  DELIVERY
 }
 
 // New Wishlist model
@@ -240,6 +285,7 @@ model Order {
   items         OrderItem[]
   user          User        @relation(fields: [userId], references: [id], onDelete: Cascade) // ← Add this
   paymentDetails       Payment?
+  reviews              Review[]
   @@index([userId])
   @@index([status])
   @@index([payment])

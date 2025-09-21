@@ -7496,6 +7496,7 @@ Please make sure your database server is running at `ep-royal-pine-adbeigxh-pool
 2025-09-17T20:06:43.738Z [INFO]: ::1 - - [17/Sep/2025:20:06:43 +0000] "POST /api/user/auth/check-user HTTP/1.1" 200 111 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-09-17T20:06:44.292Z [INFO]: ::1 - - [17/Sep/2025:20:06:44 +0000] "POST /api/user/register HTTP/1.1" 409 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-09-17T20:07:00.031Z [INFO]: ::1 - - [17/Sep/2025:20:07:00 +0000] "POST /api/user/register HTTP/1.1" 409 71 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+<<<<<<< HEAD
 2025-09-20T03:01:02.984Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-20T03:01:17.735Z [INFO]: ::1 - - [20/Sep/2025:03:01:17 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-09-20T03:01:22.509Z [INFO]: ::1 - - [20/Sep/2025:03:01:22 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
