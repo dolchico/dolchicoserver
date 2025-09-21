@@ -240,27 +240,43 @@ export const resetPassword = async (req, res) => {
     });
   }
 
-  // Validate password strength
-  if (!validator.isLength(newPassword, { min: 6 })) {
+  // Validate password strength (aligned with frontend)
+  const passwordErrors = [];
+  if (!validator.isLength(newPassword, { min: 10 })) {
+    passwordErrors.push('Password must be at least 10 characters long.');
+  }
+  if (!/[A-Z]/.test(newPassword)) {
+    passwordErrors.push('Password must contain at least one uppercase letter.');
+  }
+  if (!/[a-z]/.test(newPassword)) {
+    passwordErrors.push('Password must contain at least one lowercase letter.');
+  }
+  if (!/\d/.test(newPassword)) {
+    passwordErrors.push('Password must contain at least one number.');
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+    passwordErrors.push('Password must contain at least one special character.');
+  }
+  if (passwordErrors.length > 0) {
     return res.status(400).json({ 
       success: false, 
-      message: 'Password must be at least 6 characters long.' 
+      message: `Password does not meet requirements: ${passwordErrors.join(', ')}` 
     });
   }
 
   try {
     // Determine if input is phone or email
-    const isPhone = /^\+91[6-9]\d{9}$/.test(emailOrPhone.trim());
+    const isPhone = /^\+\d{1,3}\d{7,}$/.test(emailOrPhone.trim()); // More flexible phone regex
     let user;
     let otpRecord;
 
     if (isPhone) {
       // Validate phone number format
-      const phoneRegex = /^\+91[6-9]\d{9}$/;
+      const phoneRegex = /^\+\d{1,3}\d{7,}$/;
       if (!phoneRegex.test(emailOrPhone.trim())) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid phone number format. Use +91XXXXXXXXXX format.'
+          message: 'Invalid phone number format. Use +[country code][number] format.'
         });
       }
 
@@ -287,6 +303,26 @@ export const resetPassword = async (req, res) => {
           createdAt: 'desc'
         }
       });
+
+      // Increment attempts if OTP is invalid
+      if (!otpRecord) {
+        const latestOtp = await prisma.phoneOTP.findFirst({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            isUsed: false
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        });
+        if (latestOtp) {
+          await prisma.phoneOTP.update({
+            where: { id: latestOtp.id },
+            data: { attempts: latestOtp.attempts + 1 }
+          });
+        }
+      }
     } else {
       // Validate email format
       if (!validator.isEmail(emailOrPhone.trim())) {
@@ -320,12 +356,61 @@ export const resetPassword = async (req, res) => {
           createdAt: 'desc'
         }
       });
+
+      // Increment attempts if OTP is invalid
+      if (!otpRecord) {
+        const latestOtp = await prisma.emailOTP.findFirst({
+          where: {
+            userId: user.id,
+            type: 'PASSWORD_RESET',
+            isUsed: false
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        });
+        if (latestOtp) {
+          await prisma.emailOTP.update({
+            where: { id: latestOtp.id },
+            data: { attempts: latestOtp.attempts + 1 }
+          });
+        }
+      }
     }
 
     if (!otpRecord) {
+      const expiredOtp = isPhone
+        ? await prisma.phoneOTP.findFirst({
+            where: {
+              userId: user.id,
+              otp: otp.trim(),
+              type: 'PASSWORD_RESET',
+              expiresAt: {
+                lte: new Date()
+              }
+            }
+          })
+        : await prisma.emailOTP.findFirst({
+            where: {
+              userId: user.id,
+              otp: otp.trim(),
+              type: 'PASSWORD_RESET',
+              expiresAt: {
+                lte: new Date()
+              }
+            }
+          });
+
+      if (expiredOtp) {
+        return res.status(400).json({
+          success: false,
+          message: 'OTP has expired. Please request a new one.'
+        });
+      }
+
       return res.status(400).json({ 
         success: false, 
-        message: 'Invalid or expired OTP.' 
+        message: 'Invalid OTP.' 
       });
     }
 
@@ -362,7 +447,6 @@ export const resetPassword = async (req, res) => {
           }
         });
 
-        // Mark all other password reset OTPs as used
         await tx.phoneOTP.updateMany({
           where: {
             userId: user.id,
@@ -382,7 +466,6 @@ export const resetPassword = async (req, res) => {
           }
         });
 
-        // Mark all other password reset OTPs as used
         await tx.emailOTP.updateMany({
           where: {
             userId: user.id,
@@ -396,16 +479,30 @@ export const resetPassword = async (req, res) => {
       }
     });
 
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, phoneNumber: user.phoneNumber, role: user.role },
+      process.env.JWT_SECRET || 'your_jwt_secret', // Replace with your secret
+      { expiresIn: '7d' }
+    );
+
     console.log('Password reset successfully for user:', user.id);
 
-        res.status(200).json({
-            success: true,
-            message: "Password has been reset successfully.",
-        });
-    } catch (err) {
-        console.error("Reset Password Controller Error:", err);
+    res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully.',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role
+      }
+    });
+  } catch (err) {
+    console.error('Reset Password Controller Error:', err);
 
-    // Handle specific errors
     if (err.code === 'P2002') {
       return res.status(409).json({
         success: false,
@@ -413,7 +510,6 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    // Fallback for any other unexpected errors
     res.status(500).json({ 
       success: false, 
       message: 'An internal server error occurred.' 

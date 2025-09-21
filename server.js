@@ -32,6 +32,7 @@ import { ensureAuth }      from './middleware/authMiddleware.js';
 
 import userRouter          from './routes/userRoute.js';
 import productRouter       from './routes/productRoute.js';
+import productRoutes from './routes/product.js'; 
 import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
@@ -141,6 +142,7 @@ app.use('/api/auth',    OAuthRouter);
 app.use('/api/user',    userRouter);
 app.use('/api/admin',   adminRouter);
 app.use('/api/product', productRouter);
+app.use('/api', productRoutes);
 app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);
