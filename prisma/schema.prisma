@@ -64,25 +64,32 @@ model User {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  description String
-  price       Float
-  image       String[]
-  // category    String   @db.VarChar(100)    // REMOVE THIS
-  // subCategory String   @db.VarChar(100)    // REMOVE THIS
-  categoryId  Int                           // ADD THIS
-  subcategoryId Int                         // ADD THIS
-  sizes       String[]
-  bestseller  Boolean? @default(false)
-  isActive    Boolean  @default(true)
-  stock       Int      @default(0)
-  date        BigInt
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  // Denormalized review aggregates
-  averageRating Float?  @default(0)
-  reviewsCount  Int     @default(0)
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(255)
+  description     String
+  price           Float
+  discountedPrice Float?    // ✅ new
+  discountPercent Float?    // ✅ new
+  ageGroupStart   Int?      // ✅ new
+  ageGroupEnd     Int?      // ✅ new
+  image           String[]
+  categoryId      Int
+  subcategoryId   Int
+  sizes           String[]
+  bestseller      Boolean?  @default(false)
+  isActive        Boolean   @default(true)
+  stock           Int       @default(0)
+  date            BigInt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  averageRating   Float?    @default(0)
+  reviewsCount    Int       @default(0)
+
+  // ✅ New fields
+  tags            String[]  @default([])
+  brand           String?   @db.VarChar(100)
+  color           String[]  @default([])  // store as array even if 1 value
+  grouping        String?   @db.VarChar(100) // optional denormalization
 
   // Relations
   category    Category    @relation(fields: [categoryId], references: [id])
@@ -96,6 +103,8 @@ model Product {
   @@index([subcategoryId])
   @@index([bestseller])
   @@index([isActive])
+  @@index([brand])
+  @@index([grouping])
   @@map("products")
 }
 

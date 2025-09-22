@@ -8,56 +8,78 @@ import {
 } from '../services/productService.js';
 
 // ✅ Add Product - REVISED FOR RELATIONAL SCHEMA
+// controllers/productController.js
 const addProduct = async (req, res) => {
   try {
-    // CHANGED: Destructure categoryId and subcategoryId instead of names.
-    const { name, description, price, categoryId, subcategoryId, sizes, bestseller } = req.body;
+    const {
+      name,
+      description,
+      price,
+      discountedPrice,
+      discountPercent,
+      ageGroupStart,
+      ageGroupEnd,
+      categoryId,
+      subcategoryId,
+      sizes,
+      bestseller,
+      isActive,
+      stock,
+      tags,
+      brand,
+      color,
+      grouping,
+    } = req.body;
 
-    // --- Validation for new required fields ---
     if (!categoryId || !subcategoryId) {
-        return res.status(400).json({ success: false, message: 'categoryId and subcategoryId are required fields.' });
+      return res.status(400).json({ success: false, message: 'categoryId and subcategoryId are required.' });
     }
 
-    const image1 = req.files.image1?.[0];
-    const image2 = req.files.image2?.[0];
-    const image3 = req.files.image3?.[0];
-    const image4 = req.files.image4?.[0];
-
-    const images = [image1, image2, image3, image4].filter(Boolean);
-
-    if (images.length === 0) {
-        return res.status(400).json({ success: false, message: 'At least one image is required.' });
+    // Upload images to Cloudinary
+    const imageFiles = Object.values(req.files).flat();
+    if (imageFiles.length === 0) {
+      return res.status(400).json({ success: false, message: 'At least one image is required.' });
     }
-
     const imagesUrl = await Promise.all(
-      images.map(async (item) => {
-        const result = await cloudinary.uploader.upload(item.path, { resource_type: 'image' });
+      imageFiles.map(async (file) => {
+        const result = await cloudinary.uploader.upload(file.path, { resource_type: 'image' });
         return result.secure_url;
       })
     );
-    
-    // CHANGED: Construct productData with categoryId and subcategoryId for the service.
+
     const productData = {
       name,
       description,
       price: parseFloat(price),
+      discountedPrice: discountedPrice ? parseFloat(discountedPrice) : null,
+      discountPercent: discountPercent ? parseFloat(discountPercent) : null,
+      ageGroupStart: ageGroupStart ? parseInt(ageGroupStart) : null,
+      ageGroupEnd: ageGroupEnd ? parseInt(ageGroupEnd) : null,
       bestseller: bestseller === 'true',
-      sizes: JSON.parse(sizes),
+      isActive: isActive === 'true',
+      stock: stock ? parseInt(stock) : 0,
+      sizes: sizes ? JSON.parse(sizes) : [],
+      tags: tags ? JSON.parse(tags) : [],
+      brand: brand || null,
+      color: color ? JSON.parse(color) : [],
+      grouping: grouping || null,
       image: imagesUrl,
       date: Date.now(),
-      categoryId: Number(categoryId), // Ensure it's a number
-      subcategoryId: Number(subcategoryId), // Ensure it's a number
+      categoryId: Number(categoryId),
+      subcategoryId: Number(subcategoryId),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     await createProduct(productData);
-
     res.json({ success: true, message: 'Product Added' });
-  } catch (error)
- {
-    console.log(error);
+
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 // NOTE: This controller now correctly handles the nested category/subcategory objects returned by the service.
 const listProducts = async (req, res) => {

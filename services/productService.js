@@ -11,13 +11,9 @@ export const createProduct = async (data) => {
   return await prisma.product.create({
     data: {
       ...productData,
-      category: {
-        connect: { id: Number(categoryId) }
-      },
-      subcategory: {
-        connect: { id: Number(subcategoryId) }
-      }
-    }
+      category: { connect: { id: categoryId } },
+      subcategory: { connect: { id: subcategoryId } },
+    },
   });
 };
 
