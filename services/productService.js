@@ -17,6 +17,20 @@ export const createProduct = async (data) => {
   });
 };
 
+// services/productService.js
+
+export const updateProductById = async (id, data) => {
+  return await prisma.product.update({
+    where: { id },
+    data,
+    include: {
+      category: true,
+      subcategory: true,
+    },
+  });
+};
+
+
 // CHANGED: getAllProducts now uses `include` to fetch the related category and subcategory objects.
 export const getAllProducts = async () => {
   return await prisma.product.findMany({

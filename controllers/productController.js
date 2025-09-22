@@ -1,11 +1,90 @@
 import { v2 as cloudinary } from 'cloudinary';
 import {
   createProduct,
-  getAllProducts,
+  updateProductById,   // ✅ service
   deleteProductById,
+  getAllProducts,
   getProductById,
   searchProductsService,
 } from '../services/productService.js';
+
+
+const updateProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    if (!productId || isNaN(Number(productId))) {
+      return res.status(400).json({ success: false, message: 'Invalid productId' });
+    }
+
+    // Fetch existing product first
+    const existingProduct = await getProductById(Number(productId));
+    if (!existingProduct) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Handle images
+    const imageFiles = Object.values(req.files).flat();
+    let imagesUrl = existingProduct.image;
+
+    if (imageFiles.length > 0) {
+      imagesUrl = await Promise.all(
+        imageFiles.map(async (file) => {
+          const result = await cloudinary.uploader.upload(file.path, { resource_type: 'image' });
+          return result.secure_url;
+        })
+      );
+    }
+
+    // Parse body fields
+    const {
+      name,
+      description,
+      price,
+      discountedPrice,
+      discountPercent,
+      ageGroupStart,
+      ageGroupEnd,
+      categoryId,
+      subcategoryId,
+      sizes,
+      bestseller,
+      isActive,
+      stock,
+      tags,
+      brand,
+      color,
+      grouping,
+    } = req.body;
+
+    const updatedData = {
+      ...(name && { name }),
+      ...(description && { description }),
+      ...(price && { price: parseFloat(price) }),
+      ...(discountedPrice && { discountedPrice: parseFloat(discountedPrice) }),
+      ...(discountPercent && { discountPercent: parseFloat(discountPercent) }),
+      ...(ageGroupStart && { ageGroupStart: parseInt(ageGroupStart) }),
+      ...(ageGroupEnd && { ageGroupEnd: parseInt(ageGroupEnd) }),
+      ...(categoryId && { categoryId: Number(categoryId) }),
+      ...(subcategoryId && { subcategoryId: Number(subcategoryId) }),
+      ...(sizes && { sizes: JSON.parse(sizes) }),
+      ...(bestseller !== undefined && { bestseller: bestseller === 'true' }),
+      ...(isActive !== undefined && { isActive: isActive === 'true' }),
+      ...(stock && { stock: parseInt(stock) }),
+      ...(tags && { tags: JSON.parse(tags) }),
+      ...(brand && { brand }),
+      ...(color && { color: JSON.parse(color) }),
+      ...(grouping && { grouping }),
+      ...(imageFiles.length > 0 && { image: imagesUrl }), // ✅ replace only if new images
+    };
+
+    const product = await updateProductById(Number(productId), updatedData);
+
+    res.json({ success: true, message: 'Product updated successfully', product });
+  } catch (error) {
+    console.error('Update product error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // ✅ Add Product - REVISED FOR RELATIONAL SCHEMA
 // controllers/productController.js
@@ -179,4 +258,4 @@ const searchProducts = async (req, res) => {
   }
 };
 
-export { listProducts, addProduct, removeProduct, singleProduct, searchProducts };
+export { updateProduct, listProducts, addProduct, removeProduct, singleProduct, searchProducts };
