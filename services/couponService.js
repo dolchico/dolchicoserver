@@ -6,6 +6,7 @@ function toDecimal(value) {
   return new Prisma.Decimal(value);
 }
 
+// ============ CREATE ============ //
 export async function createCoupon(data) {
   const payload = {
     code: data.code,
@@ -20,12 +21,58 @@ export async function createCoupon(data) {
     validUntil: new Date(data.validUntil),
     isActive: data.isActive !== false,
     isNewUserOnly: !!data.isNewUserOnly,
-    categoryIds: data.categoryIds || null
+    categoryIds: data.categoryIds || null,
+    userId: data.userIds && data.userIds.length === 1 ? data.userIds[0] : null
   };
 
   return prisma.coupon.create({ data: payload });
 }
 
+
+
+// ============ GET COUPONS (ADMIN) ============ //
+export async function getCouponsForAdmin() {
+  return prisma.coupon.findMany({
+    orderBy: { createdAt: 'desc' }
+  });
+}
+
+// ============ GET COUPONS (USER) ============ //
+export async function getCouponsForUser(userId) {
+  if (!userId) {
+    throw new Error('CUSTOMER_USER_ID_REQUIRED');
+  }
+
+  const now = new Date();
+
+  // Public coupons (active & valid)
+  const publicCoupons = await prisma.coupon.findMany({
+    where: {
+      isActive: true,
+      validFrom: { lte: now },
+      validUntil: { gte: now }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  // User-specific coupons (via UserCoupon join table)
+  const userCoupons = await prisma.coupon.findMany({
+    where: {
+      userCoupons: {
+        some: { userId }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  // Merge & deduplicate
+  const map = new Map();
+  [...publicCoupons, ...userCoupons].forEach(c => map.set(c.id, c));
+
+  return Array.from(map.values());
+}
+
+// ============ VALIDATE / APPLY / REMOVE ============ //
 export async function validateCoupon({ userId, code, cartTotal, categoryIds }) {
   const coupon = await prisma.coupon.findUnique({ where: { code } });
   if (!coupon) return { valid: false, reason: 'NOT_FOUND' };
@@ -37,7 +84,9 @@ export async function validateCoupon({ userId, code, cartTotal, categoryIds }) {
 
   if (coupon.minOrderValue) {
     const cartDec = new Prisma.Decimal(cartTotal);
-    if (cartDec.lessThan(coupon.minOrderValue)) return { valid: false, reason: 'MIN_ORDER_NOT_MET' };
+    if (cartDec.lessThan(coupon.minOrderValue)) {
+      return { valid: false, reason: 'MIN_ORDER_NOT_MET' };
+    }
   }
 
   if (coupon.categoryIds && Array.isArray(coupon.categoryIds) && Array.isArray(categoryIds)) {
@@ -48,11 +97,15 @@ export async function validateCoupon({ userId, code, cartTotal, categoryIds }) {
 
   if (coupon.usageLimitTotal) {
     const totalUsed = await prisma.couponUsage.count({ where: { couponId: coupon.id } });
-    if (totalUsed >= coupon.usageLimitTotal) return { valid: false, reason: 'USAGE_LIMIT_EXCEEDED' };
+    if (totalUsed >= coupon.usageLimitTotal) {
+      return { valid: false, reason: 'USAGE_LIMIT_EXCEEDED' };
+    }
   }
   if (userId && coupon.usageLimitPerUser) {
     const userUsed = await prisma.couponUsage.count({ where: { couponId: coupon.id, userId } });
-    if (userUsed >= coupon.usageLimitPerUser) return { valid: false, reason: 'USER_USAGE_LIMIT_EXCEEDED' };
+    if (userUsed >= coupon.usageLimitPerUser) {
+      return { valid: false, reason: 'USER_USAGE_LIMIT_EXCEEDED' };
+    }
   }
 
   // compute discount
@@ -64,7 +117,9 @@ export async function validateCoupon({ userId, code, cartTotal, categoryIds }) {
     discount = new Prisma.Decimal(coupon.discountValue);
   }
   if (coupon.maxDiscountAmount) {
-    discount = discount.greaterThan(coupon.maxDiscountAmount) ? coupon.maxDiscountAmount : discount;
+    discount = discount.greaterThan(coupon.maxDiscountAmount)
+      ? coupon.maxDiscountAmount
+      : discount;
   }
 
   return { valid: true, discount: discount.toString() };
@@ -75,7 +130,9 @@ export async function applyCoupon({ userId, cartId, code }) {
     const coupon = await tx.coupon.findUnique({ where: { code } });
     if (!coupon) throw new Error('NOT_FOUND');
     const now = new Date();
-    if (!coupon.isActive || now < coupon.validFrom || now > coupon.validUntil) throw new Error('INVALID');
+    if (!coupon.isActive || now < coupon.validFrom || now > coupon.validUntil) {
+      throw new Error('INVALID');
+    }
 
     if (coupon.usageLimitTotal) {
       const totalUsed = await tx.couponUsage.count({ where: { couponId: coupon.id } });
@@ -86,7 +143,9 @@ export async function applyCoupon({ userId, cartId, code }) {
       if (userUsed >= coupon.usageLimitPerUser) throw new Error('USER_USAGE_LIMIT_EXCEEDED');
     }
 
-    const usage = await tx.couponUsage.create({ data: { couponId: coupon.id, userId, orderId: null } });
+    const usage = await tx.couponUsage.create({
+      data: { couponId: coupon.id, userId, orderId: null }
+    });
     return { reservedUsageId: usage.id, couponId: coupon.id };
   });
 }
@@ -96,4 +155,11 @@ export async function removeCoupon({ cartId }) {
   return { removed: true };
 }
 
-export default { createCoupon, validateCoupon, applyCoupon, removeCoupon };
+export default {
+  createCoupon,
+  getCouponsForAdmin,
+  getCouponsForUser,
+  validateCoupon,
+  applyCoupon,
+  removeCoupon
+};
