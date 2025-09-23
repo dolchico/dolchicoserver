@@ -1,14 +1,6 @@
 import * as couponService from '../services/couponService.js';
 
-export const createCoupon = async (req, res, next) => {
-  try {
-    const created = await couponService.createCoupon(req.body);
-    res.status(201).json(created);
-  } catch (err) {
-    next(err);
-  }
-};
-
+// Public/legacy endpoint: validate coupon (accepts optional userId in body)
 export const validateCoupon = async (req, res, next) => {
   try {
     const { userId, code, cartTotal, categoryIds } = req.body;
@@ -19,22 +11,5 @@ export const validateCoupon = async (req, res, next) => {
   }
 };
 
-export const applyCoupon = async (req, res, next) => {
-  try {
-    const { userId, cartId, code } = req.body;
-    const result = await couponService.applyCoupon({ userId, cartId, code });
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const removeCoupon = async (req, res, next) => {
-  try {
-    const { cartId } = req.params;
-    const result = await couponService.removeCoupon({ cartId });
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
-};
+export default { validateCoupon };
+    res.json(list);

@@ -51,6 +51,8 @@ model User {
   savedCards        SavedCard[] 
   savedUpis         SavedUpi[]  
   reviews           Review[]
+  // Relations for coupon assignments
+  couponAssignments CouponAssignment[]
 
   @@index([email])
   @@index([phoneNumber])
@@ -522,6 +524,8 @@ model Coupon {
   updatedAt         DateTime  @updatedAt
   usages            CouponUsage[]
   orderCoupons      OrderCoupon[]
+  // Optional assignments to specific users. If empty/null -> global coupon
+  assignments       CouponAssignment[]
 
   @@map("coupons")
 }
@@ -546,6 +550,19 @@ model OrderCoupon {
   coupon        Coupon   @relation(fields: [couponId], references: [id])
 
   @@map("order_coupons")
+}
+
+model CouponAssignment {
+  id        Int    @id @default(autoincrement())
+  couponId  Int
+  userId    Int
+
+  coupon    Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId], name: "coupon_user_unique")
+  @@index([userId])
+  @@map("coupon_assignments")
 }
 
 enum CouponType {

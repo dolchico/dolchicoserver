@@ -7539,3 +7539,13 @@ Please make sure your database server is running at `ep-royal-pine-adbeigxh-pool
 2025-09-18T21:53:51.658Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-18T21:58:48.502Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-18T22:03:11.720Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:02:14.336Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:02:52.269Z [INFO]: ::1 - - [23/Sep/2025:18:02:52 +0000] "GET /api/coupons HTTP/1.1" 404 150 "-" "PostmanRuntime/7.46.1"
+2025-09-23T18:03:19.404Z [INFO]: ::1 - - [23/Sep/2025:18:03:19 +0000] "GET /api/coupons HTTP/1.1" 404 150 "-" "PostmanRuntime/7.46.1"
+2025-09-23T18:10:39.585Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:11:02.801Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:19:08.943Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:47:52.201Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:48:04.619Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:48:15.258Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T18:48:28.003Z [INFO]: 🚀 Server started on PORT: 4000
