@@ -25,8 +25,20 @@ export async function createCoupon(data) {
 
   // If specific userIds provided, create assignments in nested create
   if (Array.isArray(data.userIds) && data.userIds.length > 0) {
+    // Validate that all userIds exist to avoid FK constraint failures
+    const uniqueIds = Array.from(new Set(data.userIds.map((id) => Number(id))));
+    const existing = await prisma.user.findMany({ where: { id: { in: uniqueIds } }, select: { id: true } });
+    const existingIds = new Set(existing.map(u => u.id));
+    const missing = uniqueIds.filter(id => !existingIds.has(id));
+    if (missing.length > 0) {
+      // Provide a clear error rather than letting Prisma raise FK violation
+      const err = new Error(`Some userIds do not exist: ${missing.join(', ')}`);
+      err.code = 'MISSING_USER_IDS';
+      throw err;
+    }
+
     payload.assignments = {
-      create: data.userIds.map((uid) => ({ userId: uid }))
+      create: uniqueIds.map((uid) => ({ userId: uid }))
     };
   }
 

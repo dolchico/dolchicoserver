@@ -10,10 +10,12 @@ export const ensureAuth = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const userId = decoded.id || decoded.userId;
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  // Use nullish coalescing so numeric id === 0 is accepted (0 is falsy with ||)
+      const userId = decoded.id ?? decoded.userId;
 
-      if (!userId) {
+      // Accept 0 as a valid id. Only reject when userId is null or undefined.
+      if (userId === undefined || userId === null) {
         return res.status(401).json({
           success: false,
           message: 'Invalid token payload.',
@@ -55,15 +57,17 @@ export const ensureAuthWithStatus = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
       // Debug the decoded token
       console.log('Decoded JWT:', decoded);
       
-      // Get user ID from token (handle both 'id' and 'userId')
-      const userId = decoded.userId || decoded.id;
+  // Get user ID from token (handle both 'id' and 'userId').
+  // Use nullish coalescing to accept 0 as a valid id.
+      const userId = decoded.userId ?? decoded.id;
       
-      if (!userId) {
+      // Accept 0 as valid id. Only treat null/undefined as missing.
+      if (userId === undefined || userId === null) {
         return res.status(401).json({ 
           success: false,
           message: 'User ID not found in token.',

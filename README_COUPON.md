@@ -1014,3 +1014,59 @@ Common error codes:
 ---
 
 End of document.
+
+## Diagrams
+
+Below are simple, text-first diagrams (Mermaid) that illustrate the common coupon flows: validation, reservation (apply), order finalization, and removal/cleanup.
+
+### Flowchart: Coupon reservation lifecycle
+
+```mermaid
+flowchart LR
+  A[User enters coupon code] --> B{Validate coupon}
+  B -->|valid| C[Apply / Reserve coupon (POST /api/cart/apply-coupon)\ncreate CouponUsage with orderId = null]
+  B -->|invalid| D[Return error to frontend]
+  C --> E{User proceeds to checkout}
+  E -->|order created & paid| F[Finalize reservation - link CouponUsage to Order (set orderId)]
+  E -->|coupon removed or cart abandoned| G[Remove reservation (delete CouponUsage) / let cleanup job expire]
+  F --> H[Consume coupon: count towards usage limits]
+  G --> I[Free up redemption slot]
+
+  style C fill:#e6ffed,stroke:#2ecc71
+  style F fill:#e6f7ff,stroke:#3498db
+
+```
+
+### Sequence: user -> frontend -> API -> DB -> order service
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant FE as Frontend
+  participant API as Coupon API
+  participant DB as Database
+  participant ORDER as Order Service
+
+  U->>FE: Enter coupon code
+  FE->>API: POST /api/coupons/validate { code, cartTotal, categoryIds }
+  API-->>FE: 200 OK (valid, discountAmount) or 4xx (reason)
+  alt coupon is valid
+    FE->>API: POST /api/cart/apply-coupon { cartId, code }
+    API->>DB: begin transaction
+    API->>DB: INSERT CouponUsage(orderId=NULL, couponId, userId, cartId?)
+    DB-->>API: reservedUsageId
+    API->>DB: commit
+    API-->>FE: 200 OK { reservedUsageId }
+    FE->>ORDER: create order (payment)
+    ORDER->>API: POST /api/coupons/finalize { reservedUsageId, orderId }
+    API->>DB: update CouponUsage set orderId = <orderId>
+    API-->>ORDER: 200 OK
+  end
+
+```
+
+Notes
+- These diagrams are text-first and editable in the repo. GitHub's markdown rendering may support Mermaid (or use a plugin). You can also render them to SVG using the Mermaid CLI (`mmdc`).
+
+Want a separate `.mmd` file or an exported SVG checked into the repo? I can add either on your request.
+

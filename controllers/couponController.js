@@ -12,4 +12,3 @@ export const validateCoupon = async (req, res, next) => {
 };
 
 export default { validateCoupon };
-    res.json(list);
