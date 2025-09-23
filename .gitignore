@@ -5,3 +5,8 @@ logs
 /generated/prisma
 app.log
 *app.log
+    # Ignore all .log files
+    *.log
+
+    # Ignore a specific logs directory
+    logs/
