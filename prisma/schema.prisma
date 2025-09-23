@@ -61,6 +61,7 @@ model User {
   @@index([emailVerified, isProfileComplete])
   @@index([resetToken])
   @@map("users")
+  Coupon Coupon[]
 }
 
 model Product {
@@ -504,8 +505,8 @@ model Offer {
 }
 
 model Coupon {
-  id                Int       @id @default(autoincrement())
-  code              String    @unique @db.VarChar(50)
+  id                Int            @id @default(autoincrement())
+  code              String         @unique @db.VarChar(50)
   name              String
   type              CouponType
   discountValue     Decimal
@@ -515,13 +516,16 @@ model Coupon {
   usageLimitPerUser Int?
   validFrom         DateTime
   validUntil        DateTime
-  isActive          Boolean   @default(true)
-  isNewUserOnly     Boolean   @default(false)
+  isActive          Boolean        @default(true)
+  isNewUserOnly     Boolean        @default(false)
   categoryIds       Json?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  userId            Int?           // optional: coupon restricted to a specific user
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   usages            CouponUsage[]
   orderCoupons      OrderCoupon[]
+  // relation to User (if you already have a User model in your schema)
+  user              User?          @relation(fields: [userId], references: [id])
 
   @@map("coupons")
 }
@@ -550,5 +554,5 @@ model OrderCoupon {
 
 enum CouponType {
   PERCENTAGE
-  FIXED_AMOUNT
+  FLAT
 }
