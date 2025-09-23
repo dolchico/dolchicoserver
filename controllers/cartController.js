@@ -1,3 +1,33 @@
+import * as couponService from '../services/couponService.js';
+
+export const applyCouponToCart = async (req, res, next) => {
+  try {
+    const userId = req.user && (req.user.id || req.user.userId) || req.body.userId;
+    const { cartId, code } = req.body;
+    if (!cartId || !code) return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'cartId and code are required' });
+    const result = await couponService.applyCoupon({ userId, cartId, code });
+    res.json(result);
+  } catch (err) {
+    // translate known errors
+    if (err.message === 'NOT_FOUND') return res.status(404).json({ error: 'NOT_FOUND', message: 'Coupon not found' });
+    if (err.message === 'USAGE_LIMIT_EXCEEDED') return res.status(409).json({ error: 'USAGE_LIMIT_EXCEEDED', message: 'Coupon fully redeemed' });
+    if (err.message === 'USER_USAGE_LIMIT_EXCEEDED') return res.status(409).json({ error: 'USER_USAGE_LIMIT_EXCEEDED', message: 'User limit exceeded' });
+    next(err);
+  }
+};
+
+export const removeCouponFromCart = async (req, res, next) => {
+  try {
+    const { cartId } = req.params;
+    if (!cartId) return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'cartId required' });
+    const result = await couponService.removeCoupon({ cartId });
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export default { applyCouponToCart, removeCouponFromCart };
 /**
  * The Controller Layer for Cart functionality.
  * This file acts as the "traffic cop" between the HTTP world and our application's business logic.

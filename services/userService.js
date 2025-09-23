@@ -429,12 +429,18 @@ export const checkUserExistenceService = async (emailOrPhone) => {
 // services/userService.js - Fix the getUserAuthStatus function
 export const getUserAuthStatus = async (userId) => {
     try {
-        if (!userId) {
+        // Accept 0 as a valid userId. Only reject when userId is null/undefined or not a number.
+        if (userId === undefined || userId === null) {
+            throw new Error("User ID is required");
+        }
+
+        const idNum = Number(userId);
+        if (Number.isNaN(idNum)) {
             throw new Error("User ID is required");
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: parseInt(userId) },
+            where: { id: idNum },
             select: {
                 id: true,
                 name: true,
