@@ -4,6 +4,12 @@ This document describes the Reviews feature: authentication flow, endpoints, req
 
 > Example test account (use only on your dev/test environment):
 > - Email: akashthanda14@gmail.com
+# Reviews API — Backend Reference
+
+This document describes the Reviews feature: authentication flow, endpoints, request/response shapes, validation rules, error codes, and frontend integration tips. It's written from a backend developer perspective to help frontend engineers integrate cleanly.
+
+> Example test account (use only on your dev/test environment):
+> - Email: akashthanda14@gmail.com
 > - Password: Dolchi@0088
 
 ## Authentication (JWT)
@@ -224,4 +230,74 @@ fetch('/api/reviews', {
 If you want, I can also:
 - Add example cURL requests for each endpoint, or
 - Create a Postman collection / OpenAPI snippet for the frontend.
+
+## Testing with Postman (upload photos)
+
+This section explains how to test the review endpoints in Postman, including uploading up to 2 images (multipart/form-data). The server uses `multer` (memoryStorage) and streams images to Cloudinary. Per-file limits: 2MB. Allowed mime types: image/png, image/jpeg, image/jpg, image/webp.
+
+Before you start:
+- Obtain a JWT via POST /api/auth/signin and include it in the `Authorization: Bearer <JWT_TOKEN>` header for protected endpoints.
+- Use `form-data` body type in Postman when uploading images. File field name: `images` (up to 2 files).
+- Non-file fields should be sent as text form fields. If sending `metadata`, stringify it (e.g. `{"size":"M"}`).
+
+Example: Create PRODUCT review with up to 2 images
+- Method: POST
+- URL: https://<your-host>/api/reviews
+- Headers: Authorization: Bearer <JWT_TOKEN>
+- Body -> form-data:
+  - type: PRODUCT
+  - productId: 17
+  - rating: 5
+  - title: Excellent
+  - comment: Loved the fabric
+  - metadata: {"size":"M","color":"white"}   (as a string)
+  - images: (file) upload image #1
+  - images: (file) upload image #2 (optional)
+
+Expected: HTTP 201 with created review object; `images` field contains Cloudinary secure URLs.
+
+Example: Create DELIVERY review with images
+- Method: POST
+- URL: https://<your-host>/api/reviews
+- Body -> form-data:
+  - type: DELIVERY
+  - orderId: 123
+  - rating: 4
+  - comment: Delivery was on time
+  - images: (file) up to 2 images
+
+Update review (add/replace images)
+- Method: PATCH
+- URL: https://<your-host>/api/reviews/:id
+- Body -> form-data: include `rating`, `title`, `comment`, `metadata`, and up to 2 files under `images`. Uploaded files are uploaded to Cloudinary and merged with any existing `images` provided in the JSON body; final array is trimmed to 2 URLs.
+
+Quick cURL (single image):
+curl -X POST "https://<your-host>/api/reviews" \
+  -H "Authorization: Bearer <JWT_TOKEN>" \
+  -F "type=PRODUCT" \
+  -F "productId=17" \
+  -F "rating=5" \
+  -F "title=Nice" \
+  -F "images=@/path/to/photo1.jpg"
+
+Troubleshooting & common errors with file uploads
+- 400 Bad Request: missing required fields (type, rating, productId/orderId when required).
+- 401 Unauthorized: missing/invalid JWT.
+- 403 Forbidden: reviewing an order you don't own.
+- 409 Conflict: duplicate review for the same user/product/order.
+- 422 Unprocessable Entity: user hasn't purchased the product / order not delivered.
+- Unsupported file type or file too large: multer rejects files >2MB or non-image mime types.
+- 500 Internal Server Error: Cloudinary or server-side error — check server logs.
+
+Postman tips
+- Use `form-data` and set file keys to `File`, text keys to `Text`.
+- For `metadata`, stringify JSON in the form field and parse client-side as needed.
+- If you get a validation error, inspect the response body for details and ensure you included all required fields.
+
+Optional queries to test
+- GET /api/reviews?type=PRODUCT&productId=17&page=1 — list reviews for a product.
+- GET /api/reviews/products/:productId — product reviews + summary.
+- GET /api/reviews/orders/:orderId — delivery review for an order (requires auth).
+
+If you want, I can export a Postman collection with these requests pre-filled (including an Authorization helper to set the Bearer token).
 

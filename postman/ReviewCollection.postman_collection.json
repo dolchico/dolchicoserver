@@ -1,0 +1,129 @@
+{
+  "info": {
+    "name": "Dolchico - Reviews API",
+    "_postman_id": "d3f4f6b6-0000-4000-8000-000000000000",
+    "description": "Collection for testing Reviews endpoints (signin, create/update reviews with up to 2 images). Uses {{baseUrl}} and stores JWT into {{jwt}} via test script.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "jwt", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth - Sign In",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"akashthanda14@gmail.com\",\n  \"password\": \"Dolchi@0088\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/api/auth/signin", "host": ["{{baseUrl}}"], "path": ["api","auth","signin"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json && json.token) {",
+              "  pm.environment.set('jwt', json.token);",
+              "  console.log('Saved jwt to {{jwt}}');",
+              "} else {",
+              "  console.warn('No token found in signin response');",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create - Product Review (form-data, up to 2 images)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "type", "value": "PRODUCT", "type": "text" },
+            { "key": "productId", "value": "17", "type": "text" },
+            { "key": "rating", "value": "5", "type": "text" },
+            { "key": "title", "value": "Excellent", "type": "text" },
+            { "key": "comment", "value": "Loved the fabric", "type": "text" },
+            { "key": "metadata", "value": "{\"size\":\"M\",\"color\":\"white\"}", "type": "text" },
+            { "key": "images", "type": "file", "src": "/path/to/photo1.jpg" },
+            { "key": "images", "type": "file", "src": "/path/to/photo2.jpg" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/reviews", "host": ["{{baseUrl}}"], "path": ["api","reviews"] }
+      }
+    },
+    {
+      "name": "Create - Delivery Review (form-data, up to 2 images)",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}" } ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "type", "value": "DELIVERY", "type": "text" },
+            { "key": "orderId", "value": "123", "type": "text" },
+            { "key": "rating", "value": "4", "type": "text" },
+            { "key": "comment", "value": "Delivery was on time", "type": "text" },
+            { "key": "images", "type": "file", "src": "/path/to/delivery1.jpg" },
+            { "key": "images", "type": "file", "src": "/path/to/delivery2.jpg" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/reviews", "host": ["{{baseUrl}}"], "path": ["api","reviews"] }
+      }
+    },
+    {
+      "name": "Update Review (patch, form-data)",
+      "request": {
+        "method": "PATCH",
+        "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}" } ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "rating", "value": "4", "type": "text" },
+            { "key": "comment", "value": "Updated comment", "type": "text" },
+            { "key": "images", "type": "file", "src": "/path/to/new1.jpg" }
+          ]
+        },
+        "url": { "raw": "{{baseUrl}}/api/reviews/:id", "host": ["{{baseUrl}}"], "path": ["api","reviews",":id"] }
+      }
+    },
+    {
+      "name": "List Reviews (search)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/reviews?type=PRODUCT&productId=17&page=1&pageSize=10", "host": ["{{baseUrl}}"], "path": ["api","reviews"], "query": [ { "key": "type", "value": "PRODUCT" }, { "key": "productId", "value": "17" }, { "key": "page", "value": "1" } ] }
+      }
+    },
+    {
+      "name": "Get Product Reviews (product endpoint)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/api/reviews/products/:productId", "host": ["{{baseUrl}}"], "path": ["api","reviews","products",":productId"] }
+      }
+    },
+    {
+      "name": "Get Order Review (delivery)",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{jwt}}" } ],
+        "url": { "raw": "{{baseUrl}}/api/reviews/orders/:orderId", "host": ["{{baseUrl}}"], "path": ["api","reviews","orders",":orderId"] }
+      }
+    }
+  ]
+}
