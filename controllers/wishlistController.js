@@ -456,3 +456,20 @@ export const getWishlistSummary = async (req, res) => {
         });
     }
 };
+
+// Example route handler with safe fallback for DB schema mismatch
+export const exampleHandler = async (req, res) => {
+    try {
+        const list = await prisma.wishlist.findMany({
+            where: { /* your conditions */ },
+            include: { /* your relations */ },
+        });
+        return res.json(list);
+    } catch (err) {
+        if (err.code === 'P2022') {
+            // DB schema mismatch — return safe fallback
+            return res.status(200).json([]); // or 503 with a helpful message
+        }
+        throw err;
+    }
+};

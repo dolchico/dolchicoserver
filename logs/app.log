@@ -9816,3 +9816,8 @@ Please make sure your database server is running at `ep-royal-pine-adbeigxh-pool
 2025-09-24T00:21:05.129Z [INFO]: ::1 - - [24/Sep/2025:00:21:05 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 400 37 "-" "PostmanRuntime/7.46.1"
 2025-09-24T00:21:16.028Z [INFO]: ::1 - - [24/Sep/2025:00:21:16 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 201 411 "-" "PostmanRuntime/7.46.1"
 2025-09-24T00:22:01.912Z [INFO]: ::1 - - [24/Sep/2025:00:22:01 +0000] "GET /api/categories HTTP/1.1" 200 6755 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:29:39.934Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:30:27.155Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:32:13.202Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:32:17.572Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:32:18.388Z [INFO]: 🚀 Server started on PORT: 4000
