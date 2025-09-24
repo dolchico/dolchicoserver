@@ -9754,3 +9754,65 @@ Please make sure your database server is running at `ep-royal-pine-adbeigxh-pool
 2025-09-20T18:20:40.606Z [INFO]: ::1 - - [20/Sep/2025:18:20:40 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-09-20T18:20:41.323Z [INFO]: ::1 - - [20/Sep/2025:18:20:41 +0000] "POST /api/product/stock HTTP/1.1" 401 80 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-09-20T18:20:42.876Z [INFO]: ::1 - - [20/Sep/2025:18:20:42 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-23T21:37:10.598Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T21:43:24.083Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T21:44:09.527Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T21:44:27.044Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:24:30.782Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:26:06.526Z [INFO]: ::1 - - [23/Sep/2025:22:26:06 +0000] "POST /api/admin/login HTTP/1.1" 200 315 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:30:34.597Z [INFO]: ::1 - - [23/Sep/2025:22:30:34 +0000] "POST /api/admin/categories HTTP/1.1" 500 116 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:31:25.577Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:31:32.383Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:31:46.605Z [INFO]: ::1 - - [23/Sep/2025:22:31:46 +0000] "POST /api/admin/categories HTTP/1.1" 409 60 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:32:19.547Z [INFO]: ::1 - - [23/Sep/2025:22:32:19 +0000] "POST /api/admin/categories HTTP/1.1" 201 188 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:34:48.240Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:35:06.747Z [INFO]: ::1 - - [23/Sep/2025:22:35:06 +0000] "POST /api/admin/categories HTTP/1.1" 201 239 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:36:45.915Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:37:09.555Z [INFO]: ::1 - - [23/Sep/2025:22:37:09 +0000] "POST /api/admin/categories HTTP/1.1" 201 274 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:43:28.855Z [INFO]: ::1 - - [23/Sep/2025:22:43:28 +0000] "PUT /api/admin/categories/1 HTTP/1.1" 200 154 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:43:56.999Z [INFO]: ::1 - - [23/Sep/2025:22:43:56 +0000] "PUT /api/admin/categories/1 HTTP/1.1" 200 202 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:44:43.974Z [INFO]: ::1 - - [23/Sep/2025:22:44:43 +0000] "PUT /api/admin/categories/1 HTTP/1.1" 200 202 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:44:51.483Z [INFO]: ::1 - - [23/Sep/2025:22:44:51 +0000] "DELETE /api/admin/categories/1 HTTP/1.1" 500 145 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:47:18.291Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:47:27.331Z [INFO]: ::1 - - [23/Sep/2025:22:47:27 +0000] "DELETE /api/admin/categories/1 HTTP/1.1" 409 100 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:49:34.938Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:49:43.524Z [INFO]: ::1 - - [23/Sep/2025:22:49:43 +0000] "DELETE /api/admin/categories/1 HTTP/1.1" 204 - "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:50:27.036Z [INFO]: ::1 - - [23/Sep/2025:22:50:27 +0000] "GET /api/categories HTTP/1.1" 200 5552 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:51:32.567Z [INFO]: ::1 - - [23/Sep/2025:22:51:32 +0000] "GET /api/categories/clothingg HTTP/1.1" 404 32 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:51:36.791Z [INFO]: ::1 - - [23/Sep/2025:22:51:36 +0000] "GET /api/categories/clothing HTTP/1.1" 404 32 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:51:40.984Z [INFO]: ::1 - - [23/Sep/2025:22:51:40 +0000] "GET /api/categories/clothinggg HTTP/1.1" 404 32 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:52:09.022Z [INFO]: ::1 - - [23/Sep/2025:22:52:09 +0000] "GET /api/categories/Clothing HTTP/1.1" 200 1913 "-" "PostmanRuntime/7.46.1"
+2025-09-23T22:57:09.790Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:57:32.266Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T22:59:54.435Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T23:00:03.864Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T23:02:45.782Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T23:33:26.428Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T23:52:47.192Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-23T23:53:09.565Z [INFO]: ::1 - - [23/Sep/2025:23:53:09 +0000] "POST /api/admin/login HTTP/1.1" 200 315 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:54:02.702Z [INFO]: ::1 - - [23/Sep/2025:23:54:02 +0000] "POST /api/admin/categories HTTP/1.1" 409 60 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:54:11.915Z [INFO]: ::1 - - [23/Sep/2025:23:54:11 +0000] "POST /api/admin/categories HTTP/1.1" 201 270 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:55:22.338Z [INFO]: ::1 - - [23/Sep/2025:23:55:22 +0000] "PUT /api/admin/categories/13 HTTP/1.1" 200 298 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:55:41.710Z [INFO]: ::1 - - [23/Sep/2025:23:55:41 +0000] "DELETE /api/admin/categories/13 HTTP/1.1" 204 - "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:56:32.918Z [INFO]: ::1 - - [23/Sep/2025:23:56:32 +0000] "POST /api/admin/categories/initialize HTTP/1.1" 201 762 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:58:51.466Z [INFO]: ::1 - - [23/Sep/2025:23:58:51 +0000] "POST /api/admin/categories/:id/subcategories HTTP/1.1" 500 566 "-" "PostmanRuntime/7.46.1"
+2025-09-23T23:59:54.668Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:00:23.037Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:00:40.229Z [INFO]: ::1 - - [24/Sep/2025:00:00:40 +0000] "POST /api/admin/categories/:id/subcategories HTTP/1.1" 400 33 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:01:06.016Z [INFO]: ::1 - - [24/Sep/2025:00:01:06 +0000] "POST /api/admin/categories/2/subcategories HTTP/1.1" 201 271 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:02:17.816Z [INFO]: ::1 - - [24/Sep/2025:00:02:17 +0000] "DELETE /api/admin/subcategories/13 HTTP/1.1" 204 - "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:05:02.273Z [INFO]: ::1 - - [24/Sep/2025:00:05:02 +0000] "POST /api/admin/categories/:id/offers HTTP/1.1" 400 33 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:05:16.412Z [INFO]: ::1 - - [24/Sep/2025:00:05:16 +0000] "POST /api/admin/categories/12/offers HTTP/1.1" 500 608 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:05:27.686Z [INFO]: ::1 - - [24/Sep/2025:00:05:27 +0000] "POST /api/admin/categories/13/offers HTTP/1.1" 500 608 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:05:34.032Z [INFO]: ::1 - - [24/Sep/2025:00:05:34 +0000] "POST /api/admin/categories/1/offers HTTP/1.1" 500 607 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:05:51.852Z [INFO]: ::1 - - [24/Sep/2025:00:05:51 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 500 607 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:07:19.259Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:07:43.788Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:08:30.892Z [INFO]: ::1 - - [24/Sep/2025:00:08:30 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 409 97 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:09:27.147Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:09:57.518Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-24T00:10:07.544Z [INFO]: ::1 - - [24/Sep/2025:00:10:07 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 400 37 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:10:16.745Z [INFO]: ::1 - - [24/Sep/2025:00:10:16 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 400 37 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:21:05.129Z [INFO]: ::1 - - [24/Sep/2025:00:21:05 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 400 37 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:21:16.028Z [INFO]: ::1 - - [24/Sep/2025:00:21:16 +0000] "POST /api/admin/categories/2/offers HTTP/1.1" 201 411 "-" "PostmanRuntime/7.46.1"
+2025-09-24T00:22:01.912Z [INFO]: ::1 - - [24/Sep/2025:00:22:01 +0000] "GET /api/categories HTTP/1.1" 200 6755 "-" "PostmanRuntime/7.46.1"

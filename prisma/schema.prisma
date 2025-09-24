@@ -8,36 +8,36 @@ datasource db {
 }
 
 model User {
-  id                Int                      @id @default(autoincrement())
-  name              String?                  
-  username          String?                  @unique @db.VarChar(50)  // Add this
-  fullName          String?                  @db.VarChar(100)        // Add this
-  email             String?                  @unique @db.VarChar(255)
+  id                Int       @id @default(autoincrement())
+  name              String?
+  username          String?   @unique @db.VarChar(50) // Add this
+  fullName          String?   @db.VarChar(100) // Add this
+  email             String?   @unique @db.VarChar(255)
   password          String?
-  payments          Payment[] 
-  role              UserRole                 @default(USER)
-  createdAt         DateTime                 @default(now())
-  updatedAt         DateTime                 @updatedAt
-  emailVerified     Boolean                  @default(false)
-  phoneNumber       String?                  @unique @db.VarChar(20)
-  phoneVerified     Boolean                  @default(false)
-  isProfileComplete Boolean                  @default(false)
-  isActive          Boolean                  @default(true)
-  resetToken        String?                  @db.VarChar(255)
-  dob               DateTime?                // Optional date of birth
-  
+  payments          Payment[]
+  role              UserRole  @default(USER)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  emailVerified     Boolean   @default(false)
+  phoneNumber       String?   @unique @db.VarChar(20)
+  phoneVerified     Boolean   @default(false)
+  isProfileComplete Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  resetToken        String?   @db.VarChar(255)
+  dob               DateTime? // Optional date of birth
+
   // Add these new profile fields
-  country           String?                  @db.VarChar(100)        // Add this
-  state             String?                  @db.VarChar(100)        // Add this
-  zip               String?                  @db.VarChar(20)         // Add this
-  
-  pendingEmail       String?
-  pendingEmailOtp    String?
-  pendingEmailExpiry DateTime?
-  resetTokenExpiry  DateTime?
-  pendingDeleteOtp     String?
-  pendingDeleteExpiry  DateTime?
-  
+  country String? @db.VarChar(100) // Add this
+  state   String? @db.VarChar(100) // Add this
+  zip     String? @db.VarChar(20) // Add this
+
+  pendingEmail        String?
+  pendingEmailOtp     String?
+  pendingEmailExpiry  DateTime?
+  resetTokenExpiry    DateTime?
+  pendingDeleteOtp    String?
+  pendingDeleteExpiry DateTime?
+
   // Relations
   accounts          Account[]
   cartItems         CartItem[]
@@ -46,17 +46,17 @@ model User {
   orders            Order[]
   phoneOtps         PhoneOTP[]
   sessions          Session[]
-  wishlist          Wishlist[]  
+  wishlist          Wishlist[]
   addresses         Address[]
-  savedCards        SavedCard[] 
-  savedUpis         SavedUpi[]  
+  savedCards        SavedCard[]
+  savedUpis         SavedUpi[]
   reviews           Review[]
   // Relations for coupon assignments
   couponAssignments CouponAssignment[]
 
   @@index([email])
   @@index([phoneNumber])
-  @@index([username])                        // Add this index
+  @@index([username]) // Add this index
   @@index([role])
   @@index([isActive])
   @@index([phoneVerified, isProfileComplete])
@@ -66,29 +66,29 @@ model User {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  description String
-  price       Float
-  image       String[]
+  id            Int      @id @default(autoincrement())
+  name          String   @db.VarChar(255)
+  description   String
+  price         Float
+  image         String[]
   // category    String   @db.VarChar(100)    // REMOVE THIS
   // subCategory String   @db.VarChar(100)    // REMOVE THIS
-  categoryId  Int                           // ADD THIS
-  subcategoryId Int                         // ADD THIS
-  sizes       String[]
-  bestseller  Boolean? @default(false)
-  isActive    Boolean  @default(true)
-  stock       Int      @default(0)
-  date        BigInt
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  categoryId    Int // ADD THIS
+  subcategoryId Int // ADD THIS
+  sizes         String[]
+  bestseller    Boolean? @default(false)
+  isActive      Boolean  @default(true)
+  stock         Int      @default(0)
+  date          BigInt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   // Denormalized review aggregates
-  averageRating Float?  @default(0)
-  reviewsCount  Int     @default(0)
+  averageRating Float?   @default(0)
+  reviewsCount  Int      @default(0)
 
   // Relations
-  category    Category    @relation(fields: [categoryId], references: [id])
-  subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
   cartItems   CartItem[]
   orderItems  OrderItem[]
   wishlist    Wishlist[]
@@ -103,37 +103,57 @@ model Product {
 
 // Reviews: unified for product and delivery reviews
 model Review {
-  id              String    @id @default(cuid())
+  id              String     @id @default(cuid())
   userId          Int
   type            ReviewType
-  productId       Int?      
+  productId       Int?
   orderId         Int?
   deliveryAgentId Int?
   rating          Int
-  title           String?   @db.VarChar(100)
-  comment         String?   @db.VarChar(2000)
-  images          String[]  @default([])
+  title           String?    @db.VarChar(100)
+  comment         String?    @db.VarChar(2000)
+  images          String[]   @default([])
   metadata        Json?
-  isEdited        Boolean   @default(false)
-  isDeleted       Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isEdited        Boolean    @default(false)
+  isDeleted       Boolean    @default(false)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product         Product?  @relation(fields: [productId], references: [id])
-  order           Order?    @relation(fields: [orderId], references: [id])
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+  order   Order?   @relation(fields: [orderId], references: [id])
 
+  @@unique([userId, productId, type], name: "unique_product_review")
+  @@unique([userId, orderId, type], name: "unique_delivery_review")
   @@index([type, productId])
   @@index([type, orderId])
   @@index([userId, type])
   @@index([productId])
   @@index([orderId])
   @@index([deliveryAgentId])
-
-  @@unique([userId, productId, type], name: "unique_product_review")
-  @@unique([userId, orderId, type], name: "unique_delivery_review")
   @@map("reviews")
+}
+
+model OfferRule {
+  id            Int      @id @default(autoincrement())
+  offerId       Int
+  priceBelow    Decimal?
+  priceAbove    Decimal?
+  minDiscount   Int?
+  maxDiscount   Int?
+  ageGroupStart Int?
+  ageGroupEnd   Int?
+  tags          String[] @default([])
+  subcategoryId Int?
+
+  offer       Offer        @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  subcategory Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("offer_rules")
 }
 
 enum ReviewType {
@@ -147,11 +167,11 @@ model Wishlist {
   userId    Int
   productId Int
   createdAt DateTime @default(now())
-  
+
   // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
   // Composite unique constraint to prevent duplicates
   @@unique([userId, productId], name: "userId_productId")
   @@index([userId])
@@ -240,14 +260,14 @@ model EmailOTP {
 }
 
 model EmailVerificationToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
+  id        Int       @id @default(autoincrement())
+  token     String    @unique
   userId    Int
   expiresAt DateTime
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  usedAt    DateTime?  // ← This is at the end, but your code expects it
-  
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usedAt    DateTime? // ← This is at the end, but your code expects it
+
   @@index([token])
   @@index([userId])
   @@index([expiresAt])
@@ -265,7 +285,7 @@ model OrderItem {
   updatedAt DateTime @updatedAt
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
   @@index([productId])
@@ -273,28 +293,28 @@ model OrderItem {
 }
 
 model Order {
-  id            Int         @id @default(autoincrement())
-  userId        Int
-  amount        Float
-  address       Json
-  status        OrderStatus @default(ORDER_PLACED)
-  paymentMethod String      @db.VarChar(50)
-  payment       Boolean     @default(false)
-  paymentId     String?     @db.VarChar(255)
-  date          BigInt
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  items         OrderItem[]
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade) // ← Add this
-  paymentDetails       Payment?
-  reviews              Review[]
+  id             Int         @id @default(autoincrement())
+  userId         Int
+  amount         Float
+  address        Json
+  status         OrderStatus @default(ORDER_PLACED)
+  paymentMethod  String      @db.VarChar(50)
+  payment        Boolean     @default(false)
+  paymentId      String?     @db.VarChar(255)
+  date           BigInt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade) // ← Add this
+  paymentDetails Payment?
+  reviews        Review[]
+
   @@index([userId])
   @@index([status])
   @@index([payment])
   @@index([createdAt])
   @@map("orders")
 }
-
 
 model CartItem {
   id        Int      @id @default(autoincrement())
@@ -349,26 +369,25 @@ enum OTPType {
   EMAIL_CHANGE
   PHONE_CHANGE
   ACCOUNT_DELETE
-
 }
 
 model Address {
   id           Int      @id @default(autoincrement())
   userId       Int
-  name         String   // The name of the recipient, e.g., "John Doe"
+  name         String // The name of the recipient, e.g., "John Doe"
   street       String
   city         String
   state        String
   zip          String
   country      String
   phone        String
-  instructions String?  // Optional delivery instructions
+  instructions String? // Optional delivery instructions
   isDefault    Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // Establish the relationship with the User model
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([isDefault])
@@ -380,7 +399,7 @@ model SavedCard {
   userId              Int
   cardholderName      String
   last4               String   @db.VarChar(4)
-  brand               String   // e.g., "visa", "mastercard"
+  brand               String // e.g., "visa", "mastercard"
   expiryMonth         Int
   expiryYear          Int
   paymentGatewayToken String   @unique // IMPORTANT: Secure token from your payment provider (e.g., Stripe, Razorpay)
@@ -388,7 +407,7 @@ model SavedCard {
   updatedAt           DateTime @updatedAt
 
   // Relation to the User model
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("saved_cards")
@@ -397,13 +416,13 @@ model SavedCard {
 model SavedUpi {
   id        Int      @id @default(autoincrement())
   userId    Int
-  name      String   // Name associated with the UPI
+  name      String // Name associated with the UPI
   vpa       String   @unique // Virtual Payment Address, e.g., "username@okhdfcbank"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relation to the User model
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("saved_upis")
@@ -413,32 +432,31 @@ model Payment {
   id                String        @id @default(cuid())
   razorpayPaymentId String?       @unique // Razorpay payment_id
   razorpayOrderId   String        @unique // Razorpay order_id  
-  razorpaySignature String?       // Payment verification signature
-  amount            Int           // Amount in paise (100 paise = 1 INR)
+  razorpaySignature String? // Payment verification signature
+  amount            Int // Amount in paise (100 paise = 1 INR)
   currency          String        @default("INR")
   status            PaymentStatus @default(PENDING)
   method            String?       @db.VarChar(50) // card, netbanking, wallet, upi
   gateway           String        @default("RAZORPAY") @db.VarChar(50)
-  gatewayResponse   Json?         // Store full gateway response for debugging
+  gatewayResponse   Json? // Store full gateway response for debugging
   failureReason     String?       @db.VarChar(500)
   orderId           Int           @unique // Links to your existing Order
-  userId            Int           // <- ADD THIS FIELD
+  userId            Int // <- ADD THIS FIELD
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
   // Relations
-  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade) // <- ADD THIS
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade) // <- ADD THIS
 
+  @@unique([userId, razorpayOrderId], name: "userId_razorpayOrderId")
   @@index([razorpayOrderId])
   @@index([razorpayPaymentId])
   @@index([status])
-  @@index([userId])       // <- ADD THIS INDEX
+  @@index([userId]) // <- ADD THIS INDEX
   @@index([createdAt])
-  @@unique([userId, razorpayOrderId], name: "userId_razorpayOrderId")
   @@map("payments")
 }
-
 
 enum PaymentStatus {
   PENDING
@@ -449,13 +467,13 @@ enum PaymentStatus {
 }
 
 model Category {
-  id            Int      @id @default(autoincrement())
-  name          String   @unique @db.VarChar(100)
-  description   String?
-  imageUrl      String?  // Optional: for category images
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?
+  imageUrl    String? // Optional: for category images
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   subcategories Subcategory[]
@@ -467,17 +485,20 @@ model Category {
 }
 
 model Subcategory {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  grouping    String   @db.VarChar(100) // For "Topwear", "Bottomwear", etc.
-  categoryId  Int
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  grouping   String   @db.VarChar(100) // For "Topwear", "Bottomwear", etc.
+  categoryId Int
+  imageUrl   String? // optional image/icon for subcategory
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Relations
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products    Product[]
+  category   Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products   Product[]
+  // Offer rules that target this subcategory
+  offerRules OfferRule[]
 
   @@unique([name, categoryId]) // A subcategory name should be unique within a category
   @@index([grouping])
@@ -486,28 +507,49 @@ model Subcategory {
 }
 
 model Offer {
-  id              Int       @id @default(autoincrement())
-  title           String    @db.VarChar(255)
+  id              Int      @id @default(autoincrement())
+  title           String   @db.VarChar(255)
   description     String
   discountPercent Float
-  isActive        Boolean   @default(true)
+  iconUrl         String?
+  isActive        Boolean  @default(true)
   startDate       DateTime
   endDate         DateTime
   categoryId      Int
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  offerTypeId     Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
-  category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  offerType  OfferType?  @relation(fields: [offerTypeId], references: [id])
+  // Offer rules for this offer
+  offerRules OfferRule[]
 
   @@index([categoryId])
   @@index([isActive, startDate, endDate])
   @@map("offers")
 }
 
+// New model for Offer Types (categorization of offers, can have icon/image)
+model OfferType {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?
+  iconUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  offers Offer[]
+
+  @@map("offer_types")
+}
+
 model Coupon {
-  id                Int       @id @default(autoincrement())
-  code              String    @unique @db.VarChar(50)
+  id                Int                @id @default(autoincrement())
+  code              String             @unique @db.VarChar(50)
   name              String
   type              CouponType
   discountValue     Decimal
@@ -517,11 +559,11 @@ model Coupon {
   usageLimitPerUser Int?
   validFrom         DateTime
   validUntil        DateTime
-  isActive          Boolean   @default(true)
-  isNewUserOnly     Boolean   @default(false)
+  isActive          Boolean            @default(true)
+  isNewUserOnly     Boolean            @default(false)
   categoryIds       Json?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
   usages            CouponUsage[]
   orderCoupons      OrderCoupon[]
   // Optional assignments to specific users. If empty/null -> global coupon
@@ -531,12 +573,12 @@ model Coupon {
 }
 
 model CouponUsage {
-  id        Int      @id @default(autoincrement())
-  couponId  Int
-  userId    Int
-  orderId   Int?
-  usedAt    DateTime @default(now())
-  coupon    Coupon   @relation(fields: [couponId], references: [id])
+  id       Int      @id @default(autoincrement())
+  couponId Int
+  userId   Int
+  orderId  Int?
+  usedAt   DateTime @default(now())
+  coupon   Coupon   @relation(fields: [couponId], references: [id])
 
   @@map("coupon_usages")
 }
@@ -553,12 +595,12 @@ model OrderCoupon {
 }
 
 model CouponAssignment {
-  id        Int    @id @default(autoincrement())
-  couponId  Int
-  userId    Int
+  id       Int @id @default(autoincrement())
+  couponId Int
+  userId   Int
 
-  coupon    Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([couponId, userId], name: "coupon_user_unique")
   @@index([userId])

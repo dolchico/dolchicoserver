@@ -44,6 +44,7 @@ import authUser from './middleware/auth.js';
 import categoryRoutes from './routes/category.routes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import debugRoute from './routes/debugRoute.js';
+import offerTypeRoutes from './routes/offerType.routes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 
@@ -151,9 +152,13 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/payment', paymentRouter); // Removed authUser - auth is now handled in routes
 app.use('/api', categoryRoutes);
 app.use('/api', couponRoutes);
+app.use('/api', offerTypeRoutes);
 app.use('/api/debug', debugRoute);
 app.use('/api/reviews', reviewRoutes);
 // app.use('/api/payment', paymentRoutes);
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Root health check (for deployment platforms)
 app.get('/', (req, res) => {

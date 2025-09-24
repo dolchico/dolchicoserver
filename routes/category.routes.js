@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as CategoryController from '../controllers/category.controller.js';
-// --- CHANGE HERE: Import your actual middleware ---
+import upload from '../middleware/multer.js';
 import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -11,17 +11,17 @@ const publicRouter = Router();
 // Note: We apply the middleware directly to the adminRouter.
 // 1. ensureAuthWithStatus: Verifies JWT and checks if the user account is active.
 // 2. ensureRole(['ADMIN']): Verifies the user has the 'ADMIN' role.
-adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));``
+adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
 // Category routes
-adminRouter.post('/categories', CategoryController.createCategory);
-adminRouter.put('/categories/:id', CategoryController.updateCategory);
+adminRouter.post('/categories', upload.single('image'), CategoryController.createCategory);
+adminRouter.put('/categories/:id', upload.single('image'), CategoryController.updateCategory);
 adminRouter.delete('/categories/:id', CategoryController.deleteCategory);
 adminRouter.post('/categories/initialize', CategoryController.initializeData);
 
 // Add subcategories and offers to a specific category
-adminRouter.post('/categories/:id/subcategories', CategoryController.addSubcategory);
-adminRouter.post('/categories/:id/offers', CategoryController.addOffer);
+adminRouter.post('/categories/:id/subcategories', upload.single('image'), CategoryController.addSubcategory);
+adminRouter.post('/categories/:id/offers', upload.single('icon'), CategoryController.addOffer);
 
 // Standalone subcategory and offer management
 adminRouter.put('/subcategories/:id', CategoryController.updateSubcategory);
