@@ -248,15 +248,15 @@ export const resetPassword = async (req, res) => {
   if (!/[A-Z]/.test(newPassword)) {
     passwordErrors.push('Password must contain at least one uppercase letter.');
   }
-  if (!/[a-z]/.test(newPassword)) {
-    passwordErrors.push('Password must contain at least one lowercase letter.');
-  }
+  // if (!/[a-z]/.test(newPassword)) {
+  //   passwordErrors.push('Password must contain at least one lowercase letter.');
+  // }
   if (!/\d/.test(newPassword)) {
     passwordErrors.push('Password must contain at least one number.');
   }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
-    passwordErrors.push('Password must contain at least one special character.');
-  }
+  // if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+  //   passwordErrors.push('Password must contain at least one special character.');
+  // }
   if (passwordErrors.length > 0) {
     return res.status(400).json({ 
       success: false, 
