@@ -56,19 +56,59 @@ export const addToWishlistService = async (userId, productId) => {
     }
 
     // Create wishlist entry
-    const wishlistItem = await prisma.wishlist.create({
-      data: {
-        userId: userIdNum,
-        productId: productIdNum
-      },
-      include: {
-        product: {
-          select: productInclude
+    // Try to create and include subcategory.imageUrl. If the DB is missing that column
+    // Prisma will throw P2022; in that case fallback to a query that excludes imageUrl.
+    try {
+      const wishlistItem = await prisma.wishlist.create({
+        data: {
+          userId: userIdNum,
+          productId: productIdNum
+        },
+        include: {
+          product: {
+            select: {
+              ...productInclude,
+              // override subcategory to select fields explicitly including imageUrl
+              subcategory: {
+                select: {
+                  id: true,
+                  name: true,
+                  grouping: true,
+                  imageUrl: true
+                }
+              }
+            }
+          }
         }
+      });
+      return wishlistItem;
+    } catch (error) {
+      // If missing column error for imageUrl, retry without selecting it
+      if (error && error.code === 'P2022' && String(error.message).includes('imageUrl')) {
+        const wishlistItem = await prisma.wishlist.create({
+          data: {
+            userId: userIdNum,
+            productId: productIdNum
+          },
+          include: {
+            product: {
+              select: {
+                ...productInclude,
+                subcategory: {
+                  select: {
+                    id: true,
+                    name: true,
+                    grouping: true
+                  }
+                }
+              }
+            }
+          }
+        });
+        return wishlistItem;
       }
-    });
-
-    return wishlistItem;
+      throw error;
+    }
   } catch (error) {
     console.error('Error adding to wishlist:', error);
     throw error;
