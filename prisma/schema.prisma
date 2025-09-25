@@ -109,7 +109,7 @@ model Review {
   type            ReviewType
   productId       Int?
   orderId         Int?
-  deliveryAgentId Int?
+  // deliveryAgentId removed — delivery agent reviews are not tracked in schema
   rating          Int
   title           String?    @db.VarChar(100)
   comment         String?    @db.VarChar(2000)
@@ -132,7 +132,7 @@ model Review {
   @@index([userId, type])
   @@index([productId])
   @@index([orderId])
-  @@index([deliveryAgentId])
+  // @@index([deliveryAgentId]) removed
   @@map("reviews")
 }
 
