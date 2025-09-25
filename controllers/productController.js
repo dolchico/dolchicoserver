@@ -10,13 +10,13 @@ import {
 // ✅ Add Product - REVISED FOR RELATIONAL SCHEMA
 const addProduct = async (req, res) => {
   try {
-    // CHANGED: Destructure categoryId and subcategoryId instead of names.
-    const { name, description, price, categoryId, subcategoryId, sizes, bestseller } = req.body;
+  // CHANGED: Only require `subcategoryId`. We'll derive `categoryId` server-side to ensure consistency.
+  const { name, description, price, subcategoryId, sizes, bestseller } = req.body;
 
-    // --- Validation for new required fields ---
-    if (!categoryId || !subcategoryId) {
-        return res.status(400).json({ success: false, message: 'categoryId and subcategoryId are required fields.' });
-    }
+  // --- Validation for new required fields ---
+  if (!subcategoryId) {
+    return res.status(400).json({ success: false, message: 'subcategoryId is a required field.' });
+  }
 
     const image1 = req.files.image1?.[0];
     const image2 = req.files.image2?.[0];
@@ -36,7 +36,7 @@ const addProduct = async (req, res) => {
       })
     );
     
-    // CHANGED: Construct productData with categoryId and subcategoryId for the service.
+    // CHANGED: Construct productData with subcategoryId only; service will derive categoryId.
     const productData = {
       name,
       description,
@@ -45,7 +45,7 @@ const addProduct = async (req, res) => {
       sizes: JSON.parse(sizes),
       image: imagesUrl,
       date: Date.now(),
-      categoryId: Number(categoryId), // Ensure it's a number
+      // Do not accept categoryId from client. Only pass subcategoryId; service will derive categoryId.
       subcategoryId: Number(subcategoryId), // Ensure it's a number
     };
 

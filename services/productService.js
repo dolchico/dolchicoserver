@@ -2,21 +2,29 @@ import prisma from '../lib/prisma.js';
 
 // CHANGED: createProduct now uses `connect` to link to existing categories/subcategories by their ID.
 export const createProduct = async (data) => {
-  const { categoryId, subcategoryId, ...productData } = data;
+  // Require subcategoryId and derive the canonical categoryId from it.
+  const { categoryId: providedCategoryId, subcategoryId, ...productData } = data;
 
-  if (!categoryId || !subcategoryId) {
-    throw new Error('categoryId and subcategoryId are required to create a product.');
+  if (!subcategoryId) {
+    throw new Error('subcategoryId is required to create a product.');
+  }
+
+  // Resolve the subcategory to get its categoryId.
+  const sub = await prisma.subcategory.findUnique({ where: { id: Number(subcategoryId) }, select: { id: true, categoryId: true } });
+  if (!sub) {
+    throw new Error('Invalid subcategoryId provided');
+  }
+
+  const derivedCategoryId = sub.categoryId;
+  if (typeof providedCategoryId !== 'undefined' && Number(providedCategoryId) !== derivedCategoryId) {
+    console.warn(`createProduct: provided categoryId=${providedCategoryId} does not match subcategory(${subcategoryId}).categoryId=${derivedCategoryId}. Overriding with derived value.`);
   }
 
   return await prisma.product.create({
     data: {
       ...productData,
-      category: {
-        connect: { id: Number(categoryId) }
-      },
-      subcategory: {
-        connect: { id: Number(subcategoryId) }
-      }
+      category: { connect: { id: Number(derivedCategoryId) } },
+      subcategory: { connect: { id: Number(subcategoryId) } }
     }
   });
 };
