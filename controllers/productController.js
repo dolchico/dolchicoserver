@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { priceUtils } from '../utils/priceUtils.js';
 import {
   createProduct,
   getAllProducts,
@@ -40,7 +41,7 @@ const addProduct = async (req, res) => {
     const productData = {
       name,
       description,
-      price: parseFloat(price),
+      price: priceUtils.toPrismaDecimal(price),
       bestseller: bestseller === 'true',
       sizes: JSON.parse(sizes),
       image: imagesUrl,
@@ -132,8 +133,8 @@ const searchProducts = async (req, res) => {
       filters: {
         ...(category && { category }),
         ...(subCategory && { subCategory }),
-        ...(minPrice && { minPrice: parseFloat(minPrice) }),
-        ...(maxPrice && { maxPrice: parseFloat(maxPrice) })
+        ...(minPrice && { minPrice: priceUtils.toPrismaDecimal(minPrice) }),
+        ...(maxPrice && { maxPrice: priceUtils.toPrismaDecimal(maxPrice) })
       },
       sortBy
     };

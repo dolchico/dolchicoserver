@@ -1,4 +1,5 @@
 import logger from '../logger.js';
+import { priceUtils } from '../utils/priceUtils.js';
 import {
   createRazorpayOrder,
   verifyRazorpayPayment,
@@ -72,7 +73,7 @@ export const createPaymentOrder = async (req, res) => {
     const orderData = await createRazorpayOrder({
       userId: Number(userId),
       items,
-      amount: parseFloat(amount),
+      amount: priceUtils.toPrismaDecimal(amount),
       address,
       notes
     });

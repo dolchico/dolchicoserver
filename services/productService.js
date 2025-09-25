@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js';
+import { priceUtils } from '../utils/priceUtils.js';
 
 // CHANGED: createProduct now uses `connect` to link to existing categories/subcategories by their ID.
 export const createProduct = async (data) => {
@@ -100,11 +101,11 @@ export const searchProductsService = async (searchParams) => {
     }
     
     if (filters.minPrice !== undefined) {
-      whereConditions.AND.push({ price: { gte: parseFloat(filters.minPrice) } });
+      whereConditions.AND.push({ price: { gte: priceUtils.toPrismaDecimal(filters.minPrice) } });
     }
     
     if (filters.maxPrice !== undefined) {
-      whereConditions.AND.push({ price: { lte: parseFloat(filters.maxPrice) } });
+      whereConditions.AND.push({ price: { lte: priceUtils.toPrismaDecimal(filters.maxPrice) } });
     }
 
     const getOrderBy = (sortBy) => {

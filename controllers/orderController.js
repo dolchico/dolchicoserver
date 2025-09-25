@@ -6,6 +6,7 @@ import {
     updateOrderStatus,
     addToCart,
 } from "../services/orderService.js";
+import { priceUtils } from '../utils/priceUtils.js';
 
 /**
  * ✅ Place COD Order
@@ -39,7 +40,7 @@ export const placeOrder = async (req, res) => {
 
         const order = await createOrder({
             userId: Number(userId),
-            amount: parseFloat(amount),
+            amount: priceUtils.toPrismaDecimal(amount),
             address,
             items,
         });

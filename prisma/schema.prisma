@@ -69,7 +69,7 @@ model Product {
   id            Int      @id @default(autoincrement())
   name          String   @db.VarChar(255)
   description   String
-  price         Float
+  price         Decimal
   image         String[]
   // category    String   @db.VarChar(100)    // REMOVE THIS
   // subCategory String   @db.VarChar(100)    // REMOVE THIS
@@ -281,7 +281,7 @@ model OrderItem {
   productId Int
   size      String   @db.VarChar(10)
   quantity  Int
-  price     Float
+  price     Decimal
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -296,7 +296,7 @@ model OrderItem {
 model Order {
   id             Int         @id @default(autoincrement())
   userId         Int
-  amount         Float
+  amount         Decimal
   address        Json
   status         OrderStatus @default(ORDER_PLACED)
   paymentMethod  String      @db.VarChar(50)
@@ -323,7 +323,7 @@ model CartItem {
   productId Int
   size      String   @db.VarChar(10)
   quantity  Int
-  price     Float
+  price     Decimal
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   product   Product  @relation(fields: [productId], references: [id])
