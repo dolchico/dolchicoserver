@@ -23,6 +23,14 @@ const recalcDeliveryAgentAggregates = async (deliveryAgentId, tx) => {
   }
 };
 
+// Helper to resolve id which can be numeric (intId) or string (id)
+const resolveReviewById = async (tx, identifier) => {
+  if (typeof identifier === 'number' || (/^\d+$/.test(String(identifier)))) {
+    return tx.review.findUnique({ where: { intId: Number(identifier) } });
+  }
+  return tx.review.findUnique({ where: { id: String(identifier) } });
+};
+
 const createReview = async (dto, userId) => {
   return prisma.$transaction(async (tx) => {
     if (dto.type === REVIEW_TYPE.PRODUCT) {
@@ -63,7 +71,7 @@ const createReview = async (dto, userId) => {
 
 const updateReview = async (id, dto, userCtx) => {
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.review.findUnique({ where: { id } });
+  const existing = await resolveReviewById(tx, id);
     if (!existing) throw { status: 404, message: 'Review not found' };
     if (existing.isDeleted) throw { status: 404, message: 'Review not found' };
     if (existing.userId !== userCtx.id && userCtx.role !== 'ADMIN' && userCtx.role !== 'MODERATOR') throw { status: 403, message: 'Forbidden' };
@@ -83,7 +91,7 @@ const updateReview = async (id, dto, userCtx) => {
 
 const deleteReview = async (id, userCtx) => {
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.review.findUnique({ where: { id } });
+    const existing = await resolveReviewById(prisma, id);
     if (!existing) throw { status: 404, message: 'Review not found' };
     if (existing.userId !== userCtx.id && userCtx.role !== 'ADMIN' && userCtx.role !== 'MODERATOR') throw { status: 403, message: 'Forbidden' };
     if (existing.isDeleted) return { success: true };
