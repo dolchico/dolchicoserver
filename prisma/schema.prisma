@@ -104,7 +104,6 @@ model Product {
 // Reviews: unified for product and delivery reviews
 model Review {
   id              String     @id @default(cuid())
-  intId           Int?       @unique
   userId          Int
   type            ReviewType
   productId       Int?
