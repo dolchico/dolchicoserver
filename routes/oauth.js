@@ -16,19 +16,16 @@ router.get('/google',
 );
 
 // Handle Google OAuth callback
-// In your backend OAuth route (e.g., authRoutes.js)
 router.get('/google/callback', 
   passport.authenticate('google', { 
     failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed` 
   }),
   async (req, res) => {
     try {
-      // Generate JWT token
+      // Generate JWT token matching email/password format
       const token = jwt.sign(
         { 
-          userId: req.user.id, 
-          email: req.user.email,
-          role: req.user.role 
+          id: req.user.id // Use 'id' instead of 'userId', exclude email and role
         },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
@@ -60,15 +57,8 @@ router.get('/google/callback',
   }
 );
 
-
 // Logout endpoint
 router.post('/logout', AuthController.logout);
-
-// Get current user profile
-// router.get('/profile', AuthController.getProfile);
-
-// Add this route to verify tokens
-
 
 // Middleware to authenticate token
 const authenticateToken = (req, res, next) => {
@@ -83,10 +73,11 @@ const authenticateToken = (req, res, next) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
-    req.userId = decoded.userId;
+    req.userId = decoded.id; // Update to use 'id' to match new token format
     next();
   });
 };
+
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
