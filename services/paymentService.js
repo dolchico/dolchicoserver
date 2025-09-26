@@ -65,9 +65,9 @@ export const createRazorpayOrder = async (data) => {
     });
 
     // Clear user's cart after creating order
-    await prisma.cartItem.deleteMany({
-      where: { userId }
-    });
+    // await prisma.cartItem.deleteMany({
+    //   where: { userId }
+    // });
 
     return {
       orderId: razorpayOrder.id,
@@ -75,6 +75,51 @@ export const createRazorpayOrder = async (data) => {
       currency: razorpayOrder.currency,
       dbOrderId: dbOrder.id,
       key: process.env.RAZORPAY_KEY_ID // Frontend needs this
+    };
+  } catch (error) {
+    console.error('Error creating Razorpay order:', error);
+    throw new Error('Failed to create payment order');
+  }
+};
+export const createCodOrder = async (data) => {
+  try {
+    const { userId, items, amount, address, notes = {} } = data;
+    const amountInPaise = Math.round(amount * 100);
+
+    // Create order in database with pending payment
+    const dbOrder = await prisma.$transaction(async (tx) => {
+      // Create the order
+      const order = await tx.order.create({
+        data: {
+          userId,
+          amount,
+          address,
+          status: 'ORDER_PLACED',
+          paymentMethod: 'COD',
+          payment: true, // Keep existing boolean for compatibility
+          paymentId: "randomxyz", // Store Razorpay order ID
+          date: BigInt(Date.now()),
+          items: {
+            create: items.map(item => ({
+              productId: item.productId,
+              size: item.size,
+              quantity: item.quantity,
+              price: item.price
+            }))
+          }
+        },
+        include: { items: true }
+      });
+      console.log("createCodOrder",order);
+      return order;
+    });
+
+    // Clear user's cart after creating order
+    // await prisma.cartItem.deleteMany({
+    //   where: { userId }
+    // });
+    return {
+      dbOrderId: dbOrder.id,
     };
   } catch (error) {
     console.error('Error creating Razorpay order:', error);

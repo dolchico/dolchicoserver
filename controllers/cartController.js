@@ -6,6 +6,7 @@ export const applyCouponToCart = async (req, res, next) => {
     const { cartId, code } = req.body;
     if (!cartId || !code) return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'cartId and code are required' });
     const result = await couponService.applyCoupon({ userId, cartId, code });
+    console.log(result);
     res.json(result);
   } catch (err) {
     // translate known errors
@@ -19,10 +20,33 @@ export const applyCouponToCart = async (req, res, next) => {
 export const removeCouponFromCart = async (req, res, next) => {
   try {
     const { cartId } = req.params;
-    if (!cartId) return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'cartId required' });
-    const result = await couponService.removeCoupon({ cartId });
-    res.json(result);
+    console.log('Removing coupon for cartId:', cartId);
+
+    // Validate cartId
+    if (!cartId) {
+      console.log('Missing cartId');
+      return res.status(400).json({ error: 'INVALID_PAYLOAD', message: 'cartId required' });
+    }
+
+    // Assume couponService.removeCoupon implementation
+    const result = await couponService.removeCoupon({ cartId, userId: req.user?.id });
+    console.log('couponService.removeCoupon result:', result);
+
+    // Ensure consistent success response
+    res.json({ success: true, message: 'Coupon removed successfully', ...result });
   } catch (err) {
+    console.error('Error in removeCouponFromCart:', err.message, err.stack);
+    // Map specific errors to appropriate responses
+    if (err.message === 'Cart not found') {
+      return res.status(404).json({ error: 'NOT_FOUND', message: 'Cart not found' });
+    }
+    if (err.message === 'No coupon applied') {
+      return res.status(400).json({ error: 'NO_COUPON_APPLIED', message: 'No coupon is applied to this cart' });
+    }
+    if (err.message === 'Unauthorized') {
+      return res.status(401).json({ error: 'UNAUTHORIZED', message: 'User not authorized to modify this cart' });
+    }
+    // Fallback for unhandled errors
     next(err);
   }
 };
