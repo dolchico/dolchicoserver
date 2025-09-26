@@ -8,28 +8,54 @@ import {
   searchProducts, // Add this new controller
 } from '../controllers/productController.js';
 import upload from '../middleware/multer.js';
-import adminAuth from '../middleware/adminAuth.js';
+import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
+import authUser from '../middleware/auth.js';
+import { getProductStock, getProductById } from '../services/productService.js';
 
-const productRouter = express.Router();
+const router = express.Router();
+const adminRouter = express.Router();
+const publicRouter = express.Router();
 
-// Admin routes (keep these for admin panel)
-productRouter.post(
-  '/add',
-  adminAuth,
-  upload.fields([
-    { name: 'image1', maxCount: 1 },
-    { name: 'image2', maxCount: 1 },
-    { name: 'image3', maxCount: 1 },
-    { name: 'image4', maxCount: 1 },
-  ]),
-  addProduct
-);
+// Apply admin middlewares (same as category.routes.js)
+adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
-productRouter.post('/remove', adminAuth, removeProduct);
+// Admin routes (protected)
+adminRouter.post('/add', upload.array('images', 6), addProduct);
+adminRouter.post('/remove', removeProduct);
 
 // Public routes (for users)
-productRouter.get('/single/:productId', singleProduct);
-productRouter.get('/list', listProducts);
-productRouter.get('/search', searchProducts); // Add this line
+publicRouter.get('/single/:productId', singleProduct);
+publicRouter.get('/list', listProducts);
+publicRouter.get('/search', searchProducts);
+// Product stock endpoint (protected)
+publicRouter.post('/product/stock', authUser, async (req, res) => {
+  try {
+    const { productIds } = req.body;
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or empty productIds array' });
+    }
+    const stockData = await getProductStock(productIds);
+    res.status(200).json({ success: true, data: stockData });
+  } catch (err) {
+    console.error('Get Product Stock Controller Error:', err);
+    res.status(500).json({ success: false, message: 'An internal server error occurred.', error: err.message });
+  }
+});
 
-export default productRouter;
+// Legacy single product route (keep for backward compatibility at /product/single/:id)
+publicRouter.get('/product/single/:id', async (req, res) => {
+  try {
+    const product = await getProductById(req.params.id);
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+    return res.status(200).json({ success: true, product });
+  } catch (err) {
+    console.error('Get Product Controller Error:', err);
+    res.status(500).json({ success: false, message: 'An internal server error occurred.' });
+  }
+});
+
+// Mount subrouters
+router.use('/admin', adminRouter);
+router.use(publicRouter);
+
+export default router;

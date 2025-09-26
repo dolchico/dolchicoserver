@@ -86,6 +86,14 @@ model Product {
   averageRating Float?   @default(0)
   reviewsCount  Int      @default(0)
 
+  // New e-commerce fields
+  sku            String   @unique @db.VarChar(50)
+  weight         Decimal? @db.Decimal(8,3)
+  dimensions     Json?
+  tags           String[] @default([])
+  seoSlug        String?  @unique @db.VarChar(255)
+  compareAtPrice Decimal?
+
   // Relations
   category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
@@ -98,6 +106,9 @@ model Product {
   @@index([subcategoryId])
   @@index([bestseller])
   @@index([isActive])
+  @@index([sku])
+  @@index([seoSlug])
+  @@index([tags])
   @@map("products")
 }
 

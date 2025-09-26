@@ -9831,3 +9831,151 @@ Please make sure your database server is running at `ep-royal-pine-adbeigxh-pool
 2025-09-24T00:52:15.158Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-24T00:52:49.896Z [INFO]: 🚀 Server started on PORT: 4000
 2025-09-24T00:53:17.946Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:13:41.646Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:13:49.500Z [INFO]: ::1 - - [25/Sep/2025:22:13:49 +0000] "GET /api/user/wishlist HTTP/1.1" 401 91 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:13:49.505Z [INFO]: ::1 - - [25/Sep/2025:22:13:49 +0000] "GET /api/cart HTTP/1.1" 401 80 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:13:50.314Z [INFO]: ::1 - - [25/Sep/2025:22:13:50 +0000] "GET /api/auth/google HTTP/1.1" 302 0 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:13:57.702Z [INFO]: ::1 - - [25/Sep/2025:22:13:57 +0000] "GET /api/auth/google/callback?code=4%2F0AVGzR1BJATxr4mZKzYRrnS1ZRQJL_57M6ODD-5PylIAETKJZksJ62VFukY0hVCt2yBsL1g&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent HTTP/1.1" 302 369 "https://accounts.google.com/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:13:59.777Z [INFO]: ::1 - - [25/Sep/2025:22:13:59 +0000] "GET /api/auth/profile HTTP/1.1" 200 161 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:13:59.979Z [INFO]: ::1 - - [25/Sep/2025:22:13:59 +0000] "GET /api/auth/profile HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:01.016Z [INFO]: ::1 - - [25/Sep/2025:22:14:01 +0000] "GET /api/cart HTTP/1.1" 200 76 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:01.171Z [INFO]: ::1 - - [25/Sep/2025:22:14:01 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:01.330Z [INFO]: ::1 - - [25/Sep/2025:22:14:01 +0000] "GET /api/user/wishlist HTTP/1.1" 200 159 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:01.842Z [INFO]: ::1 - - [25/Sep/2025:22:14:01 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:12.615Z [INFO]: ::1 - - [25/Sep/2025:22:14:12 +0000] "POST /api/user/complete-profile HTTP/1.1" 200 544 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:12.932Z [INFO]: ::1 - - [25/Sep/2025:22:14:12 +0000] "GET /api/user/wishlist HTTP/1.1" 200 158 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:12.936Z [INFO]: ::1 - - [25/Sep/2025:22:14:12 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:13.092Z [INFO]: ::1 - - [25/Sep/2025:22:14:13 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:13.158Z [INFO]: ::1 - - [25/Sep/2025:22:14:13 +0000] "GET /api/user/wishlist HTTP/1.1" - - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:13.752Z [INFO]: ::1 - - [25/Sep/2025:22:14:13 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:13.900Z [INFO]: ::1 - - [25/Sep/2025:22:14:13 +0000] "GET /api/user/wishlist HTTP/1.1" 200 158 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:17.621Z [INFO]: ::1 - - [25/Sep/2025:22:14:17 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:17.793Z [INFO]: ::1 - - [25/Sep/2025:22:14:17 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:17.945Z [INFO]: ::1 - - [25/Sep/2025:22:14:17 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:18.332Z [INFO]: ::1 - - [25/Sep/2025:22:14:18 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:19.735Z [INFO]: ::1 - - [25/Sep/2025:22:14:19 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 200 39386 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:20.206Z [INFO]: ::1 - - [25/Sep/2025:22:14:20 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:24.059Z [INFO]: ::1 - - [25/Sep/2025:22:14:24 +0000] "GET /api/product/31/reviews HTTP/1.1" 404 161 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:24.061Z [INFO]: ::1 - - [25/Sep/2025:22:14:24 +0000] "GET /api/product/31/reviews HTTP/1.1" 404 161 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:25.131Z [INFO]: ::1 - - [25/Sep/2025:22:14:25 +0000] "GET /api/product/single/31 HTTP/1.1" 200 1031 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:25.284Z [INFO]: ::1 - - [25/Sep/2025:22:14:25 +0000] "GET /api/product/list HTTP/1.1" 200 39386 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:25.656Z [INFO]: ::1 - - [25/Sep/2025:22:14:25 +0000] "GET /api/product/single/31 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:25.656Z [INFO]: ::1 - - [25/Sep/2025:22:14:25 +0000] "GET /api/user/wishlist/check/31 HTTP/1.1" 200 123 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:25.809Z [INFO]: ::1 - - [25/Sep/2025:22:14:25 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:26.179Z [INFO]: ::1 - - [25/Sep/2025:22:14:26 +0000] "GET /api/user/wishlist/check/31 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:37.772Z [INFO]: ::1 - - [25/Sep/2025:22:14:37 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:37.929Z [INFO]: ::1 - - [25/Sep/2025:22:14:37 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:38.057Z [INFO]: ::1 - - [25/Sep/2025:22:14:38 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:38.390Z [INFO]: ::1 - - [25/Sep/2025:22:14:38 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:38.764Z [INFO]: ::1 - - [25/Sep/2025:22:14:38 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:39.289Z [INFO]: ::1 - - [25/Sep/2025:22:14:39 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:43.718Z [INFO]: ::1 - - [25/Sep/2025:22:14:43 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:43.871Z [INFO]: ::1 - - [25/Sep/2025:22:14:43 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:44.186Z [INFO]: ::1 - - [25/Sep/2025:22:14:44 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:53.594Z [INFO]: ::1 - - [25/Sep/2025:22:14:53 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:53.745Z [INFO]: ::1 - - [25/Sep/2025:22:14:53 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:53.967Z [INFO]: ::1 - - [25/Sep/2025:22:14:53 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:54.120Z [INFO]: ::1 - - [25/Sep/2025:22:14:54 +0000] "GET /api/product/list?category=HomeLiving&sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 200 39386 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:54.275Z [INFO]: ::1 - - [25/Sep/2025:22:14:54 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:54.791Z [INFO]: ::1 - - [25/Sep/2025:22:14:54 +0000] "GET /api/product/list?category=HomeLiving&sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:56.487Z [INFO]: ::1 - - [25/Sep/2025:22:14:56 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:56.634Z [INFO]: ::1 - - [25/Sep/2025:22:14:56 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:56.639Z [INFO]: ::1 - - [25/Sep/2025:22:14:56 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:56.944Z [INFO]: ::1 - - [25/Sep/2025:22:14:56 +0000] "GET /api/product/list?category=HomeLiving&sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:56.945Z [INFO]: ::1 - - [25/Sep/2025:22:14:56 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:14:57.421Z [INFO]: ::1 - - [25/Sep/2025:22:14:57 +0000] "GET /api/product/list?category=HomeLiving&sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-25T22:16:25.891Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:16:37.889Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:16:47.017Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:19:11.507Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:19:18.742Z [INFO]: ::1 - - [25/Sep/2025:22:19:18 +0000] "POST /api/admin/login HTTP/1.1" 200 315 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:22:13.086Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:22:13.089Z [INFO]: ::1 - - [25/Sep/2025:22:22:13 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:29:41.751Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:29:41.755Z [INFO]: ::1 - - [25/Sep/2025:22:29:41 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:30:35.976Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:30:43.846Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:32:14.217Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:32:14.221Z [INFO]: ::1 - - [25/Sep/2025:22:32:14 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:33:05.170Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:33:08.250Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:33:08.253Z [INFO]: ::1 - - [25/Sep/2025:22:33:08 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:33:13.037Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:33:13.038Z [INFO]: ::1 - - [25/Sep/2025:22:33:13 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:33:13.524Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:33:13.525Z [INFO]: ::1 - - [25/Sep/2025:22:33:13 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:33:23.482Z [ERROR]: Global error handler: Field name missing
+2025-09-25T22:33:23.484Z [INFO]: ::1 - - [25/Sep/2025:22:33:23 +0000] "POST /api/product/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:35:01.526Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:35:26.858Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:35:32.024Z [INFO]: ::1 - - [25/Sep/2025:22:35:32 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:36:12.556Z [INFO]: ::1 - - [25/Sep/2025:22:36:12 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:39:19.776Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:39:24.895Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:39:48.446Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-25T22:40:12.586Z [INFO]: ::1 - - [25/Sep/2025:22:40:12 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:40:16.436Z [INFO]: ::1 - - [25/Sep/2025:22:40:16 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-25T22:40:17.283Z [INFO]: ::1 - - [25/Sep/2025:22:40:17 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-26T18:45:28.197Z [INFO]: ::1 - - [26/Sep/2025:18:45:28 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:28.472Z [INFO]: ::1 - - [26/Sep/2025:18:45:28 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:28.625Z [INFO]: ::1 - - [26/Sep/2025:18:45:28 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:28.646Z [INFO]: ::1 - - [26/Sep/2025:18:45:28 +0000] "GET /api/product/list?sortBy=createdAt&sortOrder=desc&page=1&limit=12 HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:29.864Z [INFO]: ::1 - - [26/Sep/2025:18:45:29 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:30.316Z [INFO]: ::1 - - [26/Sep/2025:18:45:30 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:32.347Z [INFO]: ::1 - - [26/Sep/2025:18:45:32 +0000] "POST /api/cart/items HTTP/1.1" 201 209 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:32.947Z [INFO]: ::1 - - [26/Sep/2025:18:45:32 +0000] "GET /api/cart HTTP/1.1" 200 497 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:36.939Z [INFO]: ::1 - - [26/Sep/2025:18:45:36 +0000] "POST /api/cart/items HTTP/1.1" 201 210 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:37.395Z [INFO]: ::1 - - [26/Sep/2025:18:45:37 +0000] "GET /api/cart HTTP/1.1" 200 881 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:41.498Z [INFO]: ::1 - - [26/Sep/2025:18:45:41 +0000] "GET /api/cart HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:41.503Z [INFO]: ::1 - - [26/Sep/2025:18:45:41 +0000] "POST /api/product/stock HTTP/1.1" 404 157 "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:41.648Z [INFO]: ::1 - - [26/Sep/2025:18:45:41 +0000] "GET /api/user/wishlist HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:45:42.266Z [INFO]: ::1 - - [26/Sep/2025:18:45:42 +0000] "GET /api/product/list HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-09-26T18:49:05.332Z [INFO]: ::1 - - [26/Sep/2025:18:49:05 +0000] "POST /api%20/cart/apply-coupon HTTP/1.1" 404 164 "-" "PostmanRuntime/7.47.1"
+2025-09-26T18:49:32.625Z [INFO]: ::1 - - [26/Sep/2025:18:49:32 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 401 65 "-" "PostmanRuntime/7.47.1"
+2025-09-26T18:49:57.247Z [INFO]: ::1 - - [26/Sep/2025:18:49:57 +0000] "POST /api/user/login HTTP/1.1" 200 323 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:02:57.734Z [INFO]: ::1 - - [26/Sep/2025:19:02:57 +0000] "POST /api/coupons/validate HTTP/1.1" 200 36 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:04:08.152Z [INFO]: ::1 - - [26/Sep/2025:19:04:08 +0000] "POST /api/coupons/validate HTTP/1.1" 200 39 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:04:56.540Z [INFO]: ::1 - - [26/Sep/2025:19:04:56 +0000] "POST /api/coupons/validate HTTP/1.1" 200 44 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:05:12.841Z [INFO]: ::1 - - [26/Sep/2025:19:05:12 +0000] "POST /api/coupons/validate HTTP/1.1" 200 44 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:05:22.888Z [INFO]: ::1 - - [26/Sep/2025:19:05:22 +0000] "POST /api/coupons/validate HTTP/1.1" 200 30 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:07:32.146Z [INFO]: ::1 - - [26/Sep/2025:19:07:32 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 401 65 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:07:43.133Z [INFO]: ::1 - - [26/Sep/2025:19:07:43 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 404 50 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:07:54.711Z [INFO]: ::1 - - [26/Sep/2025:19:07:54 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 200 36 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:08:06.348Z [INFO]: ::1 - - [26/Sep/2025:19:08:06 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 200 36 "-" "PostmanRuntime/7.47.1"
+2025-09-26T19:08:10.991Z [INFO]: ::1 - - [26/Sep/2025:19:08:10 +0000] "POST /api/cart/apply-coupon HTTP/1.1" 200 36 "-" "PostmanRuntime/7.47.1"
+2025-09-26T20:55:21.977Z [INFO]: ::1 - - [26/Sep/2025:20:55:21 +0000] "POST /api/product/ad HTTP/1.1" 404 154 "-" "PostmanRuntime/7.47.1"
+2025-09-26T20:55:33.475Z [INFO]: ::1 - - [26/Sep/2025:20:55:33 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-26T20:59:41.496Z [INFO]: ::1 - - [26/Sep/2025:20:59:41 +0000] "POST /api/product/add HTTP/1.1" 404 155 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:01:57.286Z [ERROR]: Global error handler: Field name missing
+2025-09-26T21:01:57.287Z [INFO]: ::1 - - [26/Sep/2025:21:01:57 +0000] "POST /api/product/admin/add HTTP/1.1" 500 51 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:02:35.253Z [INFO]: ::1 - - [26/Sep/2025:21:02:35 +0000] "POST /api/product/admin/add HTTP/1.1" 400 82 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:03:25.130Z [INFO]: ::1 - - [26/Sep/2025:21:03:25 +0000] "POST /api/product/admin/add HTTP/1.1" 500 106 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:03:38.538Z [INFO]: ::1 - - [26/Sep/2025:21:03:38 +0000] "POST /api/product/admin/add HTTP/1.1" 500 106 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:06:11.142Z [INFO]: ::1 - - [26/Sep/2025:21:06:11 +0000] "POST /api/product/admin/add HTTP/1.1" 500 106 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:06:27.604Z [INFO]: ::1 - - [26/Sep/2025:21:06:27 +0000] "POST /api/product/admin/add HTTP/1.1" 500 106 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:07:35.641Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:07:44.492Z [INFO]: ::1 - - [26/Sep/2025:21:07:44 +0000] "POST /api/product/admin/add HTTP/1.1" 500 110 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:08:20.240Z [INFO]: ::1 - - [26/Sep/2025:21:08:20 +0000] "POST /api/product/admin/add HTTP/1.1" 500 870 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:08:33.521Z [INFO]: ::1 - - [26/Sep/2025:21:08:33 +0000] "POST /api/product/admin/add HTTP/1.1" 500 870 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:09:48.785Z [INFO]: ::1 - - [26/Sep/2025:21:09:48 +0000] "POST /api/product/admin/add HTTP/1.1" 500 870 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:10:16.817Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:10:29.760Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:10:43.506Z [INFO]: ::1 - - [26/Sep/2025:21:10:43 +0000] "POST /api/product/admin/add HTTP/1.1" 500 870 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:10:51.806Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:11:00.324Z [INFO]: ::1 - - [26/Sep/2025:21:11:00 +0000] "POST /api/product/admin/add HTTP/1.1" 500 870 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:11:42.911Z [INFO]: ::1 - - [26/Sep/2025:21:11:42 +0000] "POST /api/product/admin/add HTTP/1.1" 500 99 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:12:15.287Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:12:26.671Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:12:32.800Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:12:46.168Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:12:53.938Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:13:01.125Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:13:09.875Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:13:21.341Z [INFO]: ::1 - - [26/Sep/2025:21:13:21 +0000] "POST /api/product/admin/add HTTP/1.1" 201 549 "-" "PostmanRuntime/7.47.1"
+2025-09-26T21:14:35.320Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:14:44.459Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:14:52.521Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:14:58.335Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:15:03.779Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:15:37.166Z [INFO]: 🚀 Server started on PORT: 4000
+2025-09-26T21:15:53.045Z [INFO]: ::1 - - [26/Sep/2025:21:15:53 +0000] "POST /api/product/admin/add HTTP/1.1" 201 575 "-" "PostmanRuntime/7.47.1"

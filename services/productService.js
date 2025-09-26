@@ -1,5 +1,7 @@
 import prisma from '../lib/prisma.js';
-import { priceUtils } from '../utils/priceUtils.js';
+import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
+import { generateProductSlug } from '../utils/seoUtils.js';
+import { generateSKU } from '../utils/inventoryUtils.js';
 
 // CHANGED: createProduct now uses `connect` to link to existing categories/subcategories by their ID.
 export const createProduct = async (data) => {
@@ -10,8 +12,11 @@ export const createProduct = async (data) => {
     throw new Error('subcategoryId is required to create a product.');
   }
 
-  // Resolve the subcategory to get its categoryId.
-  const sub = await prisma.subcategory.findUnique({ where: { id: Number(subcategoryId) }, select: { id: true, categoryId: true } });
+  // Resolve the subcategory to get its categoryId and names for SKU generation.
+  const sub = await prisma.subcategory.findUnique({
+    where: { id: Number(subcategoryId) },
+    select: { id: true, categoryId: true, name: true, category: { select: { name: true } } }
+  });
   if (!sub) {
     throw new Error('Invalid subcategoryId provided');
   }
@@ -21,13 +26,38 @@ export const createProduct = async (data) => {
     console.warn(`createProduct: provided categoryId=${providedCategoryId} does not match subcategory(${subcategoryId}).categoryId=${derivedCategoryId}. Overriding with derived value.`);
   }
 
-  return await prisma.product.create({
+  // Prepare product data with auto-generated fields
+  const enhancedProductData = { ...productData };
+
+  // Auto-generate SKU if not provided
+  if (!enhancedProductData.sku) {
+    enhancedProductData.sku = generateSKU(sub.category.name, sub.name, Date.now()); // Use timestamp as temp ID
+  }
+
+  // Auto-generate seoSlug if not provided
+  if (!enhancedProductData.seoSlug) {
+    enhancedProductData.seoSlug = generateProductSlug(enhancedProductData.name, Date.now());
+  }
+
+  // Create the product
+  const product = await prisma.product.create({
     data: {
-      ...productData,
+      ...enhancedProductData,
       category: { connect: { id: Number(derivedCategoryId) } },
       subcategory: { connect: { id: Number(subcategoryId) } }
     }
   });
+
+  // Update SKU and seoSlug with actual product ID for uniqueness
+  const finalProduct = await prisma.product.update({
+    where: { id: product.id },
+    data: {
+      sku: productData.sku || generateSKU(sub.category.name, sub.name, product.id),
+      seoSlug: productData.seoSlug || generateProductSlug(enhancedProductData.name, product.id)
+    }
+  });
+
+  return finalProduct;
 };
 
 // CHANGED: getAllProducts now uses `include` to fetch the related category and subcategory objects.
@@ -79,7 +109,9 @@ export const searchProductsService = async (searchParams) => {
             { description: { contains: query, mode: 'insensitive' } },
             // Search on the *name* of the related category/subcategory
             { category: { name: { contains: query, mode: 'insensitive' } } },
-            { subcategory: { name: { contains: query, mode: 'insensitive' } } }
+            { subcategory: { name: { contains: query, mode: 'insensitive' } } },
+            // Search in tags array
+            { tags: { hasSome: [query] } }
           ]
         },
         { stock: { gt: 0 } }
@@ -100,12 +132,19 @@ export const searchProductsService = async (searchParams) => {
       });
     }
     
+    // Tag filter
+    if (filters.tags && Array.isArray(filters.tags) && filters.tags.length > 0) {
+      whereConditions.AND.push({
+        tags: { hasSome: filters.tags }
+      });
+    }
+    
     if (filters.minPrice !== undefined) {
-      whereConditions.AND.push({ price: { gte: priceUtils.toPrismaDecimal(filters.minPrice) } });
+      whereConditions.AND.push({ price: { gte: toPrismaDecimal(filters.minPrice) } });
     }
     
     if (filters.maxPrice !== undefined) {
-      whereConditions.AND.push({ price: { lte: priceUtils.toPrismaDecimal(filters.maxPrice) } });
+      whereConditions.AND.push({ price: { lte: toPrismaDecimal(filters.maxPrice) } });
     }
 
     const getOrderBy = (sortBy) => {
