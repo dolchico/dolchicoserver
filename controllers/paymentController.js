@@ -1,7 +1,9 @@
 import logger from '../logger.js';
 import { priceUtils } from '../utils/priceUtils.js';
+import { priceUtils } from '../utils/priceUtils.js';
 import {
   createRazorpayOrder,
+  createCodOrder,
   verifyRazorpayPayment,
   getOrderPaymentStatus,
   retryFailedPayment
@@ -46,51 +48,75 @@ const convertBigIntFields = (data) => {
 export const createPaymentOrder = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { items, amount, address, notes } = req.body;
+    const { items, amount, address, paymentMethod, notes } = req.body;
+    
 
     // Validate required fields
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Items are required and must be a non-empty array' 
+      return res.status(400).json({
+        success: false,
+        message: 'Items are required and must be a non-empty array'
       });
     }
 
     if (!amount || amount <= 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Amount must be greater than 0' 
+      return res.status(400).json({
+        success: false,
+        message: 'Amount must be greater than 0'
       });
     }
 
     if (!address) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Address is required' 
+      return res.status(400).json({
+        success: false,
+        message: 'Address is required'
+      });
+    }
+    if (paymentMethod == "online") {
+      const orderData = await createRazorpayOrder({
+        userId: Number(userId),
+        items,
+        amount: parseFloat(amount),
+        address,
+        notes
+      });
+      
+      const serializedOrderData = convertBigIntFields(orderData);
+      res.status(201).json({
+        success: true,
+        message: 'Payment order created successfully',
+        data: serializedOrderData
+      });
+    }
+    else {
+      
+      const orderData = await createCodOrder({
+        userId: Number(userId),
+        items,
+        amount: parseFloat(amount),
+        address,
+        notes
+      });
+      const serializedOrderData = convertBigIntFields(orderData);
+      
+      res.status(201).json({
+        success: true,
+        message: 'Payment order created successfully',
+        data: serializedOrderData
       });
     }
 
-    const orderData = await createRazorpayOrder({
-      userId: Number(userId),
-      items,
-      amount: priceUtils.toPrismaDecimal(amount),
-      address,
-      notes
-    });
 
     // Convert BigInt fields to Numbers
-    const serializedOrderData = convertBigIntFields(orderData);
+    // const serializedOrderData = convertBigIntFields(orderData);
+    // console.log("serializedOrderData",serializedOrderData);
 
-    res.status(201).json({
-      success: true,
-      message: 'Payment order created successfully',
-      data: serializedOrderData
-    });
+
   } catch (error) {
     console.error('Create Payment Order Error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: error.message 
+    res.status(500).json({
+      success: false,
+      message: error.message
     });
   }
 };
@@ -277,12 +303,6 @@ export const testRazorpayConfig = async (req, res) => {
     const hasKeyId = !!process.env.RAZORPAY_KEY_ID;
     const hasKeySecret = !!process.env.RAZORPAY_KEY_SECRET;
     
-    console.log("Razorpay Config Check:", {
-      hasKeyId,
-      hasKeySecret,
-      keyIdLength: process.env.RAZORPAY_KEY_ID?.length || 0,
-      keySecretLength: process.env.RAZORPAY_KEY_SECRET?.length || 0
-    });
     
     res.json({
       success: true,
@@ -325,13 +345,6 @@ export const testSignatureGeneration = async (req, res) => {
       .update(body.toString())
       .digest('hex');
 
-    console.log('=== SIGNATURE GENERATION TEST ===');
-    console.log('Order ID:', razorpay_order_id);
-    console.log('Payment ID:', razorpay_payment_id);
-    console.log('Body for signature:', body);
-    console.log('Generated signature:', generatedSignature);
-    console.log('Expected signature:', expected_signature);
-    console.log('Signatures match:', generatedSignature === expected_signature);
 
     res.json({
       success: true,
