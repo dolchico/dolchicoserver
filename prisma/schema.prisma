@@ -69,7 +69,7 @@ model Product {
   id            Int      @id @default(autoincrement())
   name          String   @db.VarChar(255)
   description   String
-  price         Float
+  price         Decimal
   image         String[]
   // category    String   @db.VarChar(100)    // REMOVE THIS
   // subCategory String   @db.VarChar(100)    // REMOVE THIS
@@ -86,6 +86,14 @@ model Product {
   averageRating Float?   @default(0)
   reviewsCount  Int      @default(0)
 
+  // New e-commerce fields
+  sku            String   @unique @db.VarChar(50)
+  weight         Decimal? @db.Decimal(8,3)
+  dimensions     Json?
+  tags           String[] @default([])
+  seoSlug        String?  @unique @db.VarChar(255)
+  compareAtPrice Decimal?
+
   // Relations
   category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
@@ -98,6 +106,9 @@ model Product {
   @@index([subcategoryId])
   @@index([bestseller])
   @@index([isActive])
+  @@index([sku])
+  @@index([seoSlug])
+  @@index([tags])
   @@map("products")
 }
 
@@ -108,7 +119,7 @@ model Review {
   type            ReviewType
   productId       Int?
   orderId         Int?
-  deliveryAgentId Int?
+  // deliveryAgentId removed — delivery agent reviews are not tracked in schema
   rating          Int
   title           String?    @db.VarChar(100)
   comment         String?    @db.VarChar(2000)
@@ -131,7 +142,7 @@ model Review {
   @@index([userId, type])
   @@index([productId])
   @@index([orderId])
-  @@index([deliveryAgentId])
+  // @@index([deliveryAgentId]) removed
   @@map("reviews")
 }
 
@@ -280,7 +291,7 @@ model OrderItem {
   productId Int
   size      String   @db.VarChar(10)
   quantity  Int
-  price     Float
+  price     Decimal
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -295,7 +306,7 @@ model OrderItem {
 model Order {
   id             Int         @id @default(autoincrement())
   userId         Int
-  amount         Float
+  amount         Decimal
   address        Json
   status         OrderStatus @default(ORDER_PLACED)
   paymentMethod  String      @db.VarChar(50)
@@ -322,7 +333,7 @@ model CartItem {
   productId Int
   size      String   @db.VarChar(10)
   quantity  Int
-  price     Float
+  price     Decimal
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   product   Product  @relation(fields: [productId], references: [id])

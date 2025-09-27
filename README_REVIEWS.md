@@ -47,7 +47,7 @@ Fields (key):
 - type: 'PRODUCT' | 'DELIVERY'
 - productId?: int
 - orderId?: int
-- deliveryAgentId?: int
+<!-- deliveryAgentId removed -->
 - rating: int (1-5)
 - title?: string
 - comment?: string
@@ -140,7 +140,7 @@ Notes for frontend:
 - GET /api/reviews
 - Query params (all optional):
   - type: PRODUCT|DELIVERY
-  - productId, orderId, deliveryAgentId, userId, rating
+  - productId, orderId, userId, rating
   - minRating, maxRating
   - hasImages: boolean
   - fromDate, toDate (ISO)
@@ -161,7 +161,7 @@ Notes:
 - GET /api/reviews/product/:productId/summary
   - Returns: { averageRating, reviewsCount, distribution }
   - distribution: counts for ratings 1..5
-- GET /api/reviews/delivery/:deliveryAgentId/summary
+<!-- delivery agent summary endpoint removed -->
   - Same shape as product summary
 
 Frontend notes:

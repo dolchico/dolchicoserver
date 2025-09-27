@@ -8,6 +8,7 @@
 
 import prisma from '../lib/prisma.js';
 import { ValidationError, NotFoundError } from '../utils/errors.js';
+import { priceUtils } from '../utils/priceUtils.js';
 
 /**
  * Adds an item to a user's cart or increments its quantity if it already exists.
@@ -161,15 +162,15 @@ export const getCart = async (userId) => {
   // Calculate the total number of items (e.g., 2 shirts + 1 hat = 3).
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   // Calculate the subtotal based on the price snapshot in each cart item.
-  const subtotal = cartItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+  const subtotal = cartItems.reduce((sum, item) => priceUtils.add(sum, priceUtils.multiply(item.price, item.quantity)), 0);
 
   // Return a structured object for the frontend.
   return {
     items: cartItems,
     summary: {
       totalItems,
-      // Format the subtotal to two decimal places to avoid floating-point issues.
-      subtotal: parseFloat(subtotal.toFixed(2)),
+      // Format the subtotal to two decimal places using Decimal.
+      subtotal: priceUtils.toNumber(priceUtils.round(subtotal)),
     },
   };
 };

@@ -11,17 +11,9 @@ const recalcProductAggregates = async (productId, tx) => {
   await tx.product.update({ where: { id: productId }, data: { averageRating: avg === null ? 0 : avg, reviewsCount: count } });
 };
 
-const recalcDeliveryAgentAggregates = async (deliveryAgentId, tx) => {
-  if (!deliveryAgentId) return;
-  try {
-    const agg = await tx.review.aggregate({ where: { deliveryAgentId, isDeleted: false }, _avg: { rating: true }, _count: { rating: true } });
-    const avg = agg._avg.rating;
-    const count = agg._count.rating || 0;
-    await tx.$executeRaw`UPDATE "deliveryAgent" SET "averageRating" = ${avg === null ? 0 : avg}, "reviewsCount" = ${count} WHERE id = ${deliveryAgentId}`;
-  } catch (err) {
-    // skip if no table
-  }
-};
+// deliveryAgent aggregates removed — delivery agents are not tracked in schema
+
+// Helper removed - now using single id strategy
 
 const createReview = async (dto, userId) => {
   return prisma.$transaction(async (tx) => {
@@ -42,7 +34,7 @@ const createReview = async (dto, userId) => {
       type: dto.type,
       productId: dto.productId || null,
       orderId: dto.orderId || null,
-      deliveryAgentId: dto.deliveryAgentId || null,
+  // deliveryAgentId removed
       rating: dto.rating,
       title: dto.title || null,
       comment: dto.comment || null,
@@ -52,7 +44,7 @@ const createReview = async (dto, userId) => {
     try {
       const review = await tx.review.create({ data: createData });
       if (dto.type === REVIEW_TYPE.PRODUCT && dto.productId) await recalcProductAggregates(dto.productId, tx);
-      if (dto.deliveryAgentId) await recalcDeliveryAgentAggregates(dto.deliveryAgentId, tx);
+  // deliveryAgent aggregation removed
       return review;
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') throw { status: 409, message: 'Review already exists' };
@@ -63,7 +55,7 @@ const createReview = async (dto, userId) => {
 
 const updateReview = async (id, dto, userCtx) => {
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.review.findUnique({ where: { id } });
+  const existing = await tx.review.findUnique({ where: { id } });
     if (!existing) throw { status: 404, message: 'Review not found' };
     if (existing.isDeleted) throw { status: 404, message: 'Review not found' };
     if (existing.userId !== userCtx.id && userCtx.role !== 'ADMIN' && userCtx.role !== 'MODERATOR') throw { status: 403, message: 'Forbidden' };
@@ -74,9 +66,9 @@ const updateReview = async (id, dto, userCtx) => {
     if (dto.images !== undefined) data.images = dto.images;
     if (Object.keys(data).length === 0) return existing;
     data.isEdited = true;
-    const updated = await tx.review.update({ where: { id }, data });
+    const updated = await tx.review.update({ where: { id: existing.id }, data });
     if (existing.type === 'PRODUCT' && existing.productId) await recalcProductAggregates(existing.productId, tx);
-    if (existing.deliveryAgentId) await recalcDeliveryAgentAggregates(existing.deliveryAgentId, tx);
+  // deliveryAgent aggregation removed
     return updated;
   });
 };
@@ -87,9 +79,9 @@ const deleteReview = async (id, userCtx) => {
     if (!existing) throw { status: 404, message: 'Review not found' };
     if (existing.userId !== userCtx.id && userCtx.role !== 'ADMIN' && userCtx.role !== 'MODERATOR') throw { status: 403, message: 'Forbidden' };
     if (existing.isDeleted) return { success: true };
-    await tx.review.update({ where: { id }, data: { isDeleted: true } });
+    await tx.review.update({ where: { id: existing.id }, data: { isDeleted: true } });
     if (existing.type === 'PRODUCT' && existing.productId) await recalcProductAggregates(existing.productId, tx);
-    if (existing.deliveryAgentId) await recalcDeliveryAgentAggregates(existing.deliveryAgentId, tx);
+  // deliveryAgent aggregation removed
     return { success: true };
   });
 };
@@ -106,7 +98,7 @@ const listReviews = async (filters, pagination) => {
   if (filters.type) where.type = filters.type;
   if (filters.productId) where.productId = Number(filters.productId);
   if (filters.orderId) where.orderId = Number(filters.orderId);
-  if (filters.deliveryAgentId) where.deliveryAgentId = Number(filters.deliveryAgentId);
+  // deliveryAgentId filter removed
   if (filters.userId) where.userId = Number(filters.userId);
   if (filters.rating) where.rating = Number(filters.rating);
   if (filters.minRating) where.rating = { gte: Number(filters.minRating) };
@@ -141,16 +133,6 @@ const getProductSummary = async (productId) => {
   return { averageRating: agg._avg.rating || 0, reviewsCount: agg._count.rating || 0, distribution };
 };
 
-const getDeliveryAgentSummary = async (deliveryAgentId) => {
-  try {
-    const agg = await prisma.review.aggregate({ where: { deliveryAgentId, isDeleted: false }, _avg: { rating: true }, _count: { rating: true } });
-    const distributionRaw = await prisma.$queryRaw`SELECT rating, COUNT(*) FROM reviews WHERE "deliveryAgentId" = ${deliveryAgentId} AND NOT "isDeleted" GROUP BY rating`;
-    const distribution = { 1:0,2:0,3:0,4:0,5:0 };
-    for (const row of distributionRaw) distribution[row.rating] = Number(row.count);
-    return { averageRating: agg._avg.rating || 0, reviewsCount: agg._count.rating || 0, distribution };
-  } catch (err) {
-    return { averageRating: 0, reviewsCount: 0, distribution: {1:0,2:0,3:0,4:0,5:0} };
-  }
-};
+// getDeliveryAgentSummary removed — delivery agents not tracked
 
-export default { createReview, updateReview, deleteReview, getReviewById, listReviews, getProductSummary, getDeliveryAgentSummary };
+export default { createReview, updateReview, deleteReview, getReviewById, listReviews, getProductSummary };

@@ -6,6 +6,7 @@ import {
     updateOrderStatus,
     addToCart,
 } from "../services/orderService.js";
+import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
 
 /**
  * ✅ Place COD Order
@@ -39,7 +40,7 @@ export const placeOrder = async (req, res) => {
 
         const order = await createOrder({
             userId: Number(userId),
-            amount: parseFloat(amount),
+            amount: toPrismaDecimal(amount),
             address,
             items,
         });
@@ -160,7 +161,7 @@ export const getSingleOrderController = async (req, res) => {
         const userId = req.user?.id;
 
         if (!orderId || orderId === "undefined" || orderId.trim() === "") {
-            console.log("❌ OrderId validation failed:", orderId);
+            
             return res.status(400).json({
                 success: false,
                 message: "Order ID is required",
@@ -169,10 +170,10 @@ export const getSingleOrderController = async (req, res) => {
 
         // Remove the problematic validation temporarily
         const orderIdNumber = Number(orderId);
-        console.log("Parsed orderId:", orderIdNumber);
+        
 
         if (isNaN(orderIdNumber) || orderIdNumber <= 0) {
-            console.log("❌ OrderId number validation failed:", orderIdNumber);
+            
             return res.status(400).json({
                 success: false,
                 message: "Invalid Order ID format",

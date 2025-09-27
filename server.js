@@ -32,7 +32,6 @@ import { ensureAuth }      from './middleware/authMiddleware.js';
 
 import userRouter          from './routes/userRoute.js';
 import productRouter       from './routes/productRoute.js';
-import productRoutes from './routes/product.js'; 
 import cartRouter          from './routes/cartRoute.js';
 import orderRouter         from './routes/orderRoute.js';
 import adminRouter         from './routes/adminRoute.js';
@@ -103,6 +102,8 @@ app.use(cors({
     'https://dolchico.com',
     'https://www.dolchico.com',
     'https://valyris-i.onrender.com',
+    'https://dolchicoserver-development.up.railway.app',
+    'https://dolchi-titan.vercel.app',
     process.env.FRONTEND_URL,
     process.env.CLIENT_URL
   ].filter(Boolean), // Remove undefined values
@@ -143,8 +144,8 @@ app.use(morgan('combined', {
 app.use('/api/auth',    OAuthRouter);
 app.use('/api/user',    userRouter);
 app.use('/api/admin',   adminRouter);
+// productRoutes merged into productRouter; old `routes/product.js` removed
 app.use('/api/product', productRouter);
-app.use('/api', productRoutes);
 app.use('/api/order',   ensureAuth, orderRouter);
 app.use('/api/cart',    ensureAuth, cartRouter);
 app.use('/api/wishlist', wishlistRoutes);

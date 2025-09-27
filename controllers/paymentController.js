@@ -1,4 +1,5 @@
 import logger from '../logger.js';
+import { priceUtils } from '../utils/priceUtils.js';
 import {
   createRazorpayOrder,
   createCodOrder,
@@ -7,7 +8,6 @@ import {
   retryFailedPayment
 } from '../services/paymentService.js';
 import { verifyPaymentWithAPI } from '../services/alternativePaymentVerification.js';
-import { PrismaClient } from '@prisma/client';
 
 // Utility function to convert BigInt to Number safely
 const serializeBigInt = (obj) => {
@@ -19,11 +19,11 @@ const serializeBigInt = (obj) => {
 // Alternative utility for nested objects
 const convertBigIntFields = (data) => {
   if (data === null || data === undefined) return data;
-
+  
   if (Array.isArray(data)) {
     return data.map(convertBigIntFields);
   }
-
+  
   if (typeof data === 'object') {
     const converted = {};
     for (const [key, value] of Object.entries(data)) {
@@ -37,7 +37,7 @@ const convertBigIntFields = (data) => {
     }
     return converted;
   }
-
+  
   return typeof data === 'bigint' ? Number(data) : data;
 };
 
@@ -48,7 +48,7 @@ export const createPaymentOrder = async (req, res) => {
   try {
     const userId = req.user.id;
     const { items, amount, address, paymentMethod, notes } = req.body;
-    console.log("req.body", req.body);
+    
 
     // Validate required fields
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -79,7 +79,7 @@ export const createPaymentOrder = async (req, res) => {
         address,
         notes
       });
-      console.log("orderData", orderData);
+      
       const serializedOrderData = convertBigIntFields(orderData);
       res.status(201).json({
         success: true,
@@ -88,7 +88,7 @@ export const createPaymentOrder = async (req, res) => {
       });
     }
     else {
-      console.log("aagye cod me");
+      
       const orderData = await createCodOrder({
         userId: Number(userId),
         items,
@@ -97,7 +97,7 @@ export const createPaymentOrder = async (req, res) => {
         notes
       });
       const serializedOrderData = convertBigIntFields(orderData);
-      console.log("orderData", orderData);
+      
       res.status(201).json({
         success: true,
         message: 'Payment order created successfully',
@@ -125,12 +125,12 @@ export const createPaymentOrder = async (req, res) => {
  */
 export const verifyPayment = async (req, res) => {
   try {
-    let userId = undefined;
-    if (req && req.user && req.user.id) userId = req.user.id;
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
+  let userId = undefined;
+  if (req && req.user && req.user.id) userId = req.user.id;
+    const { 
+      razorpay_order_id, 
+      razorpay_payment_id, 
+      razorpay_signature 
     } = req.body;
 
     logger.info('=== PAYMENT VERIFICATION CONTROLLER ===');
@@ -148,9 +148,9 @@ export const verifyPayment = async (req, res) => {
       if (!razorpay_order_id) missingFields.push('razorpay_order_id');
       if (!razorpay_payment_id) missingFields.push('razorpay_payment_id');
       if (!razorpay_signature) missingFields.push('razorpay_signature');
-
-      logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
-
+      
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
+      
       return res.status(400).json({
         success: false,
         message: `Missing required payment verification data: ${missingFields.join(', ')}`,
@@ -162,7 +162,7 @@ export const verifyPayment = async (req, res) => {
       });
     }
 
-    logger.info('All required fields present, proceeding with verification');
+  logger.info('All required fields present, proceeding with verification');
 
     const result = await verifyRazorpayPayment({
       razorpay_order_id,
@@ -180,9 +180,9 @@ export const verifyPayment = async (req, res) => {
     if (result.verified) {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
-
-      logger.info('Payment verified successfully, sending success response');
-
+      
+  logger.info('Payment verified successfully, sending success response');
+      
       res.json({
         success: true,
         message: 'Payment verified and order completed successfully',
@@ -190,8 +190,8 @@ export const verifyPayment = async (req, res) => {
         orderDetails: serializedResult.orderDetails
       });
     } else {
-      logger.warn('Payment verification failed, sending error response');
-
+  logger.warn('Payment verification failed, sending error response');
+      
       res.status(400).json({
         success: false,
         message: result.message,
@@ -205,9 +205,9 @@ export const verifyPayment = async (req, res) => {
       userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
       requestBody: req && req.body ? req.body : 'NO_BODY'
     });
-
-    res.status(500).json({
-      success: false,
+    
+    res.status(500).json({ 
+      success: false, 
       message: `Payment verification failed: ${error.message}`,
       error: process.env.NODE_ENV === 'development' ? {
         message: error.message,
@@ -251,9 +251,9 @@ export const getPaymentStatus = async (req, res) => {
     });
   } catch (error) {
     console.error('Get Payment Status Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
     });
   }
 };
@@ -286,9 +286,9 @@ export const retryPayment = async (req, res) => {
     });
   } catch (error) {
     console.error('Retry Payment Error:', error);
-    res.status(500).json({
-      success: false,
-      message: error.message
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
     });
   }
 };
@@ -301,14 +301,8 @@ export const testRazorpayConfig = async (req, res) => {
   try {
     const hasKeyId = !!process.env.RAZORPAY_KEY_ID;
     const hasKeySecret = !!process.env.RAZORPAY_KEY_SECRET;
-
-    console.log("Razorpay Config Check:", {
-      hasKeyId,
-      hasKeySecret,
-      keyIdLength: process.env.RAZORPAY_KEY_ID?.length || 0,
-      keySecretLength: process.env.RAZORPAY_KEY_SECRET?.length || 0
-    });
-
+    
+    
     res.json({
       success: true,
       config: {
@@ -333,7 +327,7 @@ export const testRazorpayConfig = async (req, res) => {
 export const testSignatureGeneration = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, expected_signature } = req.body;
-
+    
     if (!razorpay_order_id || !razorpay_payment_id) {
       return res.status(400).json({
         success: false,
@@ -342,7 +336,7 @@ export const testSignatureGeneration = async (req, res) => {
     }
 
     const crypto = await import('crypto');
-
+    
     // Generate signature exactly as done in the payment service
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const generatedSignature = crypto.default
@@ -350,13 +344,6 @@ export const testSignatureGeneration = async (req, res) => {
       .update(body.toString())
       .digest('hex');
 
-    console.log('=== SIGNATURE GENERATION TEST ===');
-    console.log('Order ID:', razorpay_order_id);
-    console.log('Payment ID:', razorpay_payment_id);
-    console.log('Body for signature:', body);
-    console.log('Generated signature:', generatedSignature);
-    console.log('Expected signature:', expected_signature);
-    console.log('Signatures match:', generatedSignature === expected_signature);
 
     res.json({
       success: true,
@@ -387,24 +374,23 @@ export const verifyPaymentAPI = async (req, res) => {
   try {
     let userId = undefined;
     if (req && req.user && req.user.id) userId = req.user.id;
-    const {
-      razorpay_order_id,
+    const { 
+      razorpay_order_id, 
       razorpay_payment_id
     } = req.body;
-    console.log("verifyPaymentAPI", req.body);
 
-    logger.info('=== API-BASED PAYMENT VERIFICATION CONTROLLER ===');
-    logger.debug(`User ID: ${userId}`);
-    logger.debug('Payment data received', { razorpay_order_id, razorpay_payment_id });
+  logger.info('=== API-BASED PAYMENT VERIFICATION CONTROLLER ===');
+  logger.debug(`User ID: ${userId}`);
+  logger.debug('Payment data received', { razorpay_order_id, razorpay_payment_id });
 
     // Validation
     if (!razorpay_order_id || !razorpay_payment_id) {
       const missingFields = [];
       if (!razorpay_order_id) missingFields.push("razorpay_order_id");
       if (!razorpay_payment_id) missingFields.push("razorpay_payment_id");
-
-      logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
-
+      
+  logger.warn(`Missing required fields: ${missingFields.join(', ')}`);
+      
       return res.status(400).json({
         success: false,
         message: `Missing required payment verification data: ${missingFields.join(", ")}`,
@@ -415,7 +401,7 @@ export const verifyPaymentAPI = async (req, res) => {
       });
     }
 
-    logger.info('All required fields present, proceeding with API verification');
+  logger.info('All required fields present, proceeding with API verification');
 
     const result = await verifyPaymentWithAPI({
       razorpay_order_id,
@@ -433,9 +419,9 @@ export const verifyPaymentAPI = async (req, res) => {
     if (result.verified) {
       // Convert BigInt fields in the result
       const serializedResult = convertBigIntFields(result);
-
-      logger.info('Payment verified successfully via API, sending success response');
-
+      
+  logger.info('Payment verified successfully via API, sending success response');
+      
       res.json({
         success: true,
         message: "Payment verified successfully via Razorpay API",
@@ -445,8 +431,8 @@ export const verifyPaymentAPI = async (req, res) => {
         verificationMethod: "api"
       });
     } else {
-      logger.warn('Payment API verification failed, sending error response');
-
+  logger.warn('Payment API verification failed, sending error response');
+      
       res.status(400).json({
         success: false,
         message: result.message,
@@ -459,12 +445,12 @@ export const verifyPaymentAPI = async (req, res) => {
     logger.error('API Payment verification controller error', {
       message: error.message,
       stack: error.stack,
-      userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
-      requestBody: req && req.body ? req.body : 'NO_BODY'
+  userId: typeof userId !== 'undefined' ? userId : 'UNKNOWN',
+  requestBody: req && req.body ? req.body : 'NO_BODY'
     });
-
-    res.status(500).json({
-      success: false,
+    
+    res.status(500).json({ 
+      success: false, 
       message: `API payment verification failed: ${error.message}`,
       verificationMethod: "api",
       error: process.env.NODE_ENV === "development" ? {

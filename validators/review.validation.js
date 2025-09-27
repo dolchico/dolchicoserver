@@ -25,7 +25,7 @@ const createValidators = [
   ...baseValidators,
   body('productId').if(body('type').equals(REVIEW_TYPE.PRODUCT)).exists().isInt(),
   body('orderId').if(body('type').equals(REVIEW_TYPE.DELIVERY)).exists().isInt(),
-  body('deliveryAgentId').optional().isInt()
+  // deliveryAgentId removed
 ];
 
 const updateValidators = [
@@ -45,7 +45,7 @@ const listValidators = [
   query('type').optional().isIn([REVIEW_TYPE.PRODUCT, REVIEW_TYPE.DELIVERY]),
   query('productId').optional().isInt(),
   query('orderId').optional().isInt(),
-  query('deliveryAgentId').optional().isInt(),
+  // deliveryAgentId query removed
   query('userId').optional().isInt(),
   query('rating').optional().isInt({ min: 1, max: 5 }),
   query('minRating').optional().isInt({ min: 1, max: 5 }),

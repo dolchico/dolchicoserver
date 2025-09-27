@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { razorpayInstance, RAZORPAY_CONFIG } from '../config/razorpay.js';
+import { priceUtils } from '../utils/priceUtils.js';
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,7 @@ const prisma = new PrismaClient();
 export const createRazorpayOrder = async (data) => {
   try {
     const { userId, items, amount, address, notes = {} } = data;
-    const amountInPaise = Math.round(amount * 100);
+    const amountInPaise = Math.round(priceUtils.toNumber(priceUtils.multiply(amount, 100)));
 
     // Create order in Razorpay
     const razorpayOrder = await razorpayInstance.orders.create({
