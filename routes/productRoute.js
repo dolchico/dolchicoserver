@@ -22,27 +22,13 @@ adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 // Admin routes (protected)
 adminRouter.post('/add', upload.array('images', 6), addProduct);
 adminRouter.post('/remove', removeProduct);
-import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
-import authUser from '../middleware/auth.js';
-import { getProductStock, getProductById } from '../services/productService.js';
-
-const router = express.Router();
-const adminRouter = express.Router();
-const publicRouter = express.Router();
-
-// Apply admin middlewares (same as category.routes.js)
-adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
-
-// Admin routes (protected)
-adminRouter.post('/add', upload.array('images', 6), addProduct);
-adminRouter.post('/remove', removeProduct);
 
 // Public routes (for users)
 publicRouter.get('/single/:productId', singleProduct);
 publicRouter.get('/list', listProducts);
 publicRouter.get('/search', searchProducts);
 // Product stock endpoint (protected)
-publicRouter.post('/stock', authUser, async (req, res) => {
+publicRouter.post('/product/stock', authUser, async (req, res) => {
   try {
     const { productIds } = req.body;
     if (!Array.isArray(productIds) || productIds.length === 0) {
