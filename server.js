@@ -102,6 +102,7 @@ app.use(cors({
     'https://dolchico.com',
     'https://www.dolchico.com',
     'https://valyris-i.onrender.com',
+    'https://dolchicoserver-development.up.railway.app',
     'https://dolchi-titan.vercel.app',
     process.env.FRONTEND_URL,
     process.env.CLIENT_URL
@@ -263,4 +264,5 @@ export const findUserByPhone = async (phoneNumber) => {
         throw error;
     }
 };
+
 
