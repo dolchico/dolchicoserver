@@ -1,6 +1,5 @@
 import logger from '../logger.js';
 import { priceUtils } from '../utils/priceUtils.js';
-import { priceUtils } from '../utils/priceUtils.js';
 import {
   createRazorpayOrder,
   createCodOrder,

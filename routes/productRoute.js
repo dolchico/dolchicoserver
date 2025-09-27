@@ -11,7 +11,6 @@ import upload from '../middleware/multer.js';
 import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
 import authUser from '../middleware/auth.js';
 import { getProductStock, getProductById } from '../services/productService.js';
-
 const router = express.Router();
 const adminRouter = express.Router();
 const publicRouter = express.Router();
@@ -22,13 +21,8 @@ adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 // Admin routes (protected)
 adminRouter.post('/add', upload.array('images', 6), addProduct);
 adminRouter.post('/remove', removeProduct);
-import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
-import authUser from '../middleware/auth.js';
-import { getProductStock, getProductById } from '../services/productService.js';
 
-const router = express.Router();
-const adminRouter = express.Router();
-const publicRouter = express.Router();
+
 
 // Apply admin middlewares (same as category.routes.js)
 adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
