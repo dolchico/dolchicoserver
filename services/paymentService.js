@@ -89,7 +89,30 @@ export const createCodOrder = async (data) => {
 
     // Create order in database with pending payment
     const dbOrder = await prisma.$transaction(async (tx) => {
-      // Create the order
+      // First, validate and decrement stock for each item
+      for (const item of items) {
+        const currentProduct = await tx.product.findUnique({
+          where: { id: item.productId }
+        });
+        
+        if (!currentProduct) {
+          throw new Error(`Product with ID ${item.productId} not found`);
+        }
+        
+        if (currentProduct.stock < item.quantity) {
+          throw new Error(`Insufficient stock for product ${item.productId}. Available: ${currentProduct.stock}, Required: ${item.quantity}`);
+        }
+        
+        // Decrement stock
+        await tx.product.update({
+          where: { id: item.productId },
+          data: { 
+            stock: currentProduct.stock - item.quantity 
+          }
+        });
+      }
+
+      // Create the order (stock is already decremented)
       const order = await tx.order.create({
         data: {
           userId,
@@ -111,20 +134,22 @@ export const createCodOrder = async (data) => {
         },
         include: { items: true }
       });
-      console.log("createCodOrder",order);
+      
+      console.log("createCodOrder", order);
       return order;
     });
 
-    // Clear user's cart after creating order
+    // Clear user's cart after creating order (optional, but recommended)
     // await prisma.cartItem.deleteMany({
     //   where: { userId }
     // });
+
     return {
       dbOrderId: dbOrder.id,
     };
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
-    throw new Error('Failed to create payment order');
+    console.error('Error creating COD order:', error);
+    throw new Error('Failed to create COD order');
   }
 };
 
@@ -201,14 +226,27 @@ export const verifyRazorpayPayment = async (data) => {
         // First try to locate the order by paymentId stored on the order
         let foundOrder = await tx.order.findFirst({
           where: { userId, paymentId: razorpay_order_id },
-          include: { paymentDetails: true }
+          include: { 
+            items: { 
+              include: { 
+                product: true 
+              } 
+            }, 
+            paymentDetails: true 
+          }
         });
 
         // Fallback: look up Payment record by razorpayOrderId and then fetch the order by orderId
         if (!foundOrder) {
           const paymentRecord = await tx.payment.findUnique({ where: { razorpayOrderId: razorpay_order_id } });
           if (paymentRecord && paymentRecord.orderId) {
-            const orderById = await tx.order.findUnique({ where: { id: paymentRecord.orderId }, include: { paymentDetails: true } });
+            const orderById = await tx.order.findUnique({ 
+              where: { id: paymentRecord.orderId }, 
+              include: { 
+                items: { include: { product: true } }, 
+                paymentDetails: true 
+              } 
+            });
             if (orderById && orderById.userId === userId) foundOrder = orderById;
           }
         }
@@ -224,11 +262,36 @@ export const verifyRazorpayPayment = async (data) => {
           return foundOrder;
         }
 
+        // Validate and decrement stock for each item
+        for (const orderItem of foundOrder.items) {
+          const currentProduct = await tx.product.findUnique({
+            where: { id: orderItem.productId }
+          });
+          
+          if (!currentProduct) {
+            throw new Error(`Product with ID ${orderItem.productId} not found`);
+          }
+          
+          if (currentProduct.stock < orderItem.quantity) {
+            throw new Error(`Insufficient stock for product ${orderItem.productId}. Available: ${currentProduct.stock}, Required: ${orderItem.quantity}`);
+          }
+          
+          // Decrement stock
+          await tx.product.update({
+            where: { id: orderItem.productId },
+            data: { 
+              stock: currentProduct.stock - orderItem.quantity 
+            }
+          });
+        }
+
+        console.log('✅ Stock decremented successfully for all items');
+
         // Update the order by unique id
         const updatedOrder = await tx.order.update({
           where: { id: foundOrder.id },
           data: { payment: true, status: 'CONFIRMED' },
-          include: { items: { include: { product: true } }, paymentDetails: true }
+          include: { items: true, paymentDetails: true }
         });
 
         console.log('📦 Updated order:', {
