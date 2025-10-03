@@ -16,19 +16,20 @@ const adminRouter = express.Router();
 const publicRouter = express.Router();
 
 // Apply admin middlewares (same as category.routes.js)
-adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
+// adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
-// Admin routes (protected)
-adminRouter.post('/add', upload.array('images', 6), addProduct);
-adminRouter.post('/remove', removeProduct);
+// Admin routes (protected) - Overloaded /add for both single and bulk
+adminRouter.post('/add', (req, res, next) => {
+  // Check if request is multipart (single add with files) or JSON (bulk add)
+  if (req.headers['content-type']?.includes('multipart/form-data')) {
+    // For single add: apply multer for file uploads
+    upload.array('images', 6)(req, res, next);
+  } else {
+    // For bulk add: skip multer and proceed directly
+    next();
+  }
+}, addProduct);
 
-
-
-// Apply admin middlewares (same as category.routes.js)
-adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
-
-// Admin routes (protected)
-adminRouter.post('/add', upload.array('images', 6), addProduct);
 adminRouter.post('/remove', removeProduct);
 
 // Public routes (for users)

@@ -3,157 +3,286 @@ import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
 import { generateProductSlug } from '../utils/seoUtils.js';
 import { generateSKU } from '../utils/inventoryUtils.js';
 
-// CHANGED: createProduct now uses `connect` to link to existing categories/subcategories by their ID.
+/**
+ * Creates a new product with category and subcategory relations.
+ * @param {Object} data - Product data including name, subcategoryId, etc.
+ * @param {number} [data.categoryId] - Optional category ID (overridden by subcategory's categoryId)
+ * @param {number} data.subcategoryId - Required subcategory ID
+ * @returns {Promise<Object>} The created product with updated SKU and seoSlug
+ * @throws {Error} If input is invalid or database operations fail
+ */
 export const createProduct = async (data) => {
-  // Require subcategoryId and derive the canonical categoryId from it.
-  const { categoryId: providedCategoryId, subcategoryId, ...productData } = data;
-
-  if (!subcategoryId) {
-    throw new Error('subcategoryId is required to create a product.');
-  }
-
-  // Resolve the subcategory to get its categoryId and names for SKU generation.
-  const sub = await prisma.subcategory.findUnique({
-    where: { id: Number(subcategoryId) },
-    select: { id: true, categoryId: true, name: true, category: { select: { name: true } } }
-  });
-  if (!sub) {
-    throw new Error('Invalid subcategoryId provided');
-  }
-
-  const derivedCategoryId = sub.categoryId;
-  if (typeof providedCategoryId !== 'undefined' && Number(providedCategoryId) !== derivedCategoryId) {
-    console.warn(`createProduct: provided categoryId=${providedCategoryId} does not match subcategory(${subcategoryId}).categoryId=${derivedCategoryId}. Overriding with derived value.`);
-  }
-
-  // Prepare product data with auto-generated fields
-  const enhancedProductData = { ...productData };
-
-  // Auto-generate SKU if not provided
-  if (!enhancedProductData.sku) {
-    enhancedProductData.sku = generateSKU(sub.category.name, sub.name, Date.now()); // Use timestamp as temp ID
-  }
-
-  // Auto-generate seoSlug if not provided
-  if (!enhancedProductData.seoSlug) {
-    enhancedProductData.seoSlug = generateProductSlug(enhancedProductData.name, Date.now());
-  }
-
-  // Create the product
-  const product = await prisma.product.create({
-    data: {
-      ...enhancedProductData,
-      category: { connect: { id: Number(derivedCategoryId) } },
-      subcategory: { connect: { id: Number(subcategoryId) } }
+  try {
+    // Validate input
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid product data');
     }
-  });
+    const { categoryId: providedCategoryId, subcategoryId, name, sku, seoSlug, ...productData } = data;
 
-  // Update SKU and seoSlug with actual product ID for uniqueness
-  const finalProduct = await prisma.product.update({
-    where: { id: product.id },
-    data: {
-      sku: productData.sku || generateSKU(sub.category.name, sub.name, product.id),
-      seoSlug: productData.seoSlug || generateProductSlug(enhancedProductData.name, product.id)
+    // Validate subcategoryId
+    const subcategoryIdNum = Number(subcategoryId);
+    if (isNaN(subcategoryIdNum) || subcategoryIdNum <= 0 || !Number.isInteger(subcategoryIdNum)) {
+      throw new Error('Invalid subcategoryId');
     }
-  });
 
-  return finalProduct;
+    // Validate optional categoryId
+    if (typeof providedCategoryId !== 'undefined') {
+      const categoryIdNum = Number(providedCategoryId);
+      if (isNaN(categoryIdNum) || categoryIdNum <= 0 || !Number.isInteger(categoryIdNum)) {
+        throw new Error('Invalid categoryId');
+      }
+    }
+
+    // Validate required fields
+    if (!name || typeof name !== 'string') {
+      throw new Error('Product name is required');
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
+    // Resolve the subcategory
+    const sub = await prisma.subcategory.findUnique({
+      where: { id: subcategoryIdNum },
+      select: { id: true, categoryId: true, name: true, category: { select: { name: true } } },
+    });
+    if (!sub) {
+      throw new Error('Invalid subcategoryId provided');
+    }
+
+    const derivedCategoryId = sub.categoryId;
+    if (typeof providedCategoryId !== 'undefined' && Number(providedCategoryId) !== derivedCategoryId) {
+      console.warn(
+        `createProduct: provided categoryId=${providedCategoryId} does not match subcategory(${subcategoryId}).categoryId=${derivedCategoryId}. Overriding with derived value.`
+      );
+    }
+
+    // Prepare product data
+    const enhancedProductData = { ...productData, name };
+    if (!enhancedProductData.sku) {
+      enhancedProductData.sku = generateSKU(sub.category.name, sub.name, Date.now());
+    }
+    if (!enhancedProductData.seoSlug) {
+      enhancedProductData.seoSlug = generateProductSlug(enhancedProductData.name, Date.now());
+    }
+
+    // Create the product
+    const product = await prisma.product.create({
+      data: {
+        ...enhancedProductData,
+        category: { connect: { id: derivedCategoryId } },
+        subcategory: { connect: { id: subcategoryIdNum } },
+      },
+    });
+
+    // Update SKU and seoSlug with product ID
+    const finalProduct = await prisma.product.update({
+      where: { id: product.id },
+      data: {
+        sku: sku || generateSKU(sub.category.name, sub.name, product.id),
+        seoSlug: seoSlug || generateProductSlug(enhancedProductData.name, product.id),
+      },
+    });
+
+    return finalProduct;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw new Error(`Failed to create product: ${error.message}`);
+  }
 };
 
-// CHANGED: getAllProducts now uses `include` to fetch the related category and subcategory objects.
+/**
+ * Retrieves all products with their category and subcategory.
+ * @returns {Promise<Array>} Array of products with related category and subcategory
+ * @throws {Error} If database query fails
+ */
 export const getAllProducts = async () => {
-  return await prisma.product.findMany({
-    include: {
-      category: true,
-      subcategory: true,
+  try {
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
     }
-  });
+
+    return await prisma.product.findMany({
+      include: {
+        category: true,
+        subcategory: true,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    throw new Error(`Failed to fetch products: ${error.message}`);
+  }
 };
 
-// NOTE: deleteProductById does not need changes as it only uses the product's own ID.
+/**
+ * Deletes a product by its ID.
+ * @param {number} id - The ID of the product to delete
+ * @returns {Promise<Object>} The deleted product
+ * @throws {Error} If id is invalid or product not found
+ */
 export const deleteProductById = async (id) => {
-  return await prisma.product.delete({ where: { id: Number(id) } });
-};
-
-// CHANGED: getProductById now uses `include` to fetch the related category and subcategory objects.
-export const getProductById = async (id) => {
-  return await prisma.product.findUnique({
-    where: { id: Number(id) },
-    include: {
-      category: true,
-      subcategory: true,
+  try {
+    // Validate id
+    const idNum = Number(id);
+    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+      throw new Error('Invalid product ID');
     }
-  });
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
+    return await prisma.product.delete({ where: { id: idNum } });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    throw new Error(`Failed to delete product: ${error.message}`);
+  }
 };
 
-// ✅ Add Search Products Service - COMPLETELY REVISED FOR RELATIONAL SCHEMA
+/**
+ * Retrieves a product by its ID with category and subcategory.
+ * @param {number} id - The ID of the product
+ * @returns {Promise<Object|null>} The product with related category and subcategory, or null if not found
+ * @throws {Error} If id is invalid or query fails
+ */
+export const getProductById = async (id) => {
+  try {
+    // Validate id
+    const idNum = Number(id);
+    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+      throw new Error('Invalid product ID');
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
+    return await prisma.product.findUnique({
+      where: { id: idNum },
+      include: {
+        category: true,
+        subcategory: true,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    throw new Error(`Failed to fetch product: ${error.message}`);
+  }
+};
+
+/**
+ * Searches products based on query and filters.
+ * @param {Object} searchParams - Search parameters
+ * @param {string} [searchParams.query] - Search query
+ * @param {number} [searchParams.page=1] - Page number
+ * @param {number} [searchParams.limit=20] - Items per page
+ * @param {Object} [searchParams.filters] - Filters (category, subCategory, tags, minPrice, maxPrice)
+ * @param {string} [searchParams.sortBy=relevance] - Sort order
+ * @returns {Promise<Object>} Search results with pagination and metadata
+ * @throws {Error} If search parameters are invalid or query fails
+ */
 export const searchProductsService = async (searchParams) => {
   try {
-    const { 
-      query, 
-      page = 1, 
-      limit = 20, 
-      filters = {},
-      sortBy = 'relevance' 
-    } = searchParams;
+    // Validate input
+    if (!searchParams || typeof searchParams !== 'object') {
+      throw new Error('Invalid search parameters');
+    }
+    const { query = '', page = 1, limit = 20, filters = {}, sortBy = 'relevance' } = searchParams;
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const take = parseInt(limit);
-    
-    // CHANGED: whereConditions now uses relational filters (e.g., category: { name: ... })
+    // Validate pagination
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
+    if (isNaN(pageNum) || pageNum <= 0 || !Number.isInteger(pageNum)) {
+      throw new Error('Invalid page number');
+    }
+    if (isNaN(limitNum) || limitNum <= 0 || !Number.isInteger(limitNum)) {
+      throw new Error('Invalid limit');
+    }
+
+    // Validate filters
+    if (typeof filters !== 'object') {
+      throw new Error('Invalid filters');
+    }
+    if (filters.category && typeof filters.category !== 'string') {
+      throw new Error('Invalid category filter');
+    }
+    if (filters.subCategory && typeof filters.subCategory !== 'string') {
+      throw new Error('Invalid subCategory filter');
+    }
+    if (filters.tags && (!Array.isArray(filters.tags) || filters.tags.some(tag => typeof tag !== 'string'))) {
+      throw new Error('Invalid tags filter');
+    }
+    if (filters.minPrice !== undefined && (isNaN(filters.minPrice) || filters.minPrice < 0)) {
+      throw new Error('Invalid minPrice');
+    }
+    if (filters.maxPrice !== undefined && (isNaN(filters.maxPrice) || filters.maxPrice < 0)) {
+      throw new Error('Invalid maxPrice');
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
+    const skip = (pageNum - 1) * limitNum;
+    const take = limitNum;
+
     const whereConditions = {
       AND: [
         {
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { description: { contains: query, mode: 'insensitive' } },
-            // Search on the *name* of the related category/subcategory
             { category: { name: { contains: query, mode: 'insensitive' } } },
             { subcategory: { name: { contains: query, mode: 'insensitive' } } },
-            // Search in tags array
-            { tags: { hasSome: [query] } }
-          ]
+            { tags: { hasSome: [query] } },
+          ],
         },
-        { stock: { gt: 0 } }
-      ]
+        { stock: { gt: 0 } },
+      ],
     };
 
-    // CHANGED: Category filter now targets the related category's name.
     if (filters.category) {
-      whereConditions.AND.push({ 
-        category: { name: { equals: filters.category, mode: 'insensitive' } }
+      whereConditions.AND.push({
+        category: { name: { equals: filters.category, mode: 'insensitive' } },
       });
     }
-    
-    // CHANGED: Subcategory filter now targets the related subcategory's name.
+
     if (filters.subCategory) {
-      whereConditions.AND.push({ 
-        subcategory: { name: { equals: filters.subCategory, mode: 'insensitive' } }
+      whereConditions.AND.push({
+        subcategory: { name: { equals: filters.subCategory, mode: 'insensitive' } },
       });
     }
-    
-    // Tag filter
+
     if (filters.tags && Array.isArray(filters.tags) && filters.tags.length > 0) {
       whereConditions.AND.push({
-        tags: { hasSome: filters.tags }
+        tags: { hasSome: filters.tags },
       });
     }
-    
+
     if (filters.minPrice !== undefined) {
       whereConditions.AND.push({ price: { gte: toPrismaDecimal(filters.minPrice) } });
     }
-    
+
     if (filters.maxPrice !== undefined) {
       whereConditions.AND.push({ price: { lte: toPrismaDecimal(filters.maxPrice) } });
     }
 
     const getOrderBy = (sortBy) => {
-      // NOTE: Sorting logic remains the same.
       switch (sortBy) {
-        case 'price_low': return [{ price: 'asc' }];
-        case 'price_high': return [{ price: 'desc' }];
-        case 'newest': return [{ date: 'desc' }];
-        default: return [{ name: 'asc' }, { date: 'desc' }];
+        case 'price_low':
+          return [{ price: 'asc' }];
+        case 'price_high':
+          return [{ price: 'desc' }];
+        case 'newest':
+          return [{ date: 'desc' }];
+        default:
+          return [{ name: 'asc' }, { date: 'desc' }];
       }
     };
 
@@ -165,88 +294,95 @@ export const searchProductsService = async (searchParams) => {
         orderBy,
         skip,
         take,
-        // CHANGED: Use `include` instead of `select` to get full related objects, which is more consistent.
         include: {
           category: true,
           subcategory: true,
-        }
+        },
       }),
-      prisma.product.count({ where: whereConditions })
+      prisma.product.count({ where: whereConditions }),
     ]);
 
     const totalPages = Math.ceil(totalCount / take);
 
-    // CHANGED: `categoryStats` logic is completely rewritten because `groupBy` cannot be used on a relation directly.
-    // Step 1: Group by the foreign key `categoryId`.
     const categoryIdStats = await prisma.product.groupBy({
       by: ['categoryId'],
-      where: whereConditions, // Use the same filters from the main search
+      where: whereConditions,
       _count: { categoryId: true },
       orderBy: { _count: { categoryId: 'desc' } },
-      take: 5
+      take: 5,
     });
 
-    // Step 2: Fetch the category names for the IDs we found.
-    const categoryIds = categoryIdStats.map(stat => stat.categoryId);
+    const categoryIds = categoryIdStats.map((stat) => stat.categoryId);
     const categories = await prisma.category.findMany({
       where: { id: { in: categoryIds } },
-      select: { id: true, name: true }
+      select: { id: true, name: true },
     });
-    
-    // Step 3: Combine the names and counts.
-    const categoryStats = categoryIdStats.map(stat => {
-        const category = categories.find(c => c.id === stat.categoryId);
-        return {
-            name: category ? category.name : 'Unknown',
-            count: stat._count.categoryId
-        };
+
+    const categoryStats = categoryIdStats.map((stat) => {
+      const category = categories.find((c) => c.id === stat.categoryId);
+      return {
+        name: category ? category.name : 'Unknown',
+        count: stat._count.categoryId,
+      };
     });
 
     return {
       products,
       pagination: {
-        currentPage: parseInt(page),
+        currentPage: pageNum,
         totalPages,
         totalCount,
-        hasNextPage: parseInt(page) < totalPages,
-        hasPrevPage: parseInt(page) > 1,
-        limit: take
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1,
+        limit: take,
       },
       metadata: {
         query,
         resultCount: products.length,
         suggestions: products.length === 0 ? await getSearchSuggestions(query) : [],
-        categoryStats
-      }
+        categoryStats,
+      },
     };
-
   } catch (error) {
     console.error('Search service error:', error);
     throw new Error(`Search operation failed: ${error.message}`);
   }
 };
 
-// Helper function for search suggestions, updated for relational queries.
+/**
+ * Generates search suggestions based on query.
+ * @param {string} query - Search query
+ * @returns {Promise<Array>} Array of unique suggestion strings
+ * @throws {Error} If query is invalid or database query fails
+ */
 const getSearchSuggestions = async (query) => {
   try {
+    // Validate query
+    if (typeof query !== 'string') {
+      throw new Error('Invalid search query');
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
     const suggestions = await prisma.product.findMany({
       where: {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
-          // CHANGED: Search on the related category's name.
-          { category: { name: { contains: query, mode: 'insensitive' } } }
+          { category: { name: { contains: query, mode: 'insensitive' } } },
         ],
-        stock: { gt: 0 }
+        stock: { gt: 0 },
       },
-      // CHANGED: Include the category name in the result.
       include: {
-        category: { select: { name: true } }
+        category: { select: { name: true } },
       },
-      take: 5
+      take: 5,
     });
 
     const uniqueSuggestions = new Set();
-    suggestions.forEach(item => {
+    suggestions.forEach((item) => {
       uniqueSuggestions.add(item.name);
       if (item.category) {
         uniqueSuggestions.add(item.category.name);
@@ -254,27 +390,45 @@ const getSearchSuggestions = async (query) => {
     });
 
     return Array.from(uniqueSuggestions).slice(0, 5);
-    
   } catch (error) {
     console.error('Error getting suggestions:', error);
     return [];
   }
 };
 
-
+/**
+ * Retrieves stock levels for multiple products by their IDs.
+ * @param {number[]} productIds - Array of product IDs
+ * @returns {Promise<Object>} Map of product IDs to their stock levels
+ * @throws {Error} If productIds is invalid or query fails
+ */
 export const getProductStock = async (productIds) => {
   try {
+    // Validate productIds
     if (!Array.isArray(productIds) || productIds.length === 0) {
       throw new Error('productIds must be a non-empty array');
     }
+    const validProductIds = productIds.map((id) => Number(id));
+    const invalidIds = validProductIds.filter((id) => isNaN(id) || id <= 0 || !Number.isInteger(id));
+    if (invalidIds.length > 0) {
+      throw new Error(`Invalid product IDs: ${invalidIds.join(', ')}`);
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
     const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
+      where: { id: { in: validProductIds } },
       select: { id: true, stock: true },
     });
+
     const stockMap = products.reduce((map, product) => {
       map[product.id] = product.stock ?? 0;
       return map;
     }, {});
+
     console.log('Product stock fetched:', stockMap);
     return stockMap;
   } catch (error) {

@@ -31,14 +31,28 @@ export const deleteCategory = async (id) => {
 export const getAllCategories = async () => {
   return prisma.category.findMany({
     where: { isActive: true },
-    include: { subcategories: true, offers: true },
+    include: { 
+      subcategories: true, 
+      offers: { 
+        include: { 
+          offerRules: true 
+        } 
+      } 
+    },
   });
 };
 
 export const getCategoryByName = async (name) => {
   return prisma.category.findUnique({
     where: { name },
-    include: { subcategories: true, offers: true },
+    include: { 
+      subcategories: true, 
+      offers: { 
+        include: { 
+          offerRules: true
+        } 
+      } 
+    },
   });
 };
 
@@ -188,24 +202,130 @@ export const initializeData = async (data) => {
   for (const cat of data) {
     const { subcategories, offers, ...categoryData } = cat;
     
+    // First, create the category with subcategories only (ignores payload IDs)
     const newCategory = await prisma.category.create({
       data: {
         ...categoryData,
         subcategories: {
-          create: subcategories || [],
-        },
-        offers: {
-          create: (offers || []).map(o => ({
-            ...o,
-            startDate: new Date(o.startDate),
-            endDate: new Date(o.endDate)
+          create: (subcategories || []).map(sub => ({
+            name: sub.name,
+            imageUrl: sub.imageUrl,
+            grouping: sub.grouping,
+            isActive: sub.isActive ?? true
           })),
         },
       },
-      include: { subcategories: true, offers: true },
+      include: { 
+        subcategories: true
+      },
     });
 
-    createdCategories.push(newCategory);
+    // Now create offers separately with their rules
+    if (offers && offers.length > 0) {
+      for (const offer of offers) {
+        const { offerRules, ...offerData } = offer;
+        
+        const offerCreateData = {
+          ...offerData,
+          categoryId: newCategory.id,
+          startDate: new Date(offerData.startDate),
+          endDate: new Date(offerData.endDate)
+        };
+
+        // Handle offerRules if present
+        if (Array.isArray(offerRules) && offerRules.length > 0) {
+          const processedRules = [];
+          
+          for (const rule of offerRules) {
+            // Parse numerics if strings (e.g., from JSON)
+            const priceBelow = parseFloat(rule.price_below ?? rule.priceBelow);
+            const priceAbove = parseFloat(rule.price_above ?? rule.priceAbove);
+            const minDiscount = parseInt(rule.min_discount ?? rule.minDiscount);
+            const maxDiscount = parseInt(rule.max_discount ?? rule.maxDiscount);
+            const ageGroupStart = parseInt(rule.ageGroupStart);
+            const ageGroupEnd = parseInt(rule.ageGroupEnd);
+
+            const ruleData = {
+              priceBelow: isNaN(priceBelow) ? undefined : priceBelow,
+              priceAbove: isNaN(priceAbove) ? undefined : priceAbove,
+              minDiscount: isNaN(minDiscount) ? undefined : minDiscount,
+              maxDiscount: isNaN(maxDiscount) ? undefined : maxDiscount,
+              ageGroupStart: isNaN(ageGroupStart) ? undefined : ageGroupStart,
+              ageGroupEnd: isNaN(ageGroupEnd) ? undefined : ageGroupEnd,
+              tags: Array.isArray(rule.tags) ? rule.tags : [],
+              subcategoryId: undefined,  // Will resolve below
+            };
+
+            // NEW: Map payload subcategoryId to new DB ID via name lookup
+            if (rule.subcategoryId) {
+              // Find matching subcategory in payload by ID to get its name
+              const payloadSubcat = subcategories.find(sub => sub.id === rule.subcategoryId);
+              if (payloadSubcat) {
+                const intendedName = payloadSubcat.name;
+                // Lookup by name in newly created subcategories
+                const newSubcat = newCategory.subcategories.find(s => s.name === intendedName);
+                if (newSubcat) {
+                  ruleData.subcategoryId = newSubcat.id;
+                  console.log(`Mapped rule subcategoryId ${rule.subcategoryId} ("${intendedName}") to new DB ID ${newSubcat.id}`);
+                } else {
+                  console.warn(`New subcategory "${intendedName}" not found for rule in offer "${offer.title}" - skipping rule`);
+                  continue;  // Skip this rule
+                }
+              } else {
+                console.warn(`Payload subcategory with ID ${rule.subcategoryId} not found for rule in offer "${offer.title}" - skipping rule`);
+                continue;  // Skip this rule
+              }
+            } else {
+              // Optional fallback: If no ID but has name (future-proof)
+              const subName = rule.subCategoriesName || rule.subcategoryName;
+              if (subName) {
+                const newSubcat = newCategory.subcategories.find(s => s.name === subName);
+                if (newSubcat) {
+                  ruleData.subcategoryId = newSubcat.id;
+                } else {
+                  console.warn(`Subcategory "${subName}" not found for rule in offer "${offer.title}" - skipping rule`);
+                  continue;
+                }
+              } else {
+                console.log(`No subcategory specified for rule in offer "${offer.title}" - creating category-wide rule`);
+                // subcategoryId remains undefined (OK for schema)
+              }
+            }
+
+            // Only add if basic filters are present (or subcategory for targeted rule)
+            if (ruleData.subcategoryId || ruleData.priceBelow !== undefined || ruleData.priceAbove !== undefined) {
+              processedRules.push(ruleData);
+            }
+          }
+
+          // Add nested create for offerRules
+          if (processedRules.length > 0) {
+            offerCreateData.offerRules = {
+              create: processedRules
+            };
+          } else {
+            console.warn(`No valid rules processed for offer "${offer.title}" - creating without rules`);
+          }
+        }
+
+        // Create the offer with its rules
+        await prisma.offer.create({
+          data: offerCreateData,
+          include: { offerRules: true }
+        });
+      }
+    }
+
+    // Fetch the complete category with all relations
+    const completeCategory = await prisma.category.findUnique({
+      where: { id: newCategory.id },
+      include: { 
+        subcategories: true, 
+        offers: { include: { offerRules: true } } 
+      }
+    });
+
+    createdCategories.push(completeCategory);
   }
   
   return createdCategories;

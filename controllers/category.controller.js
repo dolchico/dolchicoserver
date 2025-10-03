@@ -24,16 +24,44 @@ const handleRequest = (handler) => async (req, res) => {
   }
 };
 
-// --- Category Controllers ---
+// Assuming this is in your categories controller file (e.g., CategoryController.js or categoriesApi.ts)
 export const createCategory = handleRequest(async (req, res) => {
-  const payload = { ...req.body };
-  if (req.file) {
-    // multer is configured to memoryStorage; upload buffer directly to Cloudinary
-    const secureUrl = req.file.buffer ? await uploadBuffer(req.file.buffer, { folder: 'categories' }) : await uploadFile(req.file.path, { folder: 'categories' });
-    payload.imageUrl = secureUrl;
+  try {
+    // Log for debugging (remove in production)
+    console.log('Raw req.body:', req.body);
+
+    // Start with payload from req.body
+    const payload = { ...req.body };
+
+    // CRITICAL: Strip 'id' to let database auto-generate it
+    delete payload.id;
+
+    // Handle image upload (your existing logic)
+    if (req.file) {
+      const secureUrl = req.file.buffer
+        ? await uploadBuffer(req.file.buffer, { folder: 'categories' })
+        : await uploadFile(req.file.path, { folder: 'categories' });
+      payload.imageUrl = secureUrl;
+    }
+
+    // Log final payload for debugging (remove in production)
+    console.log('Final payload (id stripped):', payload);
+
+    // Pass to service (Prisma will auto-generate id)
+    const category = await CategoryService.createCategory(payload);
+    res.status(201).json(category);
+  } catch (error) {
+    // Handle Prisma unique constraint errors specifically
+    if (error.code === 'P2002' && error.meta?.target?.includes('id')) {
+      console.error('ID conflict error:', error);
+      return res.status(409).json({ 
+        message: 'A category with this ID already exists. Please omit ID from the request to auto-generate it.' 
+      });
+    }
+    // Re-throw other errors
+    console.error('Create category error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
-  const category = await CategoryService.createCategory(payload);
-  res.status(201).json(category);
 });
 
 export const updateCategory = handleRequest(async (req, res) => {
