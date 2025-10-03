@@ -16,7 +16,7 @@ const adminRouter = express.Router();
 const publicRouter = express.Router();
 
 // Apply admin middlewares (same as category.routes.js)
-// adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
+adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
 // Admin routes (protected) - Overloaded /add for both single and bulk
 adminRouter.post('/add', (req, res, next) => {

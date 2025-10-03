@@ -11162,3 +11162,15 @@ Argument `userId` is missing.
 2025-10-03T23:13:38.217Z [INFO]: ::1 - - [03/Oct/2025:23:13:38 +0000] "GET /api/order/user HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-10-03T23:13:38.722Z [INFO]: ::1 - - [03/Oct/2025:23:13:38 +0000] "GET /api/order/user HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
 2025-10-03T23:13:51.644Z [INFO]: ::1 - - [03/Oct/2025:23:13:51 +0000] "GET /api/order/user HTTP/1.1" 304 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:17:13.799Z [INFO]: 🚀 Server started on PORT: 4000
+2025-10-03T23:23:02.370Z [INFO]: ::1 - - [03/Oct/2025:23:23:02 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:23:03.163Z [INFO]: ::1 - - [03/Oct/2025:23:23:03 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:23:07.266Z [INFO]: ::1 - - [03/Oct/2025:23:23:07 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:23:07.937Z [INFO]: ::1 - - [03/Oct/2025:23:23:07 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:23:20.553Z [INFO]: ::1 - - [03/Oct/2025:23:23:20 +0000] "POST /api/admin/categories HTTP/1.1" 201 155 "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:23:22.832Z [INFO]: ::1 - - [03/Oct/2025:23:23:22 +0000] "GET /api/categories HTTP/1.1" 200 9281 "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:24:24.942Z [INFO]: ::1 - - [03/Oct/2025:23:24:24 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:24:25.626Z [INFO]: ::1 - - [03/Oct/2025:23:24:25 +0000] "GET /api/categories HTTP/1.1" 304 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+2025-10-03T23:25:32.516Z [INFO]: 🚀 Server started on PORT: 4000
+2025-10-03T23:25:35.694Z [INFO]: 🚀 Server started on PORT: 4000
+2025-10-03T23:25:38.576Z [INFO]: 🚀 Server started on PORT: 4000

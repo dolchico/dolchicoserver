@@ -11,7 +11,7 @@ const publicRouter = Router();
 // Note: We apply the middleware directly to the adminRouter.
 // 1. ensureAuthWithStatus: Verifies JWT and checks if the user account is active.
 // 2. ensureRole(['ADMIN']): Verifies the user has the 'ADMIN' role.
-// adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
+adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
 // Category routes
 adminRouter.post('/categories', upload.single('image'), CategoryController.createCategory);
