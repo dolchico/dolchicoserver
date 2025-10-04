@@ -1,49 +1,50 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import { 
-  forgotPasswordService, 
-  resetPasswordService, 
-  verifyOTP as verifyEmailOTP, 
-  clearOTP 
-} from '../services/authService.js';
-import { 
+import {
+  forgotPasswordService,
+  resetPasswordService,
+  verifyOTP as verifyEmailOTP,
+  clearOTP,
+} from "../services/authService.js";
+import {
   hashToken,
-  findEmailVerificationToken, 
+  findEmailVerificationToken,
   markEmailTokenUsed,
   createEmailVerificationToken,
-  deleteEmailVerificationToken
-} from '../services/tokenService.js';
-import { sendOTPEmail } from '../services/mailService.js';
-import { ValidationError, NotFoundError } from '../utils/errors.js';
-import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from '../services/userService.js';
-import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from '../services/msg91Service.js';
-import jwt from 'jsonwebtoken';
-import validator from 'validator';
-import bcrypt from 'bcrypt';
+  deleteEmailVerificationToken,
+} from "../services/tokenService.js";
+import { sendOTPEmail } from "../services/mailService.js";
+import { BadRequestError, NotFoundError, TooManyRequestsError } from "../utils/errors.js";
+import { determineAuthFlow, findOrCreateUser, updateProfileCompletion } from "../services/userService.js";
+import { sendWhatsAppOTP, generateAndStoreOTP, verifyOTP as verifyPhoneOTP } from "../services/msg91Service.js";
+import jwt from "jsonwebtoken";
+import validator from "validator";
+import bcrypt from "bcrypt";
+import { validate } from "uuid"; // For UUID validation
 
 // Import user service functions
-import { 
-  sendEmailVerification, 
-  findUserByEmail, 
+import {
+  sendEmailVerification,
+  findUserByEmail,
   findUserByPhone,
-  createUser 
-} from '../services/userService.js';
+  createUser,
+} from "../services/userService.js";
 
 // Import SMS service
-import { sendOTP as sendSMSOTP } from '../services/smsService.js';
-import * as userService from '../services/userService.js'; // Adjust path as needed
+import { sendOTP as sendSMSOTP } from "../services/smsService.js";
 
-
+// Validate environment variables
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is not set");
+}
 
 export const forgotPassword = async (req, res) => {
   const { emailOrPhone } = req.body;
 
   if (!emailOrPhone) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Email or phone number is required.' 
-    });
+    throw new BadRequestError("Email or phone number is required.");
   }
 
   try {
@@ -56,217 +57,191 @@ export const forgotPassword = async (req, res) => {
       // Validate phone number format
       const phoneRegex = /^\+91[6-9]\d{9}$/;
       if (!phoneRegex.test(emailOrPhone.trim())) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid phone number format. Use +91XXXXXXXXXX format.'
-        });
+        throw new BadRequestError("Invalid phone number format. Use +91XXXXXXXXXX format.");
       }
 
       user = await findUserByPhone(emailOrPhone.trim());
-      contactType = 'phone';
-      
+      contactType = "phone";
+
       if (!user) {
         return res.status(200).json({
           success: true,
-          message: 'If an account with that phone number exists, an OTP has been sent.'
+          message: "If an account with that phone number exists, an OTP has been sent.",
         });
       }
 
       if (!user.phoneVerified) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please verify your phone number first.'
-        });
+        throw new BadRequestError("Please verify your phone number first.");
       }
     } else {
       // Validate email format
       if (!validator.isEmail(emailOrPhone.trim())) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid email format.'
-        });
+        throw new BadRequestError("Invalid email format.");
       }
 
       const cleanEmail = emailOrPhone.trim().toLowerCase();
       user = await findUserByEmail(cleanEmail);
-      contactType = 'email';
-      
+      contactType = "email";
+
       if (!user) {
         return res.status(200).json({
           success: true,
-          message: 'If an account with that email exists, an OTP has been sent.'
+          message: "If an account with that email exists, an OTP has been sent.",
         });
       }
 
       if (!user.emailVerified) {
-        return res.status(400).json({
-          success: false,
-          message: 'Please verify your email address first.'
-        });
+        throw new BadRequestError("Please verify your email address first.");
       }
     }
 
+    // Validate user.id as UUID
+    if (user && !validate(user.id)) {
+      throw new BadRequestError("Invalid user ID format.");
+    }
+
     // Check rate limiting
-    const recentOTPs = isPhone 
+    const recentOTPs = isPhone
       ? await prisma.phoneOTP.count({
           where: {
             userId: user.id,
-            type: 'PASSWORD_RESET',
+            type: "PASSWORD_RESET",
             createdAt: {
-              gte: new Date(Date.now() - 60000) // Last 1 minute
-            }
-          }
+              gte: new Date(Date.now() - 60000), // Last 1 minute
+            },
+          },
         })
       : await prisma.emailOTP.count({
           where: {
             userId: user.id,
-            type: 'PASSWORD_RESET',
+            type: "PASSWORD_RESET",
             createdAt: {
-              gte: new Date(Date.now() - 60000) // Last 1 minute
-            }
-          }
+              gte: new Date(Date.now() - 60000), // Last 1 minute
+            },
+          },
         });
 
     if (recentOTPs >= 3) {
-      return res.status(429).json({
-        success: false,
-        message: 'Too many OTP requests. Please try again in a minute.'
-      });
+      throw new TooManyRequestsError("Too many OTP requests. Please try again in a minute.");
     }
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     if (isPhone) {
-      // Clear existing password reset OTPs for this user
+      // Clear existing password reset OTPs
       await prisma.phoneOTP.deleteMany({
         where: {
           userId: user.id,
-          type: 'PASSWORD_RESET'
-        }
+          type: "PASSWORD_RESET",
+        },
       });
 
       // Store phone OTP
       await prisma.phoneOTP.create({
         data: {
-          userId: user.id,
+          userId: user.id, // Ensure string UUID
           otp,
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-          type: 'PASSWORD_RESET',
+          type: "PASSWORD_RESET",
           attempts: 0,
           isUsed: false,
-          maxAttempts: 3
-        }
+          maxAttempts: 3,
+        },
       });
 
       // Send OTP via SMS/WhatsApp
       try {
-        await sendSMSOTP(user.phoneNumber, otp, 'password-reset');
-        console.log('Password reset OTP sent via SMS to:', user.phoneNumber);
+        await sendSMSOTP(user.phoneNumber, otp, "password-reset");
+        console.log(`[AuthController] Password reset OTP sent via SMS to: ${user.phoneNumber}`);
       } catch (smsError) {
-        console.error('Failed to send SMS OTP:', smsError);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to send OTP. Please try again.'
-        });
+        console.error("[AuthController] Failed to send SMS OTP:", smsError);
+        throw new Error("Failed to send OTP. Please try again.");
       }
     } else {
-      // Clear existing password reset OTPs for this user
+      // Clear existing password reset OTPs
       await prisma.emailOTP.deleteMany({
         where: {
           userId: user.id,
-          type: 'PASSWORD_RESET'
-        }
+          type: "PASSWORD_RESET",
+        },
       });
 
       // Store email OTP
       await prisma.emailOTP.create({
         data: {
-          userId: user.id,
+          userId: user.id, // Ensure string UUID
           otp,
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-          type: 'PASSWORD_RESET',
+          type: "PASSWORD_RESET",
           attempts: 0,
           isUsed: false,
-          maxAttempts: 3
-        }
+          maxAttempts: 3,
+        },
       });
 
       // Send OTP via email
       try {
-        await sendOTPEmail(user.email, user.name || 'User', otp, 'password reset');
-        console.log('Password reset OTP sent via email to:', user.email);
+        await sendOTPEmail(user.email, user.name || "User", otp, "password reset");
+        console.log(`[AuthController] Password reset OTP sent via email to: ${user.email}`);
       } catch (emailError) {
-        console.error('Failed to send email OTP:', emailError);
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to send OTP. Please try again.'
-        });
+        console.error("[AuthController] Failed to send email OTP:", emailError);
+        throw new Error("Failed to send OTP. Please try again.");
       }
     }
 
-    // Always return a generic success message to prevent user enumeration
     return res.status(200).json({
       success: true,
       message: `If an account with that ${contactType} exists, an OTP has been sent.`,
       contactType,
-      expiresIn: 600 // 10 minutes
+      expiresIn: 600, // 10 minutes
     });
-
   } catch (error) {
-    console.error('Forgot Password Controller Error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'An internal server error occurred.' 
-    });
+    console.error(`[AuthController] Forgot Password Error: ${error.message}`);
+    if (error instanceof BadRequestError || error instanceof TooManyRequestsError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
+    }
+    return res.status(500).json({ success: false, message: "An internal server error occurred." });
   }
 };
+
 export const resetPassword = async (req, res) => {
   const { emailOrPhone, otp, newPassword } = req.body;
 
   // Validate required fields
   if (!emailOrPhone || !otp || !newPassword) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Email/phone number, OTP, and new password are required.' 
-    });
+    throw new BadRequestError("Email/phone number, OTP, and new password are required.");
   }
 
   // Validate OTP format
   if (!validator.isLength(otp.trim(), { min: 6, max: 6 }) || !validator.isNumeric(otp.trim())) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Invalid OTP format. OTP must be 6 digits.' 
-    });
+    throw new BadRequestError("Invalid OTP format. OTP must be 6 digits.");
   }
 
-  // Validate password strength (aligned with frontend)
+  // Validate password strength
   const passwordErrors = [];
   if (!validator.isLength(newPassword, { min: 10 })) {
-    passwordErrors.push('Password must be at least 10 characters long.');
+    passwordErrors.push("Password must be at least 10 characters long.");
   }
   if (!/[A-Z]/.test(newPassword)) {
-    passwordErrors.push('Password must contain at least one uppercase letter.');
+    passwordErrors.push("Password must contain at least one uppercase letter.");
   }
-  // if (!/[a-z]/.test(newPassword)) {
-  //   passwordErrors.push('Password must contain at least one lowercase letter.');
-  // }
+  if (!/[a-z]/.test(newPassword)) {
+    passwordErrors.push("Password must contain at least one lowercase letter.");
+  }
   if (!/\d/.test(newPassword)) {
-    passwordErrors.push('Password must contain at least one number.');
+    passwordErrors.push("Password must contain at least one number.");
   }
-  // if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
-  //   passwordErrors.push('Password must contain at least one special character.');
-  // }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+    passwordErrors.push("Password must contain at least one special character.");
+  }
   if (passwordErrors.length > 0) {
-    return res.status(400).json({ 
-      success: false, 
-      message: `Password does not meet requirements: ${passwordErrors.join(', ')}` 
-    });
+    throw new BadRequestError(`Password does not meet requirements: ${passwordErrors.join(", ")}`);
   }
 
   try {
     // Determine if input is phone or email
-    const isPhone = /^\+\d{1,3}\d{7,}$/.test(emailOrPhone.trim()); // More flexible phone regex
+    const isPhone = /^\+\d{1,3}\d{7,}$/.test(emailOrPhone.trim());
     let user;
     let otpRecord;
 
@@ -274,34 +249,29 @@ export const resetPassword = async (req, res) => {
       // Validate phone number format
       const phoneRegex = /^\+\d{1,3}\d{7,}$/;
       if (!phoneRegex.test(emailOrPhone.trim())) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid phone number format. Use +[country code][number] format.'
-        });
+        throw new BadRequestError("Invalid phone number format. Use +[country code][number] format.");
       }
 
       user = await findUserByPhone(emailOrPhone.trim());
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found with this phone number.'
-        });
+        throw new NotFoundError("User not found with this phone number.");
+      }
+
+      // Validate user.id as UUID
+      if (!validate(user.id)) {
+        throw new BadRequestError("Invalid user ID format.");
       }
 
       // Verify phone OTP
       otpRecord = await prisma.phoneOTP.findFirst({
         where: {
-          userId: user.id,
+          userId: user.id, // Ensure string UUID
           otp: otp.trim(),
-          type: 'PASSWORD_RESET',
+          type: "PASSWORD_RESET",
           isUsed: false,
-          expiresAt: {
-            gt: new Date()
-          }
+          expiresAt: { gt: new Date() },
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: { createdAt: "desc" },
       });
 
       // Increment attempts if OTP is invalid
@@ -309,52 +279,45 @@ export const resetPassword = async (req, res) => {
         const latestOtp = await prisma.phoneOTP.findFirst({
           where: {
             userId: user.id,
-            type: 'PASSWORD_RESET',
-            isUsed: false
+            type: "PASSWORD_RESET",
+            isUsed: false,
           },
-          orderBy: {
-            createdAt: 'desc'
-          }
+          orderBy: { createdAt: "desc" },
         });
         if (latestOtp) {
           await prisma.phoneOTP.update({
             where: { id: latestOtp.id },
-            data: { attempts: latestOtp.attempts + 1 }
+            data: { attempts: latestOtp.attempts + 1 },
           });
         }
       }
     } else {
       // Validate email format
       if (!validator.isEmail(emailOrPhone.trim())) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid email format.'
-        });
+        throw new BadRequestError("Invalid email format.");
       }
 
       const cleanEmail = emailOrPhone.trim().toLowerCase();
       user = await findUserByEmail(cleanEmail);
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found with this email address.'
-        });
+        throw new NotFoundError("User not found with this email address.");
+      }
+
+      // Validate user.id as UUID
+      if (!validate(user.id)) {
+        throw new BadRequestError("Invalid user ID format.");
       }
 
       // Verify email OTP
       otpRecord = await prisma.emailOTP.findFirst({
         where: {
-          userId: user.id,
+          userId: user.id, // Ensure string UUID
           otp: otp.trim(),
-          type: 'PASSWORD_RESET',
+          type: "PASSWORD_RESET",
           isUsed: false,
-          expiresAt: {
-            gt: new Date()
-          }
+          expiresAt: { gt: new Date() },
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: { createdAt: "desc" },
       });
 
       // Increment attempts if OTP is invalid
@@ -362,17 +325,15 @@ export const resetPassword = async (req, res) => {
         const latestOtp = await prisma.emailOTP.findFirst({
           where: {
             userId: user.id,
-            type: 'PASSWORD_RESET',
-            isUsed: false
+            type: "PASSWORD_RESET",
+            isUsed: false,
           },
-          orderBy: {
-            createdAt: 'desc'
-          }
+          orderBy: { createdAt: "desc" },
         });
         if (latestOtp) {
           await prisma.emailOTP.update({
             where: { id: latestOtp.id },
-            data: { attempts: latestOtp.attempts + 1 }
+            data: { attempts: latestOtp.attempts + 1 },
           });
         }
       }
@@ -384,42 +345,29 @@ export const resetPassword = async (req, res) => {
             where: {
               userId: user.id,
               otp: otp.trim(),
-              type: 'PASSWORD_RESET',
-              expiresAt: {
-                lte: new Date()
-              }
-            }
+              type: "PASSWORD_RESET",
+              expiresAt: { lte: new Date() },
+            },
           })
         : await prisma.emailOTP.findFirst({
             where: {
               userId: user.id,
               otp: otp.trim(),
-              type: 'PASSWORD_RESET',
-              expiresAt: {
-                lte: new Date()
-              }
-            }
+              type: "PASSWORD_RESET",
+              expiresAt: { lte: new Date() },
+            },
           });
 
       if (expiredOtp) {
-        return res.status(400).json({
-          success: false,
-          message: 'OTP has expired. Please request a new one.'
-        });
+        throw new BadRequestError("OTP has expired. Please request a new one.");
       }
 
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid OTP.' 
-      });
+      throw new BadRequestError("Invalid OTP.");
     }
 
-    // Check if max attempts exceeded
+    // Check max attempts
     if (otpRecord.attempts >= otpRecord.maxAttempts) {
-      return res.status(400).json({
-        success: false,
-        message: 'OTP has exceeded maximum attempts. Please request a new one.'
-      });
+      throw new BadRequestError("OTP has exceeded maximum attempts. Please request a new one.");
     }
 
     // Hash the new password
@@ -428,53 +376,33 @@ export const resetPassword = async (req, res) => {
 
     // Update password and mark OTP as used in a transaction
     await prisma.$transaction(async (tx) => {
-      // Update user password
       await tx.user.update({
-        where: { id: user.id },
-        data: { 
+        where: { id: user.id }, // Ensure string UUID
+        data: {
           password: hashedPassword,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
 
-      // Mark OTP as used
       if (isPhone) {
         await tx.phoneOTP.update({
           where: { id: otpRecord.id },
-          data: { 
-            isUsed: true,
-            attempts: otpRecord.attempts + 1
-          }
+          data: { isUsed: true, attempts: otpRecord.attempts + 1 },
         });
 
         await tx.phoneOTP.updateMany({
-          where: {
-            userId: user.id,
-            type: 'PASSWORD_RESET',
-            isUsed: false
-          },
-          data: {
-            isUsed: true
-          }
+          where: { userId: user.id, type: "PASSWORD_RESET", isUsed: false },
+          data: { isUsed: true },
         });
       } else {
         await tx.emailOTP.update({
           where: { id: otpRecord.id },
-          data: { 
-            isUsed: true,
-            attempts: otpRecord.attempts + 1
-          }
+          data: { isUsed: true, attempts: otpRecord.attempts + 1 },
         });
 
         await tx.emailOTP.updateMany({
-          where: {
-            userId: user.id,
-            type: 'PASSWORD_RESET',
-            isUsed: false
-          },
-          data: {
-            isUsed: true
-          }
+          where: { userId: user.id, type: "PASSWORD_RESET", isUsed: false },
+          data: { isUsed: true },
         });
       }
     });
@@ -482,532 +410,442 @@ export const resetPassword = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email, phoneNumber: user.phoneNumber, role: user.role },
-      process.env.JWT_SECRET || 'your_jwt_secret', // Replace with your secret
-      { expiresIn: '7d' }
+      JWT_SECRET,
+      { expiresIn: "7d" }
     );
 
-    console.log('Password reset successfully for user:', user.id);
+    console.log(`[AuthController] Password reset successfully for user: ${user.id}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: 'Password has been reset successfully.',
+      message: "Password has been reset successfully.",
       token,
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        role: user.role
-      }
+        role: user.role,
+      },
     });
-  } catch (err) {
-    console.error('Reset Password Controller Error:', err);
-
-    if (err.code === 'P2002') {
-      return res.status(409).json({
-        success: false,
-        message: 'User data conflict occurred.'
-      });
+  } catch (error) {
+    console.error(`[AuthController] Reset Password Error: ${error.message}`);
+    if (error instanceof BadRequestError || error instanceof NotFoundError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
     }
-
-    res.status(500).json({ 
-      success: false, 
-      message: 'An internal server error occurred.' 
-    });
+    if (error.code === "P2002") {
+      return res.status(409).json({ success: false, message: "User data conflict occurred." });
+    }
+    return res.status(500).json({ success: false, message: "An internal server error occurred." });
   }
 };
 
 export const sendOTP = async (req, res) => {
-    const { phoneNumber } = req.body;
+  const { phoneNumber } = req.body;
 
-    // Validation
-    if (!phoneNumber) {
-        return res.status(400).json({
-            success: false,
-            message: "Phone number is required.",
-        });
+  // Validation
+  if (!phoneNumber) {
+    throw new BadRequestError("Phone number is required.");
+  }
+
+  // Validate phone number format (Indian format)
+  const phoneRegex = /^\+91[6-9]\d{9}$/;
+  if (!phoneRegex.test(phoneNumber)) {
+    throw new BadRequestError("Invalid phone number format. Use +91XXXXXXXXXX format.");
+  }
+
+  try {
+    // Get client info for security
+    const clientIP = req.ip || req.connection.remoteAddress || "unknown";
+    const userAgent = req.get("User-Agent") || "unknown";
+
+    // Determine auth flow
+    const { flowType } = await determineAuthFlow(phoneNumber);
+
+    // Create or find user
+    const user = await findOrCreateUser(phoneNumber);
+
+    // Validate user.id as UUID
+    if (!validate(user.id)) {
+      throw new BadRequestError("Invalid user ID format.");
     }
 
-    // Validate phone number format (Indian format)
-    const phoneRegex = /^\+91[6-9]\d{9}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid phone number format. Use +91XXXXXXXXXX format.",
-        });
+    // Generate and store OTP
+    const otpCode = await generateAndStoreOTP(user.id, flowType.toUpperCase(), clientIP, userAgent);
+
+    // Send OTP via WhatsApp
+    const whatsappResult = await sendWhatsAppOTP(phoneNumber, otpCode);
+
+    if (!whatsappResult.success) {
+      throw new Error("Failed to send WhatsApp OTP");
     }
 
-    try {
-        // Get client info for security
-        const clientIP = req.ip || req.connection.remoteAddress || "unknown";
-        const userAgent = req.get("User-Agent") || "unknown";
+    console.log(`[AuthController] OTP sent via WhatsApp to: ${phoneNumber} for ${flowType}`);
 
-        // Rate limiting check (basic implementation - enhance as needed)
-        // You can implement more sophisticated rate limiting later
-
-        // Determine if this is signin or signup flow
-        const { flowType } = await determineAuthFlow(phoneNumber);
-
-        // Create or find user (unified approach)
-        const user = await findOrCreateUser(phoneNumber);
-
-        // Generate and store OTP
-        const otpCode = await generateAndStoreOTP(
-            user.id,
-            flowType.toUpperCase(),
-            clientIP,
-            userAgent
-        );
-
-        // Send OTP via WhatsApp using MSG91
-        const whatsappResult = await sendWhatsAppOTP(phoneNumber, otpCode);
-
-        if (!whatsappResult.success) {
-            throw new Error("Failed to send WhatsApp OTP");
-        }
-
-        // Success response (consistent with your existing pattern)
-        return res.status(200).json({
-            success: true,
-            flowType, // 'signin' or 'signup'
-            message: `OTP sent via WhatsApp for ${flowType}`,
-            expiresIn: 300, // 5 minutes
-            messageId: whatsappResult.messageId,
-        });
-    } catch (error) {
-        console.error("Send OTP Controller Error:", error);
-
-        // Handle specific errors
-        if (error.message.includes("Rate limit")) {
-            return res.status(429).json({
-                success: false,
-                message: "Too many OTP requests. Please try again later.",
-            });
-        }
-
-        if (error.message.includes("WhatsApp")) {
-            return res.status(503).json({
-                success: false,
-                message: "Unable to send OTP via WhatsApp. Please try again.",
-            });
-        }
-
-        // Generic error response
-        return res.status(500).json({
-            success: false,
-            message: "An internal server error occurred.",
-        });
+    return res.status(200).json({
+      success: true,
+      flowType,
+      message: `OTP sent via WhatsApp for ${flowType}`,
+      expiresIn: 300, // 5 minutes
+      messageId: whatsappResult.messageId,
+    });
+  } catch (error) {
+    console.error(`[AuthController] Send OTP Error: ${error.message}`);
+    if (error.message.includes("Rate limit")) {
+      return res.status(429).json({ success: false, message: "Too many OTP requests. Please try again later." });
     }
+    if (error.message.includes("WhatsApp")) {
+      return res.status(503).json({ success: false, message: "Unable to send OTP via WhatsApp. Please try again." });
+    }
+    return res.status(500).json({ success: false, message: "An internal server error occurred." });
+  }
 };
 
-/**
- * CONTROLLER for POST /verify-otp
- * Verifies OTP and determines next step (dashboard or profile completion)
- */
 export const verifyOTPEndpoint = async (req, res) => {
-    const { phoneNumber, otp } = req.body;
+  const { phoneNumber, otp } = req.body;
 
-    // Validation
-    if (!phoneNumber || !otp) {
-        return res.status(400).json({
-            success: false,
-            message: "Phone number and OTP are required.",
-        });
+  // Validation
+  if (!phoneNumber || !otp) {
+    throw new BadRequestError("Phone number and OTP are required.");
+  }
+
+  if (!/^\d{6}$/.test(otp)) {
+    throw new BadRequestError("OTP must be 6 digits.");
+  }
+
+  try {
+    // Verify OTP
+    const { user, otpType } = await verifyPhoneOTP(phoneNumber, otp);
+
+    // Validate user.id as UUID
+    if (!validate(user.id)) {
+      throw new BadRequestError("Invalid user ID format.");
     }
 
-    if (!/^\d{6}$/.test(otp)) {
-        return res.status(400).json({
-            success: false,
-            message: "OTP must be 6 digits.",
-        });
+    // Update user verification status
+    await updateUserVerification(user.id);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // Determine next step
+    let nextStep;
+    let requiresProfileCompletion = false;
+
+    if (otpType === "SIGNIN" && user.isProfileComplete) {
+      nextStep = "dashboard";
+    } else if (otpType === "SIGNIN" && !user.isProfileComplete) {
+      nextStep = "profile-completion";
+      requiresProfileCompletion = true;
+    } else if (otpType === "SIGNUP") {
+      nextStep = "profile-completion";
+      requiresProfileCompletion = true;
     }
 
-    try {
-        // Verify OTP using service
-        const { user, otpType } = await verifyPhoneOTP(phoneNumber, otp);
+    console.log(`[AuthController] OTP verified for user: ${user.id}, flowType: ${otpType}`);
 
-        // Update user verification status
-        await updateUserVerification(user.id);
-
-        // Generate JWT token (consistent with your existing auth pattern)
-        const token = jwt.sign(
-            {
-                userId: user.id,
-                phoneNumber: user.phoneNumber,
-                role: user.role,
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
-        // Determine next step based on flow type and profile completion
-        let nextStep;
-        let requiresProfileCompletion = false;
-
-        if (otpType === "SIGNIN" && user.isProfileComplete) {
-            nextStep = "dashboard";
-        } else if (otpType === "SIGNIN" && !user.isProfileComplete) {
-            nextStep = "profile-completion";
-            requiresProfileCompletion = true;
-        } else if (otpType === "SIGNUP") {
-            nextStep = "profile-completion";
-            requiresProfileCompletion = true;
-        }
-
-        // Success response (Myntra-style)
-        return res.status(200).json({
-            success: true,
-            token,
-            user: {
-                id: user.id,
-                phoneNumber: user.phoneNumber,
-                name: user.name,
-                email: user.email,
-                isProfileComplete: user.isProfileComplete,
-                phoneVerified: true,
-            },
-            nextStep,
-            flowType: otpType.toLowerCase(),
-            requiresProfileCompletion,
-            message:
-                otpType === "SIGNIN"
-                    ? "Successfully signed in"
-                    : "Account verified successfully",
-        });
-    } catch (error) {
-        console.error("Verify OTP Controller Error:", error);
-
-        // Handle specific errors
-        if (
-            error.message.includes("Invalid") ||
-            error.message.includes("expired")
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid or expired OTP. Please request a new one.",
-            });
-        }
-
-        if (error.message.includes("User not found")) {
-            return res.status(404).json({
-                success: false,
-                message: "Phone number not found. Please request OTP first.",
-            });
-        }
-
-        // Generic error response
-        return res.status(500).json({
-            success: false,
-            message: "An internal server error occurred.",
-        });
+    return res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        phoneNumber: user.phoneNumber,
+        name: user.name,
+        email: user.email,
+        isProfileComplete: user.isProfileComplete,
+        phoneVerified: true,
+      },
+      nextStep,
+      flowType: otpType.toLowerCase(),
+      requiresProfileCompletion,
+      message: otpType === "SIGNIN" ? "Successfully signed in" : "Account verified successfully",
+    });
+  } catch (error) {
+    console.error(`[AuthController] Verify OTP Error: ${error.message}`);
+    if (error.message.includes("Invalid") || error.message.includes("expired")) {
+      return res.status(400).json({ success: false, message: "Invalid or expired OTP. Please request a new one." });
     }
+    if (error.message.includes("User not found")) {
+      return res.status(404).json({ success: false, message: "Phone number not found. Please request OTP first." });
+    }
+    return res.status(500).json({ success: false, message: "An internal server error occurred." });
+  }
 };
 
-/**
- * CONTROLLER for POST /complete-profile
- * For new users to complete their profile after OTP verification
- */
 export const completeProfile = async (req, res) => {
-    const { name, email, password, agreeToTerms, ageConfirmation } = req.body;
+  const { name, email, password, agreeToTerms, ageConfirmation } = req.body;
+  const userId = req.user?.userId;
 
-    // Get user ID from JWT token (set by your auth middleware)
-    const userId = req.user?.userId;
+  // Validation
+  if (!userId || !validate(userId)) {
+    throw new BadRequestError("Authentication required or invalid user ID.");
+  }
 
-    if (!userId) {
-        return res.status(401).json({
-            success: false,
-            message: "Authentication required.",
-        });
+  if (!name || !agreeToTerms || !ageConfirmation) {
+    throw new BadRequestError("Name, terms agreement, and age confirmation are required.");
+  }
+
+  if (name.trim().length < 2 || name.trim().length > 100) {
+    throw new BadRequestError("Name must be between 2 and 100 characters long.");
+  }
+
+  if (email && !validator.isEmail(email.trim())) {
+    throw new BadRequestError("Invalid email format.");
+  }
+
+  if (password && !validator.isLength(password, { min: 10 })) {
+    throw new BadRequestError("Password must be at least 10 characters long.");
+  }
+
+  try {
+    const updatedUser = await updateProfileCompletion(userId, {
+      name: name.trim(),
+      email: email?.trim(),
+      password,
+    });
+
+    console.log(`[AuthController] Profile completed for user: ${userId}`);
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: updatedUser.id,
+        phoneNumber: updatedUser.phoneNumber,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isProfileComplete: true,
+        phoneVerified: true,
+      },
+      message: "Profile completed successfully. Welcome aboard!",
+    });
+  } catch (error) {
+    console.error(`[AuthController] Profile Completion Error: ${error.message}`);
+    if (error.message.includes("Email") && error.message.includes("exists")) {
+      return res.status(409).json({ success: false, message: "Email address is already registered." });
     }
-
-    // Validation
-    if (!name || !agreeToTerms || !ageConfirmation) {
-        return res.status(400).json({
-            success: false,
-            message:
-                "Name, terms agreement, and age confirmation are required.",
-        });
-    }
-
-    if (name.trim().length < 2) {
-        return res.status(400).json({
-            success: false,
-            message: "Name must be at least 2 characters long.",
-        });
-    }
-
-    // Validate email format if provided
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid email format.",
-        });
-    }
-
-    // Validate password if provided
-    if (password && password.length < 6) {
-        return res.status(400).json({
-            success: false,
-            message: "Password must be at least 6 characters long.",
-        });
-    }
-
-    try {
-        // Update user profile using service
-        const updatedUser = await updateProfileCompletion(userId, {
-            name: name.trim(),
-            email: email?.trim(),
-            password,
-        });
-
-        // Success response
-        return res.status(200).json({
-            success: true,
-            user: {
-                id: updatedUser.id,
-                phoneNumber: updatedUser.phoneNumber,
-                name: updatedUser.name,
-                email: updatedUser.email,
-                isProfileComplete: true,
-                phoneVerified: true,
-            },
-            message: "Profile completed successfully. Welcome aboard!",
-        });
-    } catch (error) {
-        console.error("Profile Completion Controller Error:", error);
-
-        // Handle specific errors
-        if (
-            error.message.includes("Email") &&
-            error.message.includes("exists")
-        ) {
-            return res.status(409).json({
-                success: false,
-                message: "Email address is already registered.",
-            });
-        }
-
-        // Generic error response
-        return res.status(500).json({
-            success: false,
-            message: "An internal server error occurred.",
-        });
-    }
-};
-
-// ================================
-// HELPER FUNCTIONS
-// ================================
-
-/**
- * Helper function to update user verification status
- */
-const updateUserVerification = async (userId) => {
-    try {
-        await prisma.user.update({
-            where: { id: userId },
-            data: {
-                phoneVerified: true,
-                lastLoginAt: new Date(),
-            },
-        });
-    } catch (error) {
-        console.error("Error updating user verification:", error);
-        // Don't throw error here as verification is successful
-    }
+    return res.status(500).json({ success: false, message: "An internal server error occurred." });
+  }
 };
 
 export async function registerWithEmail(req, res) {
-    try {
-        const { name, email, password } = req.body;
-        if (!email)
-            return res
-                .status(400)
-                .json({ success: false, message: "Email is required." });
-
-        // create user or find existing
-        let user = await findUserByEmail(email);
-        if (!user) {
-            user = await createUser({ name, email, password });
-        }
-
-        await sendEmailVerification(
-            user.id,
-            user.email,
-            user.name,
-            /* otp */ null
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: "Registration started. Check your email to verify.",
-        });
-    } catch (e) {
-        console.error("registerWithEmail error:", e);
-        return res
-            .status(500)
-            .json({ success: false, message: "Failed to start registration." });
+  try {
+    const { name, email, password } = req.body;
+    if (!email) {
+      throw new BadRequestError("Email is required.");
     }
-}
+
+    if (!validator.isEmail(email.trim())) {
+      throw new BadRequestError("Invalid email format.");
+    }
+
+    if (name && (name.trim().length < 2 || name.trim().length > 100)) {
+      throw new BadRequestError("Name must be between 2 and 100 characters long.");
+    }
+
+    if (password && !validator.isLength(password, { min: 10 })) {
+      throw new BadRequestError("Password must be at least 10 characters long.");
+    }
+
+    let user = await findUserByEmail(email.trim().toLowerCase());
+    if (!user) {
+      user = await createUser({ name: name?.trim(), email: email.trim().toLowerCase(), password });
+    }
+
+    // Validate user.id as UUID
+    if (!validate(user.id)) {
+      throw new BadRequestError("Invalid user ID format.");
+    }
+
+    await sendEmailVerification(user.id, user.email, user.name, null);
+
+    console.log(`[AuthController] Registration started for email: ${user.email}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Registration started. Check your email to verify.",
+    });
+  } catch (error) {
+    console.error(`[AuthController] Register With Email Error: ${error.message}`);
+    if (error instanceof BadRequestError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
+    }
+    return res.status(500).json({ success: false, message: "Failed to start registration." });
+  }
+};
 
 export async function resendVerificationEmail(req, res) {
-    try {
-        const { email } = req.body;
-        if (!email)
-            return res
-                .status(400)
-                .json({ success: false, message: "Email is required." });
-        const user = await findUserByEmail(email);
-        if (!user) {
-            // Generic response to avoid enumeration
-            return res
-                .status(200)
-                .json({
-                    success: true,
-                    message:
-                        "If the email exists, a verification email was sent.",
-                });
-        }
-        if (user.emailVerified) {
-            return res
-                .status(200)
-                .json({ success: true, message: "Email already verified." });
-        }
-        await sendEmailVerification(user.id, user.email, user.name, null);
-        return res
-            .status(200)
-            .json({ success: true, message: "Verification email sent." });
-    } catch (e) {
-        console.error("resendVerificationEmail error:", e);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Failed to send verification email.",
-            });
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new BadRequestError("Email is required.");
     }
-}
+
+    if (!validator.isEmail(email.trim())) {
+      throw new BadRequestError("Invalid email format.");
+    }
+
+    const user = await findUserByEmail(email.trim().toLowerCase());
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: "If the email exists, a verification email was sent.",
+      });
+    }
+
+    // Validate user.id as UUID
+    if (!validate(user.id)) {
+      throw new BadRequestError("Invalid user ID format.");
+    }
+
+    if (user.emailVerified) {
+      return res.status(200).json({ success: true, message: "Email already verified." });
+    }
+
+    await sendEmailVerification(user.id, user.email, user.name, null);
+
+    console.log(`[AuthController] Verification email resent to: ${user.email}`);
+
+    return res.status(200).json({ success: true, message: "Verification email sent." });
+  } catch (error) {
+    console.error(`[AuthController] Resend Verification Email Error: ${error.message}`);
+    if (error instanceof BadRequestError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
+    }
+    return res.status(500).json({ success: false, message: "Failed to send verification email." });
+  }
+};
+
 export const verifyEmailToken = async (req, res) => {
-    const { token } = req.body;
+  const { token } = req.body;
 
-    if (!token) {
-        return res.status(400).json({
-            success: false,
-            message: "Verification token is required.",
-            errorCode: "MISSING_TOKEN",
-        });
+  if (!token) {
+    throw new BadRequestError("Verification token is required.", "MISSING_TOKEN");
+  }
+
+  try {
+    const verificationToken = await findEmailVerificationToken(token);
+    if (!verificationToken) {
+      throw new BadRequestError("Invalid or expired verification token.", "INVALID_TOKEN");
     }
 
-    try {
-        // Use the function from tokenService.js
-        const verificationToken = await findEmailVerificationToken(token);
-
-        if (!verificationToken) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid or expired verification token.",
-                errorCode: "INVALID_TOKEN",
-            });
-        }
-
-        // Check expiry and usage
-        if (verificationToken.expiresAt < new Date()) {
-            return res.status(400).json({
-                success: false,
-                message: "Verification token has expired.",
-                errorCode: "TOKEN_EXPIRED",
-            });
-        }
-
-        if (verificationToken.usedAt) {
-            return res.status(400).json({
-                success: false,
-                message: "This verification link has already been used.",
-                errorCode: "TOKEN_USED",
-            });
-        }
-
-        // Get user details
-        const user = await prisma.user.findUnique({
-            where: { id: verificationToken.userId },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                phoneNumber: true,
-                emailVerified: true,
-                phoneVerified: true,
-                isProfileComplete: true,
-                role: true,
-            },
-        });
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User account not found.",
-                errorCode: "USER_NOT_FOUND",
-            });
-        }
-
-        // Use transaction for atomic operations
-        const result = await prisma.$transaction(async (tx) => {
-            // Update user email verification status
-            const updatedUser = await tx.user.update({
-                where: { id: verificationToken.userId },
-                data: {
-                    emailVerified: true,
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    phoneNumber: true,
-                    emailVerified: true,
-                    phoneVerified: true,
-                    isProfileComplete: true,
-                    role: true,
-                },
-            });
-
-            // Mark token as used - now hashToken is properly imported
-            await tx.emailVerificationToken.update({
-                where: { token: hashToken(token) },
-                data: { usedAt: new Date() },
-            });
-
-            return updatedUser;
-        });
-
-        // Generate JWT token
-const authToken = jwt.sign(
-  {
-    id: result.id,      // use 'id' instead of 'userId'
-    email: result.email,
-    role: result.role,
-    emailVerified: true,
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-);
-
-
-        // Always require profile completion
-        return res.status(200).json({
-            success: true,
-            message: "Email verified successfully!",
-            token: authToken,
-            user: result,
-            requiresProfileCompletion: true, // Always true for email verification
-            nextStep: "profile-completion",
-            flowType: "email-verification", // Add this flag
-        });
-    } catch (error) {
-        console.error("Email Token Verification Error:", error);
-        return res.status(500).json({
-            success: false,
-            message: "An internal server error occurred during verification.",
-            errorCode: "INTERNAL_ERROR",
-        });
+    // Check expiry and usage
+    if (verificationToken.expiresAt < new Date()) {
+      throw new BadRequestError("Verification token has expired.", "TOKEN_EXPIRED");
     }
+
+    if (verificationToken.usedAt) {
+      throw new BadRequestError("This verification link has already been used.", "TOKEN_USED");
+    }
+
+    // Validate userId as UUID
+    if (!validate(verificationToken.userId)) {
+      throw new BadRequestError("Invalid user ID format.");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: verificationToken.userId }, // Ensure string UUID
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundError("User account not found.", "USER_NOT_FOUND");
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedUser = await tx.user.update({
+        where: { id: verificationToken.userId }, // Ensure string UUID
+        data: { emailVerified: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phoneNumber: true,
+          emailVerified: true,
+          phoneVerified: true,
+          isProfileComplete: true,
+          role: true,
+        },
+      });
+
+      await tx.emailVerificationToken.update({
+        where: { token: hashToken(token) },
+        data: { usedAt: new Date() },
+      });
+
+      return updatedUser;
+    });
+
+    const authToken = jwt.sign(
+      {
+        id: result.id,
+        email: result.email,
+        role: result.role,
+        emailVerified: true,
+      },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    console.log(`[AuthController] Email verified for user: ${result.id}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully!",
+      token: authToken,
+      user: result,
+      requiresProfileCompletion: true,
+      nextStep: "profile-completion",
+      flowType: "email-verification",
+    });
+  } catch (error) {
+    console.error(`[AuthController] Email Token Verification Error: ${error.message}`);
+    if (error instanceof BadRequestError || error instanceof NotFoundError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+        errorCode: error.errorCode || "UNKNOWN",
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: "An internal server error occurred during verification.",
+      errorCode: "INTERNAL_ERROR",
+    });
+  }
+};
+
+// Helper function to update user verification status
+const updateUserVerification = async (userId) => {
+  if (!validate(userId)) {
+    throw new BadRequestError("Invalid user ID format.");
+  }
+  try {
+    await prisma.user.update({
+      where: { id: userId }, // Ensure string UUID
+      data: {
+        phoneVerified: true,
+        lastLoginAt: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error(`[AuthController] Error updating user verification: ${error.message}`);
+    // Don't throw error to avoid disrupting successful verification
+  }
 };

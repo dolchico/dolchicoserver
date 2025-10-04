@@ -2,7 +2,13 @@ import prisma from "../lib/prisma.js";
 import { createEmailVerificationToken } from "./tokenService.js";
 import { sendVerificationEmail } from "./mailService.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"; // Added for verifyUserEmailToken
 
+/**
+ * Create a new user
+ * @param {object} userData - User data
+ * @returns {Promise<object>} Created user
+ */
 export const createUser = async (userData) => {
     try {
         const cleanUserData = { ...userData };
@@ -65,28 +71,83 @@ export const createUser = async (userData) => {
     }
 };
 
-// Find user by email (always trimmed and lowercased)
+/**
+ * Find user by email
+ * @param {string} email - User email
+ * @returns {Promise<object|null>} User object or null
+ */
 export const findUserByEmail = async (email) => {
     if (!email) return null;
     return prisma.user.findUnique({
         where: { email: email.trim().toLowerCase() },
+        select: {
+            id: true,
+            name: true,
+            username: true,
+            fullName: true,
+            email: true,
+            phoneNumber: true,
+            emailVerified: true,
+            phoneVerified: true,
+            isProfileComplete: true,
+            password: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+            country: true,
+            state: true,
+            zip: true,
+            dob: true,
+            resetToken: true,
+            pendingEmail: true,
+            pendingEmailOtp: true,
+            pendingEmailExpiry: true,
+        },
     });
 };
 
-// Find user by phone number (trimmed)
+/**
+ * Find user by phone number
+ * @param {string} phoneNumber - User phone number
+ * @returns {Promise<object|null>} User object or null
+ */
 export const findUserByPhone = async (phoneNumber) => {
     if (!phoneNumber) return null;
     return prisma.user.findUnique({
         where: { phoneNumber: phoneNumber.trim() },
+        select: {
+            id: true,
+            name: true,
+            username: true,
+            fullName: true,
+            email: true,
+            phoneNumber: true,
+            emailVerified: true,
+            phoneVerified: true,
+            isProfileComplete: true,
+            password: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+            country: true,
+            state: true,
+            zip: true,
+            dob: true,
+            resetToken: true,
+        },
     });
 };
 
-// Find user by ID
+/**
+ * Find user by ID
+ * @param {string} id - User ID
+ * @returns {Promise<object|null>} User object or null
+ */
 export const findUserById = async (id) => {
     if (!id) return null;
 
     return prisma.user.findUnique({
-        where: { id: Number(id) },
+        where: { id }, // Use string id
         select: {
             id: true,
             name: true,
@@ -100,7 +161,7 @@ export const findUserById = async (id) => {
             country: true,
             state: true,
             zip: true,
-            dob: true,          // <-- Add this line to fetch date of birth
+            dob: true,
             role: true,
             isActive: true,
             createdAt: true,
@@ -113,14 +174,28 @@ export const findUserById = async (id) => {
     });
 };
 
-
-// Update user's emailVerified status
+/**
+ * Update user's emailVerified status
+ * @param {string} userId - User ID
+ * @returns {Promise<object>} Updated user
+ */
 export const verifyUserEmail = async (userId) => {
     if (!userId) throw new Error("userId is required");
     try {
         return await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId directly
             data: { emailVerified: true },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phoneNumber: true,
+                emailVerified: true,
+                phoneVerified: true,
+                isProfileComplete: true,
+                password: true,
+                role: true,
+            },
         });
     } catch (error) {
         console.error("Error verifying user email:", error);
@@ -128,13 +203,28 @@ export const verifyUserEmail = async (userId) => {
     }
 };
 
-// Update user's phoneVerified status
+/**
+ * Update user's phoneVerified status
+ * @param {string} userId - User ID
+ * @returns {Promise<object>} Updated user
+ */
 export const verifyUserPhone = async (userId) => {
     if (!userId) throw new Error("userId is required");
     try {
         return await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId directly
             data: { phoneVerified: true },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                phoneNumber: true,
+                emailVerified: true,
+                phoneVerified: true,
+                isProfileComplete: true,
+                password: true,
+                role: true,
+            },
         });
     } catch (error) {
         console.error("Error verifying user phone:", error);
@@ -142,7 +232,12 @@ export const verifyUserPhone = async (userId) => {
     }
 };
 
-// Update user profile with allowed fields
+/**
+ * Update user profile with allowed fields
+ * @param {string} userId - User ID
+ * @param {object} updateData - Update data
+ * @returns {Promise<object>} Updated user
+ */
 export const updateProfile = async (userId, updateData) => {
     const allowedFields = [
         "name",
@@ -156,7 +251,7 @@ export const updateProfile = async (userId, updateData) => {
         "emailVerified",
         "phoneVerified",
         "isProfileComplete",
-        "dob" // Add D.O.B. as optional
+        "dob",
     ];
 
     const data = {};
@@ -177,7 +272,6 @@ export const updateProfile = async (userId, updateData) => {
     if (data.state) data.state = data.state.trim();
     if (data.zip) data.zip = data.zip.trim();
     if (data.dob) {
-        // Accepts ISO string or Date object
         data.dob = new Date(data.dob);
         if (isNaN(data.dob.getTime())) {
             throw new Error("Invalid date of birth format. Use YYYY-MM-DD.");
@@ -189,33 +283,31 @@ export const updateProfile = async (userId, updateData) => {
     }
 
     try {
-return await prisma.user.update({
-    where: { id: Number(userId) },
-    data: {
-        ...data,
-        updatedAt: new Date(),
-    },
-    select: {
-        id: true,
-        name: true,
-        username: true,
-        fullName: true,
-        email: true,
-        phoneNumber: true,
-        emailVerified: true,
-        phoneVerified: true,
-        isProfileComplete: true,
-        country: true,
-        state: true,
-        zip: true,
-        dob: true,  // <-- Add this line to return DOB
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-    },
-});
-
-
+        return await prisma.user.update({
+            where: { id: userId }, // Use string userId
+            data: {
+                ...data,
+                updatedAt: new Date(),
+            },
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                fullName: true,
+                email: true,
+                phoneNumber: true,
+                emailVerified: true,
+                phoneVerified: true,
+                isProfileComplete: true,
+                country: true,
+                state: true,
+                zip: true,
+                dob: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
     } catch (err) {
         if (err.code === "P2002") {
             const target = err.meta?.target;
@@ -234,160 +326,11 @@ return await prisma.user.update({
     }
 };
 
-// Existing email verification service
-export const resendEmailVerificationService = async (email) => {
-    const cleanEmail = email.trim().toLowerCase();
-    const user = await findUserByEmail(cleanEmail);
-
-    if (!user) {
-        return { success: false, userFound: false, alreadyVerified: false };
-    }
-
-    if (user.emailVerified) {
-        return { success: false, userFound: true, alreadyVerified: true };
-    }
-
-    try {
-        await prisma.$transaction(async (tx) => {
-            await tx.emailVerificationToken.deleteMany({
-                where: { userId: user.id },
-            });
-
-            const newToken = await createEmailVerificationToken(user.id);
-            await sendVerificationEmail(
-                user.email,
-                newToken,
-                null,
-                user.name || "User"
-            );
-        });
-
-        return { success: true, userFound: true, alreadyVerified: false };
-    } catch (error) {
-        console.error("Error in resendEmailVerificationService:", error);
-        throw error;
-    }
-};
-
-// Auth flow determination
-export const determineAuthFlow = async (phoneNumber) => {
-    const cleanPhone = phoneNumber.trim();
-
-    try {
-        const user = await findUserByPhone(cleanPhone);
-
-        if (!user) {
-            return { flowType: "signup", user: null };
-        } else if (user.phoneVerified && user.isProfileComplete) {
-            return { flowType: "signin", user };
-        } else {
-            return { flowType: "signup", user };
-        }
-    } catch (error) {
-        console.error("Error determining auth flow:", error);
-        throw new Error("Failed to determine authentication flow");
-    }
-};
-
-// Find or create user (simplified)
-export const findOrCreateUser = async (phoneNumber) => {
-    const cleanPhone = phoneNumber.trim();
-
-    try {
-        let user = await findUserByPhone(cleanPhone);
-
-        if (!user) {
-            user = await createUser({
-                phoneNumber: cleanPhone,
-                // Let Prisma handle all defaults
-            });
-
-            console.log(
-                "Created new user for phone:",
-                cleanPhone,
-                "with ID:",
-                user.id
-            );
-        }
-
-        return user;
-    } catch (error) {
-        console.error("Error in findOrCreateUser:", error);
-
-        if (error.code === "P2002") {
-            throw new Error("Phone number already exists with another account");
-        }
-
-        throw new Error("Failed to create or find user");
-    }
-};
-
-// Profile completion
-export const updateProfileCompletion = async (userId, profileData) => {
-    const { name, email, password } = profileData;
-
-    try {
-        const updateData = {
-            name: name.trim(),
-            phoneVerified: true,
-            isProfileComplete: true,
-        };
-
-        if (email && email.trim()) {
-            updateData.email = email.trim().toLowerCase();
-
-            const existingEmailUser = await prisma.user.findUnique({
-                where: { email: updateData.email },
-            });
-
-            if (existingEmailUser && existingEmailUser.id !== Number(userId)) {
-                throw new Error(
-                    "Email address is already registered with another account"
-                );
-            }
-        }
-
-        if (password && password.trim()) {
-            const saltRounds = 12;
-            updateData.password = await bcrypt.hash(
-                password.trim(),
-                saltRounds
-            );
-        }
-
-        const updatedUser = await prisma.user.update({
-            where: { id: Number(userId) },
-            data: updateData,
-            select: {
-                id: true,
-                phoneNumber: true,
-                name: true,
-                email: true,
-                phoneVerified: true,
-                emailVerified: true,
-                isProfileComplete: true,
-                role: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
-
-        console.log("Profile completed for user:", userId);
-        return updatedUser;
-    } catch (error) {
-        console.error("Error updating profile completion:", error);
-
-        if (error.code === "P2002") {
-            throw new Error("Email address is already registered");
-        }
-
-        throw error;
-    }
-};
-
-// Get user auth status
-
-// Add this to userService.js
+/**
+ * Check user existence by email or phone
+ * @param {string} emailOrPhone - Email or phone number
+ * @returns {Promise<object>} Existence result
+ */
 export const checkUserExistenceService = async (emailOrPhone) => {
     try {
         const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
@@ -426,21 +369,186 @@ export const checkUserExistenceService = async (emailOrPhone) => {
     }
 };
 
-// services/userService.js - Fix the getUserAuthStatus function
-export const getUserAuthStatus = async (userId) => {
+/**
+ * Resend email verification
+ * @param {string} email - User email
+ * @returns {Promise<object>} Result
+ */
+export const resendEmailVerificationService = async (email) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await findUserByEmail(cleanEmail);
+
+    if (!user) {
+        return { success: false, userFound: false, alreadyVerified: false };
+    }
+
+    if (user.emailVerified) {
+        return { success: false, userFound: true, alreadyVerified: true };
+    }
+
     try {
-        // Accept 0 as a valid userId. Only reject when userId is null/undefined or not a number.
-        if (userId === undefined || userId === null) {
-            throw new Error("User ID is required");
+        await prisma.$transaction(async (tx) => {
+            await tx.emailVerificationToken.deleteMany({
+                where: { userId: user.id },
+            });
+
+            const newToken = await createEmailVerificationToken(user.id);
+            await sendVerificationEmail(
+                user.email,
+                newToken,
+                null,
+                user.name || "User"
+            );
+        });
+
+        return { success: true, userFound: true, alreadyVerified: false };
+    } catch (error) {
+        console.error("Error in resendEmailVerificationService:", error);
+        throw error;
+    }
+};
+
+/**
+ * Determine auth flow
+ * @param {string} phoneNumber - Phone number
+ * @returns {Promise<object>} Auth flow result
+ */
+export const determineAuthFlow = async (phoneNumber) => {
+    const cleanPhone = phoneNumber.trim();
+
+    try {
+        const user = await findUserByPhone(cleanPhone);
+
+        if (!user) {
+            return { flowType: "signup", user: null };
+        } else if (user.phoneVerified && user.isProfileComplete) {
+            return { flowType: "signin", user };
+        } else {
+            return { flowType: "signup", user };
+        }
+    } catch (error) {
+        console.error("Error determining auth flow:", error);
+        throw new Error("Failed to determine authentication flow");
+    }
+};
+
+/**
+ * Find or create user
+ * @param {string} phoneNumber - Phone number
+ * @returns {Promise<object>} User object
+ */
+export const findOrCreateUser = async (phoneNumber) => {
+    const cleanPhone = phoneNumber.trim();
+
+    try {
+        let user = await findUserByPhone(cleanPhone);
+
+        if (!user) {
+            user = await createUser({
+                phoneNumber: cleanPhone,
+            });
+
+            console.log(
+                "Created new user for phone:",
+                cleanPhone,
+                "with ID:",
+                user.id
+            );
         }
 
-        const idNum = Number(userId);
-        if (Number.isNaN(idNum)) {
+        return user;
+    } catch (error) {
+        console.error("Error in findOrCreateUser:", error);
+
+        if (error.code === "P2002") {
+            throw new Error("Phone number already exists with another account");
+        }
+
+        throw new Error("Failed to create or find user");
+    }
+};
+
+/**
+ * Update profile completion
+ * @param {string} userId - User ID
+ * @param {object} profileData - Profile data
+ * @returns {Promise<object>} Updated user
+ */
+export const updateProfileCompletion = async (userId, profileData) => {
+    const { name, email, password } = profileData;
+
+    try {
+        const updateData = {
+            name: name.trim(),
+            phoneVerified: true,
+            isProfileComplete: true,
+        };
+
+        if (email && email.trim()) {
+            updateData.email = email.trim().toLowerCase();
+
+            const existingEmailUser = await prisma.user.findUnique({
+                where: { email: updateData.email },
+            });
+
+            if (existingEmailUser && existingEmailUser.id !== userId) {
+                throw new Error(
+                    "Email address is already registered with another account"
+                );
+            }
+        }
+
+        if (password && password.trim()) {
+            const saltRounds = 12;
+            updateData.password = await bcrypt.hash(
+                password.trim(),
+                saltRounds
+            );
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId }, // Use string userId
+            data: updateData,
+            select: {
+                id: true,
+                phoneNumber: true,
+                name: true,
+                email: true,
+                phoneVerified: true,
+                emailVerified: true,
+                isProfileComplete: true,
+                role: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+
+        console.log("Profile completed for user:", userId);
+        return updatedUser;
+    } catch (error) {
+        console.error("Error updating profile completion:", error);
+
+        if (error.code === "P2002") {
+            throw new Error("Email address is already registered");
+        }
+
+        throw error;
+    }
+};
+
+/**
+ * Get user auth status
+ * @param {string} userId - User ID
+ * @returns {Promise<object>} User auth status
+ */
+export const getUserAuthStatus = async (userId) => {
+    try {
+        if (!userId) {
             throw new Error("User ID is required");
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: idNum },
+            where: { id: userId }, // Use string userId
             select: {
                 id: true,
                 name: true,
@@ -453,9 +561,6 @@ export const getUserAuthStatus = async (userId) => {
                 isProfileComplete: true,
                 createdAt: true,
                 updatedAt: true,
-                // Remove these lines - they don't exist in your schema:
-                // isLocked: false,
-                // lockedUntil: null
             },
         });
 
@@ -463,11 +568,10 @@ export const getUserAuthStatus = async (userId) => {
             throw new Error("User not found");
         }
 
-        // Add default values for fields that don't exist in schema
         return {
             ...user,
-            isLocked: false, // Default value since it doesn't exist in schema
-            lockedUntil: null, // Default value since it doesn't exist in schema
+            isLocked: false,
+            lockedUntil: null,
         };
     } catch (error) {
         console.error("Error getting user auth status:", error);
@@ -475,19 +579,24 @@ export const getUserAuthStatus = async (userId) => {
     }
 };
 
-export async function sendEmailVerification(
-    userId,
-    email,
-    userName,
-    otp = null
-) {
+/**
+ * Send email verification
+ * @param {string} userId - User ID
+ * @param {string} email - User email
+ * @param {string} userName - User name
+ * @param {string|null} otp - OTP code
+ * @returns {Promise<object>} Result
+ */
+export const sendEmailVerification = async (userId, email, userName, otp = null) => {
     const token = await createEmailVerificationToken(userId);
-    // sendVerificationEmail(toEmail, token, otp, userName)
     await sendVerificationEmail(email, token, otp, userName || "User");
     return { success: true };
-}
+};
 
-// Clean up expired tokens
+/**
+ * Clean up expired tokens
+ * @returns {Promise<object>} Result
+ */
 export const cleanupExpiredTokens = async () => {
     try {
         const result = await prisma.emailVerificationToken.deleteMany({
@@ -503,28 +612,30 @@ export const cleanupExpiredTokens = async () => {
     }
 };
 
+/**
+ * Verify user email token
+ * @param {string} token - Verification token
+ * @returns {Promise<object>} Result
+ */
 export const verifyUserEmailToken = async (token) => {
     try {
-        // Find the verification token in database
-        const verificationToken =
-            await prisma.emailVerificationToken.findUnique({
-                where: { token },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            emailVerified: true,
-                            phoneVerified: true,
-                            isProfileComplete: true,
-                            role: true,
-                        },
+        const verificationToken = await prisma.emailVerificationToken.findUnique({
+            where: { token },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        emailVerified: true,
+                        phoneVerified: true,
+                        isProfileComplete: true,
+                        role: true,
                     },
                 },
-            });
+            },
+        });
 
-        // Check if token exists
         if (!verificationToken) {
             return {
                 success: false,
@@ -532,7 +643,6 @@ export const verifyUserEmailToken = async (token) => {
             };
         }
 
-        // Check if token has expired
         if (verificationToken.expiresAt < new Date()) {
             return {
                 success: false,
@@ -540,7 +650,6 @@ export const verifyUserEmailToken = async (token) => {
             };
         }
 
-        // Check if token was already used
         if (verificationToken.usedAt) {
             return {
                 success: false,
@@ -548,11 +657,9 @@ export const verifyUserEmailToken = async (token) => {
             };
         }
 
-        // Start database transaction for data integrity
         const result = await prisma.$transaction(async (tx) => {
-            // Update user email verification status
             const updatedUser = await tx.user.update({
-                where: { id: verificationToken.userId },
+                where: { id: verificationToken.userId }, // Use string userId
                 data: {
                     emailVerified: true,
                 },
@@ -568,7 +675,6 @@ export const verifyUserEmailToken = async (token) => {
                 },
             });
 
-            // Mark token as used
             await tx.emailVerificationToken.update({
                 where: { id: verificationToken.id },
                 data: { usedAt: new Date() },
@@ -577,7 +683,6 @@ export const verifyUserEmailToken = async (token) => {
             return updatedUser;
         });
 
-        // Generate JWT token for auto-login after verification
         const authToken = jwt.sign(
             {
                 userId: result.id,
@@ -588,7 +693,6 @@ export const verifyUserEmailToken = async (token) => {
             { expiresIn: "7d" }
         );
 
-        // Determine if user needs profile completion
         const requiresProfileCompletion = !result.isProfileComplete;
 
         return {

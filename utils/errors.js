@@ -46,3 +46,27 @@ export class NotFoundError extends AppError {
     super(message, 404);
   }
 }
+// utils/errors.js
+export class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "BadRequestError";
+    this.statusCode = 400;
+  }
+}
+
+export class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "UnauthorizedError";
+    this.statusCode = 403;
+  }
+}
+export class TooManyRequestsError extends Error {
+  constructor(message, errorCode) {
+    super(message);
+    this.name = "TooManyRequestsError";
+    this.statusCode = 429;
+    this.errorCode = errorCode || "TOO_MANY_REQUESTS";
+  }
+}

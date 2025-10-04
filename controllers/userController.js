@@ -147,7 +147,6 @@ export const registerUser = async (req, res) => {
                 userId: user.id,
                 verificationType: "phone",
                 contactInfo: user.phoneNumber,
-                contactInfo: user.phoneNumber,
                 requiresProfileCompletion: true,
             });
         } else {
@@ -229,9 +228,6 @@ export const verifyEmailOtp = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   3. Phone OTP Verification
-============================================================================ */
 export const verifyPhoneOtp = async (req, res) => {
     try {
         const { phoneNumber, otp } = req.body;
@@ -297,107 +293,12 @@ export const verifyPhoneOtp = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   4. Complete User Profile (after OTP verification)
-============================================================================ */
-// export const completeProfile = async (req, res) => {
-//   try {
-//     const { userId, name, password } = req.body;
-
-//     // Validation
-//     if (!userId || !name || !password) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'User ID, name, and password are required.'
-//       });
-//     }
-
-//     if (password.length < 8) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Password must be at least 8 characters long.'
-//       });
-//     }
-
-//     // Find user
-//     const user = await findUserById(userId);
-//     if (!user) {
-//       return res.status(404).json({
-//         success: false,
-//         message: 'User not found.'
-//       });
-//     }
-
-//     // Check if user is verified
-//     if (!user.emailVerified && !user.phoneVerified) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Please verify your email or phone first.'
-//       });
-//     }
-
-//     // Hash password
-//     const saltRounds = 12;
-//     const hashedPassword = await bcrypt.hash(password.trim(), saltRounds);
-
-//     // Update user profile
-//     const updateData = {
-//       name: name.trim(),
-//       password: hashedPassword,
-//       isProfileComplete: true,
-//       updatedAt: new Date()
-//     };
-
-//     const updatedUser = await prisma.user.update({
-//       where: { id: Number(userId) },
-//       data: updateData,
-//       select: {
-//         id: true,
-//         name: true,
-//         email: true,
-//         phoneNumber: true,
-//         emailVerified: true,
-//         phoneVerified: true,
-//         isProfileComplete: true,
-//         role: true,
-//         createdAt: true,
-//         updatedAt: true
-//       }
-//     });
-
-//     console.log('Profile completed for user:', userId);
-
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Profile completed successfully.',
-//       token: issueJwt(updatedUser.id),
-//       user: updatedUser
-//     });
-
-//   } catch (err) {
-//     console.error('Profile completion error:', err);
-
-//     if (err.code === 'P2002') {
-//       return res.status(409).json({
-//         success: false,
-//         message: 'Profile information already exists.'
-//       });
-//     }
-
-//     return res.status(500).json({
-//       success: false,
-//       message: 'Internal server error. Please try again.'
-//     });
-//   }
-// };
-
 export const completeProfile = async (req, res) => {
     try {
         const {
             userId,
             name,
             password,
-            // Optional profile fields
             username,
             fullName,
             country,
@@ -450,7 +351,7 @@ export const completeProfile = async (req, res) => {
             const existingUsername = await prisma.user.findFirst({
                 where: {
                     username: username.trim().toLowerCase(),
-                    NOT: { id: Number(userId) },
+                    NOT: { id: userId }, // Use string userId
                 },
             });
 
@@ -466,7 +367,7 @@ export const completeProfile = async (req, res) => {
         const saltRounds = 12;
         const hashedPassword = await bcrypt.hash(password.trim(), saltRounds);
 
-        // Build update data (only include fields that are provided)
+        // Build update data
         const updateData = {
             name: name.trim(),
             password: hashedPassword,
@@ -482,7 +383,7 @@ export const completeProfile = async (req, res) => {
         if (zip) updateData.zip = zip.trim();
 
         const updatedUser = await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId
             data: updateData,
             select: {
                 id: true,
@@ -515,7 +416,6 @@ export const completeProfile = async (req, res) => {
         console.error("Profile completion error:", err);
 
         if (err.code === "P2002") {
-            // Handle unique constraint violations
             const target = err.meta?.target;
             if (target?.includes("username")) {
                 return res.status(409).json({
@@ -627,61 +527,6 @@ export const loginUser = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   6. Update User Profile (Protected Route)
-============================================================================ */
-// export const updateUserProfile = async (req, res) => {
-//   try {
-//     if (!req.user || !req.user.id) {
-//       return res.status(401).json({ success: false, message: "Unauthorized" });
-//     }
-//     if (!req.body || Object.keys(req.body).length === 0) {
-//       return res.status(400).json({ success: false, message: 'No update fields provided.' });
-//     }
-
-//     const userId = req.user.id;
-
-//     // Remove fields that have dedicated endpoints (excluding phone since we're not implementing it)
-//     const {
-//       email,           // Has dedicated email change flow
-//       password,        // Has dedicated password change flow
-//       ...updateFields
-//     } = req.body;
-
-//     // Validate excluded fields
-//     if (email !== undefined) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Email changes must use /request-email-change endpoint'
-//       });
-//     }
-//     if (password !== undefined) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Password changes must use /change-password endpoint'
-//       });
-//     }
-
-//     await updateProfile(userId, updateFields);
-
-//     const user = await findUserById(userId);
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: 'User not found.' });
-//     }
-
-//     res.json({ success: true, message: 'Profile updated', user });
-//   } catch (err) {
-//     let msg = err.message || 'Profile update failed';
-//     if (err.code === 'P2002') {
-//       msg = 'Email or phone number already exists.';
-//     }
-//     res.status(400).json({ success: false, message: msg });
-//   }
-// };
-
-// POST /request-email-change
-// POST /request-email-change
-// POST /request-email-change
 export const updateUserProfile = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
@@ -700,8 +545,8 @@ export const updateUserProfile = async (req, res) => {
 
         // Remove fields that have dedicated endpoints
         const {
-            email, // Has dedicated email change flow
-            password, // Has dedicated password change flow
+            email,
+            password,
             ...updateFields
         } = req.body;
 
@@ -720,7 +565,6 @@ export const updateUserProfile = async (req, res) => {
             });
         }
 
-
         // Username validation
         if (updateFields.username !== undefined) {
             if (updateFields.username && updateFields.username.length < 3) {
@@ -733,7 +577,7 @@ export const updateUserProfile = async (req, res) => {
                 const existingUsername = await prisma.user.findFirst({
                     where: {
                         username: updateFields.username.trim().toLowerCase(),
-                        NOT: { id: Number(userId) },
+                        NOT: { id: userId }, // Use string userId
                     },
                 });
                 if (existingUsername) {
@@ -771,7 +615,6 @@ export const updateUserProfile = async (req, res) => {
     } catch (err) {
         let msg = err.message || "Profile update failed";
 
-        // Enhanced error handling for P2002 constraints
         if (err.code === "P2002") {
             const target = err.meta?.target;
             if (target?.includes("username")) {
@@ -799,7 +642,7 @@ export const requestEmailChange = async (req, res) => {
             return res.status(400).json({ error: "Invalid email format" });
 
         const user = await prisma.user.findUnique({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId
         });
         if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -809,16 +652,16 @@ export const requestEmailChange = async (req, res) => {
                 .json({ error: "New email is the same as current email" });
 
         const existing = await prisma.user.findFirst({
-            where: { email: newEmail, NOT: { id: Number(userId) } },
+            where: { email: newEmail, NOT: { id: userId } }, // Use string userId
         });
         if (existing)
             return res.status(409).json({ error: "Email already in use" });
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        await storeEmailOTP(Number(userId), otp, "EMAIL_CHANGE");
+        await storeEmailOTP(userId, otp, "EMAIL_CHANGE"); // Use string userId
 
         await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId
             data: {
                 resetToken: `EMAIL_CHANGE:${newEmail}`,
                 pendingEmail: newEmail,
@@ -835,7 +678,6 @@ export const requestEmailChange = async (req, res) => {
     }
 };
 
-// POST /verify-email-change
 export const verifyEmailChange = async (req, res) => {
     try {
         const userId = req.user.userId || req.user.id;
@@ -867,7 +709,7 @@ export const verifyEmailChange = async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // Extract new email from resetToken (where you stored "EMAIL_CHANGE:newEmail")
+        // Extract new email from resetToken
         const newEmail = user.resetToken?.replace("EMAIL_CHANGE:", "").trim();
         if (!newEmail || !validator.isEmail(newEmail)) {
             return res
@@ -883,7 +725,7 @@ export const verifyEmailChange = async (req, res) => {
 
         // Clear the resetToken
         await prisma.user.update({
-            where: { id: Number(userId) },
+            where: { id: userId }, // Use string userId
             data: {
                 resetToken: null,
                 pendingEmail: null,
@@ -907,219 +749,210 @@ export const verifyEmailChange = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   7. Phone Change Functions
-============================================================================ */
-
 export const requestPhoneChange = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { newPhoneNumber } = req.body;
+    try {
+        const userId = req.user.id;
+        const { newPhoneNumber } = req.body;
 
-    // Input validation
-    if (!newPhoneNumber) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'New phone number is required.' 
-      });
+        // Input validation
+        if (!newPhoneNumber) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'New phone number is required.' 
+            });
+        }
+
+        // Validate phone number format
+        if (!validator.isMobilePhone(newPhoneNumber)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid phone number format.' 
+            });
+        }
+
+        // Check if phone number is already in use
+        const existingUser = await prisma.user.findUnique({
+            where: { phoneNumber: newPhoneNumber }
+        });
+
+        if (existingUser && existingUser.id !== userId) {
+            return res.status(409).json({ 
+                success: false, 
+                message: 'Phone number already in use.' 
+            });
+        }
+
+        // Get current user
+        const user = await prisma.user.findUnique({
+            where: { id: userId } // Use string userId
+        });
+
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'User not found.' 
+            });
+        }
+
+        // Check if user is trying to set the same phone number
+        if (user.phoneNumber === newPhoneNumber) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'New phone number cannot be the same as current phone number.' 
+            });
+        }
+
+        // Generate OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        // Clear any existing phone OTPs for this user
+        await prisma.phoneOTP.deleteMany({ where: { userId } }); // Use string userId
+        
+        // Store OTP in database using PhoneOTP model
+        await prisma.phoneOTP.create({
+            data: {
+                userId, // Use string userId
+                otp: otp,
+                expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+                type: 'PHONE_CHANGE',
+                attempts: 0,
+                isUsed: false,
+                maxAttempts: 3
+            }
+        });
+
+        // Store new phone number in user's resetToken field with prefix
+        await prisma.user.update({
+            where: { id: userId }, // Use string userId
+            data: { resetToken: `PHONE_CHANGE:${newPhoneNumber}` }
+        });
+
+        // Send OTP via SMS
+        await sendOTP(newPhoneNumber, otp, 'phone-change');
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'OTP sent to new phone number successfully.' 
+        });
+    } catch (err) {
+        console.error('requestPhoneChange error:', err);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
     }
-
-    // Validate phone number format
-    if (!validator.isMobilePhone(newPhoneNumber)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid phone number format.' 
-      });
-    }
-
-    // Check if phone number is already in use
-    const existingUser = await prisma.user.findUnique({
-      where: { phoneNumber: newPhoneNumber }
-    });
-
-    if (existingUser && existingUser.id !== userId) {
-      return res.status(409).json({ 
-        success: false, 
-        message: 'Phone number already in use.' 
-      });
-    }
-
-    // Get current user
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'User not found.' 
-      });
-    }
-
-    // Check if user is trying to set the same phone number
-    if (user.phoneNumber === newPhoneNumber) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'New phone number cannot be the same as current phone number.' 
-      });
-    }
-
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Clear any existing phone OTPs for this user
-    await prisma.phoneOTP.deleteMany({ where: { userId: Number(userId) } });
-    
-    // Store OTP in database using PhoneOTP model
-    await prisma.phoneOTP.create({
-      data: {
-        userId: Number(userId),
-        otp: otp,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-        type: 'PHONE_CHANGE',
-        attempts: 0,
-        isUsed: false,
-        maxAttempts: 3
-      }
-    });
-
-    // Store new phone number in user's resetToken field with prefix
-    await prisma.user.update({
-      where: { id: Number(userId) },
-      data: { resetToken: `PHONE_CHANGE:${newPhoneNumber}` }
-    });
-
-    // Send OTP via SMS
-    await sendOTP(newPhoneNumber, otp, 'phone-change');
-
-    return res.status(200).json({ 
-      success: true, 
-      message: 'OTP sent to new phone number successfully.' 
-    });
-
-  } catch (err) {
-    console.error('requestPhoneChange error:', err);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
-    });
-  }
 };
 
 export const verifyPhoneChange = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { otp } = req.body;
+    try {
+        const userId = req.user.id;
+        const { otp } = req.body;
 
-    // Input validation
-    if (!otp) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'OTP is required.' 
-      });
-    }
-
-    // Find the OTP record in PhoneOTP model
-    const otpRecord = await prisma.phoneOTP.findFirst({
-      where: {
-        userId: Number(userId),
-        otp: otp,
-        type: 'PHONE_CHANGE',
-        isUsed: false,
-        expiresAt: {
-          gt: new Date()
+        // Input validation
+        if (!otp) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'OTP is required.' 
+            });
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
 
-    if (!otpRecord) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Invalid or expired OTP.' 
-      });
-    }
+        // Find the OTP record in PhoneOTP model
+        const otpRecord = await prisma.phoneOTP.findFirst({
+            where: {
+                userId, // Use string userId
+                otp: otp,
+                type: 'PHONE_CHANGE',
+                isUsed: false,
+                expiresAt: {
+                    gt: new Date()
+                }
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
 
-    // Get the user to retrieve the new phone number from resetToken
-    const user = await prisma.user.findUnique({
-      where: { id: Number(userId) }
-    });
-
-    if (!user || !user.resetToken || !user.resetToken.startsWith('PHONE_CHANGE:')) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Phone change session not found.' 
-      });
-    }
-
-    const newPhoneNumber = user.resetToken.replace('PHONE_CHANGE:', '');
-
-    // Check if the new phone number is still available
-    const existingUser = await prisma.user.findUnique({
-      where: { phoneNumber: newPhoneNumber }
-    });
-
-    if (existingUser && existingUser.id !== userId) {
-      // Delete the OTP record and clear resetToken
-      await prisma.$transaction([
-        prisma.phoneOTP.update({
-          where: { id: otpRecord.id },
-          data: { isUsed: true }
-        }),
-        prisma.user.update({
-          where: { id: Number(userId) },
-          data: { resetToken: null }
-        })
-      ]);
-
-      return res.status(409).json({ 
-        success: false, 
-        message: 'Phone number is no longer available.' 
-      });
-    }
-
-    // Update user's phone number, mark OTP as used, and clear resetToken
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: Number(userId) },
-        data: { 
-          phoneNumber: newPhoneNumber,
-          resetToken: null 
+        if (!otpRecord) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid or expired OTP.' 
+            });
         }
-      }),
-      prisma.phoneOTP.update({
-        where: { id: otpRecord.id },
-        data: { isUsed: true }
-      })
-    ]);
 
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Phone number updated successfully.' 
-    });
+        // Get the user to retrieve the new phone number from resetToken
+        const user = await prisma.user.findUnique({
+            where: { id: userId } // Use string userId
+        });
 
-  } catch (err) {
-    console.error('verifyPhoneChange error:', err);
-    
-    if (err.code === 'P2002') {
-      return res.status(409).json({ 
-        success: false, 
-        message: 'Phone number already in use' 
-      });
+        if (!user || !user.resetToken || !user.resetToken.startsWith('PHONE_CHANGE:')) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Phone change session not found.' 
+            });
+        }
+
+        const newPhoneNumber = user.resetToken.replace('PHONE_CHANGE:', '');
+
+        // Check if the new phone number is still available
+        const existingUser = await prisma.user.findUnique({
+            where: { phoneNumber: newPhoneNumber }
+        });
+
+        if (existingUser && existingUser.id !== userId) {
+            // Delete the OTP record and clear resetToken
+            await prisma.$transaction([
+                prisma.phoneOTP.update({
+                    where: { id: otpRecord.id },
+                    data: { isUsed: true }
+                }),
+                prisma.user.update({
+                    where: { id: userId }, // Use string userId
+                    data: { resetToken: null }
+                })
+            ]);
+
+            return res.status(409).json({ 
+                success: false, 
+                message: 'Phone number is no longer available.' 
+            });
+        }
+
+        // Update user's phone number, mark OTP as used, and clear resetToken
+        await prisma.$transaction([
+            prisma.user.update({
+                where: { id: userId }, // Use string userId
+                data: { 
+                    phoneNumber: newPhoneNumber,
+                    resetToken: null 
+                }
+            }),
+            prisma.phoneOTP.update({
+                where: { id: otpRecord.id },
+                data: { isUsed: true }
+            })
+        ]);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Phone number updated successfully.' 
+        });
+    } catch (err) {
+        console.error('verifyPhoneChange error:', err);
+        
+        if (err.code === 'P2002') {
+            return res.status(409).json({ 
+                success: false, 
+                message: 'Phone number already in use' 
+            });
+        }
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Internal server error' 
+        });
     }
-    
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Internal server error' 
-    });
-  }
 };
 
-/* ===========================================================================
-   8. Resend Email Verification
-============================================================================ */
 export const resendVerificationEmail = async (req, res) => {
     try {
         const { email } = req.body;
@@ -1157,8 +990,7 @@ export const resendVerificationEmail = async (req, res) => {
             });
         }
 
-        // For security (email enumeration protection), we send the same generic response
-        // whether the user exists or not
+        // For security (email enumeration protection)
         return res.status(200).json({
             success: true,
             message:
@@ -1173,9 +1005,6 @@ export const resendVerificationEmail = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   8. Email Verification via Link
-============================================================================ */
 export const verifyEmail = async (req, res) => {
     try {
         const token = req.query.token;
@@ -1236,9 +1065,6 @@ export const checkUserExistence = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   NEW: Unified Send OTP (for both new and existing users)
-============================================================================ */
 export const sendUnifiedOTP = async (req, res) => {
     try {
         const { emailOrPhone } = req.body;
@@ -1289,7 +1115,6 @@ export const sendUnifiedOTP = async (req, res) => {
             await sendOTP(emailOrPhone.trim(), otp);
         } else {
             await storeEmailOTP(userId, otp);
-            // For email, you might want to send both token and OTP
             const token = await createEmailVerificationToken(userId);
             await sendVerificationEmail(
                 emailOrPhone.trim(),
@@ -1302,7 +1127,7 @@ export const sendUnifiedOTP = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "OTP sent successfully",
-            userId: isNewUser ? userId : undefined, // Only return userId for new users
+            userId: isNewUser ? userId : undefined,
             userExists: !isNewUser,
             contactType,
         });
@@ -1315,9 +1140,6 @@ export const sendUnifiedOTP = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   NEW: Enhanced Check User (for dynamic auth flow)
-============================================================================ */
 export const checkUserForAuth = async (req, res) => {
     try {
         const { emailOrPhone } = req.body;
@@ -1337,15 +1159,12 @@ export const checkUserForAuth = async (req, res) => {
         if (!user) {
             return res.status(200).json({
                 exists: false,
-                loginMethods: ["otp"], // New users can only use OTP initially
+                loginMethods: ["otp"],
                 requiresRegistration: true,
             });
         }
 
-        // Determine available login methods for existing users
-        const loginMethods = ["otp"]; // OTP always available
-
-        // Add password option if user has verified contact and password
+        const loginMethods = ["otp"];
         const hasVerifiedContact = isPhone
             ? user.phoneVerified
             : user.emailVerified;
@@ -1369,9 +1188,6 @@ export const checkUserForAuth = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   NEW: Send OTP to Existing Users (separate endpoints)
-============================================================================ */
 export const sendEmailOTPToExisting = async (req, res) => {
     try {
         const { email } = req.body;
@@ -1394,8 +1210,6 @@ export const sendEmailOTPToExisting = async (req, res) => {
         // Generate and send OTP
         const otp = String(Math.floor(100000 + Math.random() * 900000));
         await storeEmailOTP(user.id, otp);
-
-        // Create token for email verification
         const token = await createEmailVerificationToken(user.id);
         await sendVerificationEmail(
             user.email,
@@ -1477,23 +1291,17 @@ export const verifyAccountDeletion = async (req, res) => {
     }
 };
 
-/* ===========================================================================
-   9. Get User Profile (Protected Route)
-============================================================================ */
 export const getUserProfile = async (req, res) => {
     try {
-        // The user's ID is attached to the request object by the authentication middleware.
         const userId = req.user?.id;
 
         if (!userId) {
-            // This case should ideally be caught by the auth middleware, but it's good practice to double-check.
             return res.status(401).json({
                 success: false,
                 message: "Unauthorized: No user ID found in token.",
             });
         }
 
-        // Use the existing 'findUserById' service to get the user's data.
         const user = await findUserById(userId);
 
         if (!user) {
@@ -1503,22 +1311,19 @@ export const getUserProfile = async (req, res) => {
             });
         }
 
-        // IMPORTANT: Exclude sensitive information like the password before sending the response.
-        // The 'user' object from findUserById already excludes the password, which is great.
-        // We will explicitly return the fields to ensure no sensitive data is ever leaked.
         const userProfile = {
             id: user.id,
             name: user.name,
-            username: user.username || "", // Fallback for missing field
-            fullName: user.fullName || "", // Fallback for missing field
+            username: user.username || "",
+            fullName: user.fullName || "",
             email: user.email,
             phoneNumber: user.phoneNumber,
             emailVerified: user.emailVerified,
             phoneVerified: user.phoneVerified,
             isProfileComplete: user.isProfileComplete,
-            country: user.country || "INDIA", // Fallback for missing field
-            state: user.state || "Punjab", // Fallback for missing field
-            zip: user.zip || "144410", // Fallback for missing field
+            country: user.country || "INDIA",
+            state: user.state || "Punjab",
+            zip: user.zip || "144410",
             dob: user.dob || null,
             createdAt: user.createdAt,
         };

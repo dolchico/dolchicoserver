@@ -7,6 +7,9 @@ import {
   getProductById,
   searchProductsService,
 } from '../services/productService.js';
+import prisma from '../lib/prisma.js'; // For direct Prisma access in bulk logic
+import { generateProductSlug } from '../utils/seoUtils.js';
+import { generateSKU } from '../utils/inventoryUtils.js';
 
 // Utility to convert BigInt fields to numbers for JSON serialization
 const convertBigIntFields = (data) => {
@@ -38,105 +41,206 @@ const convertBigIntFields = (data) => {
   return typeof data === 'bigint' ? Number(data) : data;
 };
 
-// ✅ Add Product - REVISED FOR RELATIONAL SCHEMA
+// ✅ Add Product - Overloaded for both single and bulk (JSON with products array)
 const addProduct = async (req, res) => {
   try {
-  // CHANGED: Only require `subcategoryId`. We'll derive `categoryId` server-side to ensure consistency.
-  const { name, description, price, subcategoryId, sizes, bestseller, sku, weight, dimensions, tags, seoSlug, compareAtPrice } = req.body;
-
-  // --- Validation for new required fields ---
-  if (!subcategoryId) {
-    return res.status(400).json({ success: false, message: 'subcategoryId is a required field.' });
-  }
-
-    // Expect req.files to be an array of up to 6 files (from multer.array('images', 6))
-    const files = Array.isArray(req.files) ? req.files : [];
-
-    // Basic input validation before uploading
-    if (!name || !description || !price) {
-      return res.status(400).json({ success: false, message: 'Missing required fields: name, description, or price' });
+    // Check if this is a bulk add (JSON body with 'products' array or direct array)
+    let rawProducts;
+    if (Array.isArray(req.body)) {
+      rawProducts = req.body;
+    } else {
+      rawProducts = req.body.products;
     }
+    if (rawProducts && Array.isArray(rawProducts) && rawProducts.length > 0) {
+      // Bulk add logic
+      console.log(`Starting bulk import of ${rawProducts.length} products...`);
 
-    if (files.length === 0) {
-      return res.status(400).json({ success: false, message: 'At least one image is required.' });
-    }
+      const createdProducts = [];
+      const errors = [];
+      let successCount = 0;
+      let errorCount = 0;
 
-    // Upload buffers to Cloudinary using upload_stream and return secure_url + public_id
-    const uploadToCloudinary = (fileBuffer, fileName) => new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: 'products' }, (error, result) => {
-        if (error) return reject(error);
-        resolve({ secure_url: result.secure_url, public_id: result.public_id });
-      });
-      stream.end(fileBuffer);
-    });
+      for (const rawProd of rawProducts) {
+        try {
+          // Basic validation per product
+          if (!rawProd.name || !rawProd.description || !rawProd.price || !rawProd.categoryId || !rawProd.subcategoryId) {
+            throw new Error('Missing required fields: name, description, price, categoryId, or subcategoryId');
+          }
 
-    // Validate and upload files (limit to 6)
-    const uploadResults = [];
-    try {
-      for (const file of files.slice(0, 6)) {
-        if (!file || !file.buffer) throw new Error('Uploaded file buffer missing');
-        const r = await uploadToCloudinary(file.buffer, file.originalname);
-        uploadResults.push(r);
+          // Handle price logic: Keep original price, set discountedPrice if provided
+          const currentPrice = toPrismaDecimal(rawProd.price);
+          const discountedPrice = rawProd.discountedPrice ? toPrismaDecimal(rawProd.discountedPrice) : null;
+          const compareAtPrice = rawProd.compareAtPrice ? toPrismaDecimal(rawProd.compareAtPrice) : currentPrice;
+
+          // Prepare product data (map schema-compatible fields)
+          const productData = {
+            name: rawProd.name,
+            description: rawProd.description,
+            price: currentPrice,
+            discountedPrice,
+            discountPercent: rawProd.discountPercent,
+            ageGroupStart: rawProd.ageGroupStart,
+            ageGroupEnd: rawProd.ageGroupEnd,
+            brand: rawProd.brand,
+            color: Array.isArray(rawProd.color) ? rawProd.color : [],
+            image: Array.isArray(rawProd.image) ? rawProd.image : [],
+            sizes: Array.isArray(rawProd.sizes) ? rawProd.sizes : [],
+            bestseller: !!rawProd.bestseller,
+            isActive: !!rawProd.isActive,
+            stock: rawProd.stock || 0,
+            date: BigInt(rawProd.date || Date.now()),
+            tags: Array.isArray(rawProd.tags) ? rawProd.tags : [],
+            averageRating: rawProd.averageRating || 0,
+            reviewsCount: rawProd.reviewsCount || 0,
+            sku: rawProd.sku, // Let service generate if undefined
+            weight: rawProd.weight ? toPrismaDecimal(rawProd.weight) : null,
+            dimensions: rawProd.dimensions,
+            seoSlug: rawProd.seoSlug, // Let service generate if undefined
+            compareAtPrice,
+            subcategoryId: Number(rawProd.subcategoryId), // Ensure it's a number
+            // categoryId is derived from subcategoryId in the service
+          };
+
+          // Create the product via service (which derives categoryId and generates SKU/slug if needed)
+          const createdProduct = await createProduct(productData);
+
+          // Serialize for response
+          const serializedProduct = convertBigIntFields({
+            ...createdProduct,
+            date: createdProduct.date?.toString() || null,
+            createdAt: createdProduct.createdAt?.toISOString() || null,
+            updatedAt: createdProduct.updatedAt?.toISOString() || null,
+          });
+
+          createdProducts.push(serializedProduct);
+          successCount++;
+          console.log(`✅ Imported product: ${createdProduct.name} (ID: ${createdProduct.id})`);
+
+        } catch (err) {
+          errorCount++;
+          errors.push({ product: rawProd.name || 'Unknown', error: err.message });
+          console.error(`❌ Failed to import ${rawProd.name || 'Unknown'}: ${err.message}`);
+        }
       }
-    } catch (uploadErr) {
-      console.error('Image upload failed:', uploadErr);
-      return res.status(500).json({ success: false, message: 'Image upload failed', error: uploadErr.message });
-    }
 
-    const imagesUrl = uploadResults.map(r => r.secure_url);
-    const uploadedPublicIds = uploadResults.map(r => r.public_id).filter(Boolean);
-    
-    // CHANGED: Construct productData with subcategoryId only; service will derive categoryId.
-    const parseMaybeJsonArray = (val) => {
-      if (!val) return [];
-      if (Array.isArray(val)) return val;
-      const strVal = String(val);
-      try { return JSON.parse(strVal); } catch (e) { return [strVal]; }
-    };
+      // Response for bulk
+      const response = {
+        success: errorCount === 0,
+        message: `Bulk import complete! Success: ${successCount}, Errors: ${errorCount}`,
+        products: createdProducts,
+        errors, // Include errors for debugging
+      };
 
-    const productData = {
-      name,
-      description,
-      price: toPrismaDecimal(price),
-      bestseller: bestseller === 'true',
-      sizes: parseMaybeJsonArray(sizes),
-      image: imagesUrl,
-      date: Date.now(),
-      // New e-commerce fields
-      sku,
-      weight: weight ? parseFloat(weight) : null,
-      dimensions: dimensions ? JSON.parse(dimensions) : null,
-      tags: parseMaybeJsonArray(tags),
-      seoSlug,
-      compareAtPrice: compareAtPrice ? toPrismaDecimal(compareAtPrice) : null,
-      // Do not accept categoryId from client. Only pass subcategoryId; service will derive categoryId.
-      subcategoryId: Number(subcategoryId), // Ensure it's a number
-    };
-    // Create product and handle cleanup if creation fails after uploads
-    let createdProduct = null;
-    try {
-      createdProduct = await createProduct(productData);
-    } catch (createErr) {
-      console.error('Product creation failed, cleaning up uploaded images...', createErr);
-      // Attempt to delete uploaded images to avoid orphaned uploads
-      await Promise.all(uploadedPublicIds.map(id => new Promise((resolve) => {
-        cloudinary.uploader.destroy(id, { resource_type: 'image' }, (err, result) => {
-          if (err) console.error('Failed to delete uploaded image', id, err);
-          resolve(result);
+      return res.status(response.success ? 201 : 207).json(response); // 207 Multi-Status for partial success
+
+    } else {
+      // Single add logic (with file uploads)
+      // CHANGED: Only require `subcategoryId`. We'll derive `categoryId` server-side to ensure consistency.
+      const { name, description, price, subcategoryId, sizes, bestseller, sku, weight, dimensions, tags, seoSlug, compareAtPrice, discountedPrice, discountPercent, ageGroupStart, ageGroupEnd, brand, color, averageRating, reviewsCount, stock } = req.body;
+
+      // --- Validation for new required fields ---
+      if (!subcategoryId) {
+        return res.status(400).json({ success: false, message: 'subcategoryId is a required field.' });
+      }
+
+      // Expect req.files to be an array of up to 6 files (from multer.array('images', 6))
+      const files = Array.isArray(req.files) ? req.files : [];
+
+      // Basic input validation before uploading
+      if (!name || !description || !price) {
+        return res.status(400).json({ success: false, message: 'Missing required fields: name, description, or price' });
+      }
+
+      if (files.length === 0) {
+        return res.status(400).json({ success: false, message: 'At least one image is required.' });
+      }
+
+      // Upload buffers to Cloudinary using upload_stream and return secure_url + public_id
+      const uploadToCloudinary = (fileBuffer, fileName) => new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: 'products' }, (error, result) => {
+          if (error) return reject(error);
+          resolve({ secure_url: result.secure_url, public_id: result.public_id });
         });
-      })));
+        stream.end(fileBuffer);
+      });
 
-      return res.status(500).json({ success: false, message: 'Product creation failed', error: createErr.message });
+      // Validate and upload files (limit to 6)
+      const uploadResults = [];
+      try {
+        for (const file of files.slice(0, 6)) {
+          if (!file || !file.buffer) throw new Error('Uploaded file buffer missing');
+          const r = await uploadToCloudinary(file.buffer, file.originalname);
+          uploadResults.push(r);
+        }
+      } catch (uploadErr) {
+        console.error('Image upload failed:', uploadErr);
+        return res.status(500).json({ success: false, message: 'Image upload failed', error: uploadErr.message });
+      }
+
+      const imagesUrl = uploadResults.map(r => r.secure_url);
+      const uploadedPublicIds = uploadResults.map(r => r.public_id).filter(Boolean);
+      
+      // CHANGED: Construct productData with subcategoryId only; service will derive categoryId.
+      const parseMaybeJsonArray = (val) => {
+        if (!val) return [];
+        if (Array.isArray(val)) return val;
+        const strVal = String(val);
+        try { return JSON.parse(strVal); } catch (e) { return [strVal]; }
+      };
+
+      const productData = {
+        name,
+        description,
+        price: toPrismaDecimal(price),
+        discountedPrice: discountedPrice ? toPrismaDecimal(discountedPrice) : null,
+        discountPercent: discountPercent ? parseInt(discountPercent) : null,
+        ageGroupStart: ageGroupStart ? parseInt(ageGroupStart) : null,
+        ageGroupEnd: ageGroupEnd ? parseInt(ageGroupEnd) : null,
+        brand,
+        color: parseMaybeJsonArray(color),
+        bestseller: bestseller === 'true',
+        sizes: parseMaybeJsonArray(sizes),
+        image: imagesUrl,
+        stock: stock ? parseInt(stock) : 0,
+        date: Date.now(),
+        // New e-commerce fields
+        sku,
+        weight: weight ? toPrismaDecimal(weight) : null,
+        dimensions: dimensions ? JSON.parse(dimensions) : null,
+        tags: parseMaybeJsonArray(tags),
+        averageRating: averageRating ? parseFloat(averageRating) : 0,
+        reviewsCount: reviewsCount ? parseInt(reviewsCount) : 0,
+        seoSlug,
+        compareAtPrice: compareAtPrice ? toPrismaDecimal(compareAtPrice) : null,
+        // Do not accept categoryId from client. Only pass subcategoryId; service will derive categoryId.
+        subcategoryId: Number(subcategoryId), // Ensure it's a number
+      };
+      // Create product and handle cleanup if creation fails after uploads
+      let createdProduct = null;
+      try {
+        createdProduct = await createProduct(productData);
+      } catch (createErr) {
+        console.error('Product creation failed, cleaning up uploaded images...', createErr);
+        // Attempt to delete uploaded images to avoid orphaned uploads
+        await Promise.all(uploadedPublicIds.map(id => new Promise((resolve) => {
+          cloudinary.uploader.destroy(id, { resource_type: 'image' }, (err, result) => {
+            if (err) console.error('Failed to delete uploaded image', id, err);
+            resolve(result);
+          });
+        })));
+
+        return res.status(500).json({ success: false, message: 'Product creation failed', error: createErr.message });
+      }
+
+      // Success for single
+      const serializedProduct = convertBigIntFields({
+        ...createdProduct,
+        date: createdProduct.date?.toString() || null,
+        createdAt: createdProduct.createdAt?.toISOString() || null,
+        updatedAt: createdProduct.updatedAt?.toISOString() || null,
+      });
+      return res.status(201).json({ success: true, message: 'Product Added', product: serializedProduct });
     }
-
-    // Success
-    const serializedProduct = convertBigIntFields({
-      ...createdProduct,
-      date: createdProduct.date?.toString() || null,
-      createdAt: createdProduct.createdAt?.toISOString() || null,
-      updatedAt: createdProduct.updatedAt?.toISOString() || null,
-    });
-    return res.status(201).json({ success: true, message: 'Product Added', product: serializedProduct });
   } catch (error) {
     // Log detailed error for debugging
     console.error('addProduct error:', { name: error?.name, message: error?.message, stack: error?.stack });

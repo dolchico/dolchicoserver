@@ -2,44 +2,38 @@ import {
     createOrder,
     getAllOrders,
     getUserOrders,
-    getSingleOrder, // ✅ This is correctly imported
+    getSingleOrder,
     updateOrderStatus,
     addToCart,
 } from "../services/orderService.js";
 import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
+import { validate } from 'uuid';
+import { BadRequestError } from '../utils/errors.js';
 
 /**
- * ✅ Place COD Order
+ * Place COD Order
  */
 export const placeOrder = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user?.id;
+        if (!userId || !validate(userId)) {
+            throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
+        }
         const { items, amount, address } = req.body;
 
         // Validate required fields
         if (!items || !Array.isArray(items) || items.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Items are required and must be a non-empty array",
-            });
+            throw new BadRequestError("Items are required and must be a non-empty array", 'INVALID_ITEMS');
         }
-
         if (!amount || amount <= 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Amount must be greater than 0",
-            });
+            throw new BadRequestError("Amount must be greater than 0", 'INVALID_AMOUNT');
         }
-
         if (!address) {
-            return res.status(400).json({
-                success: false,
-                message: "Address is required",
-            });
+            throw new BadRequestError("Address is required", 'INVALID_ADDRESS');
         }
 
         const order = await createOrder({
-            userId: Number(userId),
+            userId, // Keep as string UUID
             amount: toPrismaDecimal(amount),
             address,
             items,
@@ -54,47 +48,58 @@ export const placeOrder = async (req, res) => {
         });
     } catch (error) {
         console.error("Place Order Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(error.statusCode || 500).json({ success: false, message: error.message });
     }
 };
 
 /**
- * ✅ Add Item to Cart
+ * Add Item to Cart
  */
 export const addItemToCart = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const { productId, size, quantity = 1 } = req.body;
-
-        if (!productId) {
-            return res.status(400).json({
-                success: false,
-                message: "Product ID is required",
-            });
-        }
-
-        if (!size) {
-            return res.status(400).json({
-                success: false,
-                message: "Size is required",
-            });
-        }
-
-        const cartItem = await addToCart(userId, productId, size, quantity);
-
-        res.json({
-            success: true,
-            message: "Item added to cart",
-            cartItem,
-        });
-    } catch (error) {
-        console.error("Add to Cart Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+  try {
+    console.log('[OrderController] Received req.body:', req.body);
+console.log('[OrderController] productId type:', typeof req.body.productId, 'value:', req.body.productId);
+    const userId = req.user?.id;
+    if (!userId || !validate(userId)) {
+      throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
     }
+
+    const { productId, size, quantity = 1 } = req.body;
+
+    // Parse productId to integer (handles string "168" or number 168)
+    const productIdNumber = parseInt(productId, 10);
+    if (isNaN(productIdNumber) || productIdNumber <= 0) {
+      console.log('[OrderController] Invalid productId received:', productId, 'parsed:', productIdNumber);
+      throw new BadRequestError("Product ID is required and must be a valid integer", 'INVALID_PRODUCT_ID');
+    }
+
+    // Parse quantity to integer
+    const quantityNumber = parseInt(quantity, 10);
+    if (isNaN(quantityNumber) || quantityNumber <= 0) {
+      throw new BadRequestError("Quantity must be greater than 0", 'INVALID_QUANTITY');
+    }
+
+    if (!size || typeof size !== 'string' || size.trim().length === 0) {
+      throw new BadRequestError("Size is required", 'INVALID_SIZE');
+    }
+
+    console.log('[OrderController] Adding to cart:', { userId, productId: productIdNumber, size, quantity: quantityNumber });
+
+    const cartItem = await addToCart(userId, productIdNumber, size.trim(), quantityNumber);
+
+    res.json({
+      success: true,
+      message: "Item added to cart",
+      cartItem,
+    });
+  } catch (error) {
+    console.error("Add to Cart Error:", error);
+    res.status(error.statusCode || 500).json({ success: false, message: error.message });
+  }
 };
 
 /**
- * ✅ Get All Orders (Admin)
+ * Get All Orders (Admin)
  */
 export const allOrders = async (req, res) => {
     try {
@@ -102,44 +107,40 @@ export const allOrders = async (req, res) => {
         res.json({ success: true, orders });
     } catch (error) {
         console.error("Get All Orders Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(error.statusCode || 500).json({ success: false, message: error.message });
     }
 };
 
 /**
- * ✅ Get User Orders
+ * Get User Orders
  */
 export const userOrders = async (req, res) => {
     try {
-        const userId = req.user.id;
-        const orders = await getUserOrders(Number(userId));
+        const userId = req.user?.id;
+        if (!userId || !validate(userId)) {
+            throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
+        }
+        const orders = await getUserOrders(userId); // Keep as string UUID
 
         res.json({ success: true, orders });
     } catch (error) {
         console.error("Get User Orders Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(error.statusCode || 500).json({ success: false, message: error.message });
     }
 };
 
 /**
- * ✅ Update Order Status (Admin)
+ * Update Order Status (Admin)
  */
 export const updateStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
 
-        if (!orderId) {
-            return res.status(400).json({
-                success: false,
-                message: "Order ID is required",
-            });
+        if (!orderId || isNaN(orderId) || orderId <= 0) {
+            throw new BadRequestError("Order ID is required and must be a valid integer", 'INVALID_ORDER_ID');
         }
-
         if (!status) {
-            return res.status(400).json({
-                success: false,
-                message: "Status is required",
-            });
+            throw new BadRequestError("Status is required", 'INVALID_STATUS');
         }
 
         const updatedOrder = await updateOrderStatus(orderId, status);
@@ -150,45 +151,39 @@ export const updateStatus = async (req, res) => {
         });
     } catch (error) {
         console.error("Update Order Status Error:", error);
-        res.status(500).json({ success: false, message: error.message });
+        res.status(error.statusCode || 500).json({ success: false, message: error.message });
     }
 };
 
-// ✅ FIXED: Use getSingleOrder instead of getOrderById
+/**
+ * Get Single Order
+ */
 export const getSingleOrderController = async (req, res) => {
     try {
         const { orderId } = req.params;
         const userId = req.user?.id;
 
+        if (!userId || !validate(userId)) {
+            throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
+        }
         if (!orderId || orderId === "undefined" || orderId.trim() === "") {
-            
-            return res.status(400).json({
-                success: false,
-                message: "Order ID is required",
-            });
+            throw new BadRequestError("Order ID is required", 'INVALID_ORDER_ID');
         }
 
-        // Remove the problematic validation temporarily
-        const orderIdNumber = Number(orderId);
-        
-
+        const orderIdNumber = parseInt(orderId, 10);
         if (isNaN(orderIdNumber) || orderIdNumber <= 0) {
-            
-            return res.status(400).json({
-                success: false,
-                message: "Invalid Order ID format",
-            });
+            throw new BadRequestError("Invalid Order ID format", 'INVALID_ORDER_ID');
         }
 
         const order = await getSingleOrder(orderIdNumber, userId);
 
         res.status(200).json({
             success: true,
-            order: order,
+            order,
         });
     } catch (error) {
         console.error("Get Single Order Error:", error);
-        res.status(500).json({
+        res.status(error.statusCode || 500).json({
             success: false,
             message: "Failed to retrieve order",
             error: error.message,

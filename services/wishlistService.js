@@ -1,4 +1,3 @@
-// services/wishlistService.js
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -22,14 +21,18 @@ const productInclude = {
 // Add product to wishlist
 export const addToWishlistService = async (userId, productId) => {
   try {
-    const userIdNum = Number(userId);
-    const productIdNum = Number(productId);
-
-    if (!userIdNum || !productIdNum) {
-      throw new Error('Invalid user ID or product ID');
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid user ID');
     }
 
-    // First check if product exists and is active
+    // Validate productId is a positive integer
+    const productIdNum = Number(productId);
+    if (isNaN(productIdNum) || productIdNum <= 0) {
+      throw new Error('Invalid product ID');
+    }
+
+    // Check if product exists and is active
     const productExists = await prisma.product.findFirst({
       where: { 
         id: productIdNum,
@@ -45,7 +48,7 @@ export const addToWishlistService = async (userId, productId) => {
     const exists = await prisma.wishlist.findUnique({
       where: {
         userId_productId: { 
-          userId: userIdNum, 
+          userId, // Use string userId
           productId: productIdNum
         }
       }
@@ -56,19 +59,16 @@ export const addToWishlistService = async (userId, productId) => {
     }
 
     // Create wishlist entry
-    // Try to create and include subcategory.imageUrl. If the DB is missing that column
-    // Prisma will throw P2022; in that case fallback to a query that excludes imageUrl.
     try {
       const wishlistItem = await prisma.wishlist.create({
         data: {
-          userId: userIdNum,
+          userId, // Use string userId
           productId: productIdNum
         },
         include: {
           product: {
             select: {
               ...productInclude,
-              // override subcategory to select fields explicitly including imageUrl
               subcategory: {
                 select: {
                   id: true,
@@ -83,11 +83,11 @@ export const addToWishlistService = async (userId, productId) => {
       });
       return wishlistItem;
     } catch (error) {
-      // If missing column error for imageUrl, retry without selecting it
+      // Handle missing imageUrl column
       if (error && error.code === 'P2022' && String(error.message).includes('imageUrl')) {
         const wishlistItem = await prisma.wishlist.create({
           data: {
-            userId: userIdNum,
+            userId, // Use string userId
             productId: productIdNum
           },
           include: {
@@ -118,17 +118,21 @@ export const addToWishlistService = async (userId, productId) => {
 // Remove product from wishlist
 export const removeFromWishlistService = async (userId, productId) => {
   try {
-    const userIdNum = Number(userId);
-    const productIdNum = Number(productId);
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid user ID');
+    }
 
-    if (!userIdNum || !productIdNum) {
-      throw new Error('Invalid user ID or product ID');
+    // Validate productId is a positive integer
+    const productIdNum = Number(productId);
+    if (isNaN(productIdNum) || productIdNum <= 0) {
+      throw new Error('Invalid product ID');
     }
 
     const result = await prisma.wishlist.delete({
       where: {
         userId_productId: { 
-          userId: userIdNum, 
+          userId, // Use string userId
           productId: productIdNum
         }
       }
@@ -144,8 +148,8 @@ export const removeFromWishlistService = async (userId, productId) => {
 // Get all wishlist items for a user
 export const getWishlistService = async (userId, options = {}) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
@@ -153,7 +157,7 @@ export const getWishlistService = async (userId, options = {}) => {
     
     // Build where clause
     const where = { 
-      userId: userIdNum,
+      userId, // Use string userId
       product: {
         isActive: true
       }
@@ -198,17 +202,21 @@ export const getWishlistService = async (userId, options = {}) => {
 // Check if a product is in user's wishlist
 export const isProductInWishlistService = async (userId, productId) => {
   try {
-    const userIdNum = Number(userId);
-    const productIdNum = Number(productId);
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid user ID');
+    }
 
-    if (!userIdNum || !productIdNum) {
-      throw new Error('Invalid user ID or product ID');
+    // Validate productId is a positive integer
+    const productIdNum = Number(productId);
+    if (isNaN(productIdNum) || productIdNum <= 0) {
+      throw new Error('Invalid product ID');
     }
 
     const item = await prisma.wishlist.findUnique({
       where: {
         userId_productId: { 
-          userId: userIdNum, 
+          userId, // Use string userId
           productId: productIdNum
         }
       }
@@ -224,14 +232,14 @@ export const isProductInWishlistService = async (userId, productId) => {
 // Get wishlist count for a user
 export const getWishlistCountService = async (userId) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
     const count = await prisma.wishlist.count({
       where: { 
-        userId: userIdNum,
+        userId, // Use string userId
         product: {
           isActive: true
         }
@@ -248,13 +256,13 @@ export const getWishlistCountService = async (userId) => {
 // Clear entire wishlist for a user
 export const clearWishlistService = async (userId) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
     const result = await prisma.wishlist.deleteMany({
-      where: { userId: userIdNum }
+      where: { userId } // Use string userId
     });
 
     return result;
@@ -267,8 +275,8 @@ export const clearWishlistService = async (userId) => {
 // Get wishlist with pagination
 export const getWishlistWithPaginationService = async (userId, page = 1, limit = 10, options = {}) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
@@ -277,7 +285,7 @@ export const getWishlistWithPaginationService = async (userId, page = 1, limit =
     
     // Build where clause
     const where = { 
-      userId: userIdNum,
+      userId, // Use string userId
       product: {
         isActive: true
       }
@@ -333,8 +341,8 @@ export const getWishlistWithPaginationService = async (userId, page = 1, limit =
 // Bulk add products to wishlist
 export const bulkAddToWishlistService = async (userId, productIds) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
@@ -347,7 +355,7 @@ export const bulkAddToWishlistService = async (userId, productIds) => {
       for (const productId of productIds) {
         const productIdNum = Number(productId);
         
-        if (!productIdNum) {
+        if (isNaN(productIdNum) || productIdNum <= 0) {
           errors.push(`Invalid product ID: ${productId}`);
           continue;
         }
@@ -367,7 +375,7 @@ export const bulkAddToWishlistService = async (userId, productIds) => {
         const alreadyInWishlist = await tx.wishlist.findUnique({
           where: {
             userId_productId: { 
-              userId: userIdNum, 
+              userId, // Use string userId
               productId: productIdNum
             }
           }
@@ -385,7 +393,7 @@ export const bulkAddToWishlistService = async (userId, productIds) => {
       if (validProductIds.length > 0) {
         const createResult = await tx.wishlist.createMany({
           data: validProductIds.map(productId => ({
-            userId: userIdNum,
+            userId, // Use string userId
             productId
           })),
           skipDuplicates: true
@@ -411,14 +419,14 @@ export const bulkAddToWishlistService = async (userId, productIds) => {
 // Get wishlist summary (counts by category)
 export const getWishlistSummaryService = async (userId) => {
   try {
-    const userIdNum = Number(userId);
-    if (!userIdNum) {
+    // Validate userId is a non-empty string
+    if (!userId || typeof userId !== 'string') {
       throw new Error('Invalid user ID');
     }
 
     const wishlist = await prisma.wishlist.findMany({
       where: { 
-        userId: userIdNum,
+        userId, // Use string userId
         product: {
           isActive: true
         }
