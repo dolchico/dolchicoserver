@@ -1,18 +1,8 @@
 import * as CategoryService from '../services/category.service.js';
 import * as OfferTypeService from '../services/offerType.service.js';
-import { uploadFile, uploadBuffer } from '../services/cloudinary.service.js';
+import { uploadBuffer } from '../services/cloudinary.service.js'; // Only uploadBuffer for memory storage
 import { Prisma } from '@prisma/client';
-import multer from 'multer';
-import path from 'path';
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: './uploads/',
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-const upload = multer({ storage });
+import upload from '../middleware/multer.js'; // Imported memoryStorage multer - DO NOT REDEFINE LOCALLY!
 
 const handleRequest = (handler) => async (req, res, next) => {
   try {
@@ -32,35 +22,41 @@ const handleRequest = (handler) => async (req, res, next) => {
 };
 
 export const createCategory = handleRequest(async (req, res) => {
-  try {
-    console.log('Raw req.body:', req.body);
-    const payload = { ...req.body };
-    delete payload.id;
-
-    if (req.file) {
-      const secureUrl = req.file.buffer
-        ? await uploadBuffer(req.file.buffer, { folder: 'categories' })
-        : await uploadFile(req.file.path, { folder: 'categories' });
-      payload.imageUrl = secureUrl;
-    }
-
-    console.log('Final payload (id stripped):', payload);
-    const category = await CategoryService.createCategory(payload);
-    res.status(201).json(category);
-  } catch (error) {
-    if (error.code === 'P2002' && error.meta?.target?.includes('id')) {
-      console.error('ID conflict error:', error);
-      return res.status(409).json({ 
-        message: 'A category with this ID already exists. Please omit ID from the request to auto-generate it.' 
-      });
-    }
-    console.error('Create category error:', error);
-    res.status(500).json({ message: 'Internal server error' });
+  console.log('Raw req.body:', req.body);
+  console.log('req.file present?', !!req.file); // Debug: Should log true if file uploaded
+  if (req.file) {
+    console.log('File details:', { originalname: req.file.originalname, size: req.file.size, buffer: !!req.file.buffer });
   }
+
+  const payload = { ...req.body };
+  delete payload.id;
+  delete payload.image; // Strip invalid 'image' field (from FormData)
+
+  if (req.file && req.file.buffer) {
+    console.log('Uploading to Cloudinary...');
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'categories' });
+    payload.imageUrl = secureUrl;
+    console.log('Upload success, imageUrl:', secureUrl);
+  } else {
+    console.warn('No valid file buffer found - check multer config (should be memoryStorage)');
+  }
+
+  console.log('Final payload:', payload);
+  const category = await CategoryService.createCategory(payload);
+  res.status(201).json(category);
 });
 
 export const updateCategory = handleRequest(async (req, res) => {
-  const category = await CategoryService.updateCategory(req.params.id, req.body);
+  console.log('Update req.file present?', !!req.file);
+  const payload = { ...req.body };
+  delete payload.image; // Strip invalid field
+
+  if (req.file && req.file.buffer) {
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'categories' });
+    payload.imageUrl = secureUrl;
+  }
+
+  const category = await CategoryService.updateCategory(req.params.id, payload);
   res.status(200).json(category);
 });
 
@@ -101,11 +97,13 @@ export const addSubcategory = handleRequest(async (req, res) => {
     isActive: isActive !== undefined ? isActive === 'true' || isActive === true : true,
   };
 
-  if (req.file) {
-    const secureUrl = req.file.buffer
-      ? await uploadBuffer(req.file.buffer, { folder: 'subcategories' })
-      : await uploadFile(req.file.path, { folder: 'subcategories' });
+  if (req.file && req.file.buffer) {
+    console.log('Uploading subcategory to Cloudinary...');
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'subcategories' });
     payload.imageUrl = secureUrl;
+    console.log('Subcategory upload success, imageUrl:', secureUrl);
+  } else {
+    console.warn('No valid subcategory file buffer found');
   }
 
   try {
@@ -121,7 +119,16 @@ export const addSubcategory = handleRequest(async (req, res) => {
 });
 
 export const updateSubcategory = handleRequest(async (req, res) => {
-  const subcategory = await CategoryService.updateSubcategory(req.params.id, req.body);
+  console.log('Update subcategory req.file present?', !!req.file);
+  const payload = { ...req.body };
+  delete payload.image; // Prevent unknown 'image' field
+
+  if (req.file && req.file.buffer) {
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'subcategories' });
+    payload.imageUrl = secureUrl;
+  }
+
+  const subcategory = await CategoryService.updateSubcategory(req.params.id, payload);
   res.status(200).json(subcategory);
 });
 
@@ -146,10 +153,15 @@ export const addOffer = handleRequest(async (req, res) => {
   const categoryIdNum = Number.parseInt(req.params.id, 10);
   if (Number.isNaN(categoryIdNum)) return res.status(400).json({ message: 'Invalid category id' });
 
-  if (req.file) {
-    const secureUrl = req.file.buffer ? await uploadBuffer(req.file.buffer, { folder: 'offers' }) : await uploadFile(req.file.path, { folder: 'offers' });
+  if (req.file && req.file.buffer) {
+    console.log('Uploading offer to Cloudinary...');
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'offers' });
     payload.iconUrl = secureUrl;
+    console.log('Offer upload success, iconUrl:', secureUrl);
+  } else {
+    console.warn('No valid offer file buffer found');
   }
+
   if (payload.discountPercent !== undefined) {
     const f = parseFloat(payload.discountPercent);
     if (Number.isNaN(f)) return res.status(400).json({ message: 'Invalid discountPercent' });
@@ -174,7 +186,14 @@ export const addOffer = handleRequest(async (req, res) => {
 });
 
 export const updateOffer = handleRequest(async (req, res) => {
+  console.log('Update offer req.file present?', !!req.file);
   const payload = { ...req.body };
+
+  if (req.file && req.file.buffer) {
+    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'offers' });
+    payload.iconUrl = secureUrl;
+  }
+
   if (payload.discountPercent !== undefined) {
     const f = parseFloat(payload.discountPercent);
     if (Number.isNaN(f)) return res.status(400).json({ message: 'Invalid discountPercent' });

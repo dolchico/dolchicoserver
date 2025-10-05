@@ -7,7 +7,7 @@
 
 import axios from 'axios';
 
-const BASE = process.env.BASE_URL || 'http://localhost:4000';
+const BASE = process.env.BASE_URL || 'https://valyris-i.onrender.com';
 // Defaults can be overridden by environment variables
 const ADMIN_JWT = process.env.TEST_JWT || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzU4MDU4NzA5LCJleHAiOjE3NTg2NjM1MDl9.xVPLZqZsWJWVPsphibgAVyXUUUutua_j8fho2nRsp2c'; // user-provided admin token
 const USER_JWT = process.env.USER_JWT || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzU4MDU4Nzk0LCJleHAiOjE3NTg2NjM1OTR9.NKBVXiuyH5WE4F19up_478lvW-FbjymbQw7GnNuBlQ0';

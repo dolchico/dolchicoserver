@@ -46,6 +46,9 @@ import debugRoute from './routes/debugRoute.js';
 import offerTypeRoutes from './routes/offerType.routes.js';
 // import paymentRoutes from './routes/paymentRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
+import imageRoutes from './routes/image.routes.js';
+
+
 
 import './config/passport-setup.js';
 
@@ -156,6 +159,7 @@ app.use('/api', couponRoutes);
 app.use('/api', offerTypeRoutes);
 app.use('/api/debug', debugRoute);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/images', imageRoutes);
 // app.use('/api/payment', paymentRoutes);
 
 // Serve uploaded files

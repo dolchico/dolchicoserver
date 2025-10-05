@@ -1,8 +1,9 @@
+// controllers/productController.js
 import { v2 as cloudinary } from 'cloudinary';
 import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
 import {
   createProduct,
-  getAllProducts,
+  getProducts, // Updated from getAllProducts
   deleteProductById,
   getProductById,
   searchProductsService,
@@ -63,8 +64,8 @@ const addProduct = async (req, res) => {
       for (const rawProd of rawProducts) {
         try {
           // Basic validation per product
-          if (!rawProd.name || !rawProd.description || !rawProd.price || !rawProd.categoryId || !rawProd.subcategoryId) {
-            throw new Error('Missing required fields: name, description, price, categoryId, or subcategoryId');
+          if (!rawProd.name || !rawProd.description || !rawProd.price || !rawProd.subcategoryId) {
+            throw new Error('Missing required fields: name, description, price, or subcategoryId');
           }
 
           // Handle price logic: Keep original price, set discountedPrice if provided
@@ -249,23 +250,44 @@ const addProduct = async (req, res) => {
   }
 };
 
-// NOTE: This controller now correctly handles the nested category/subcategory objects returned by the service.
+// Updated listProducts to support filtering and pagination
 const listProducts = async (req, res) => {
   try {
-    const products = await getAllProducts();
+    const { 
+      page = 1, 
+      limit = 10, 
+      search, 
+      categoryId, 
+      subcategoryId, 
+      grouping 
+    } = req.query;
 
-    // The `products` array now contains full category and subcategory objects.
-    // The spread `...product` will correctly include them in the final response.
-    const safeProducts = products.map((product) => convertBigIntFields({
+    const result = await getProducts({ 
+      page: +page, 
+      limit: +limit, 
+      search: search ? search.toString() : '', 
+      categoryId: categoryId ? +categoryId : undefined, 
+      subcategoryId: subcategoryId ? +subcategoryId : undefined, 
+      grouping: grouping ? grouping.toString() : undefined 
+    });
+
+    const safeProducts = result.products.map((product) => convertBigIntFields({
       ...product,
       date: product.date?.toString() || null,
       createdAt: product.createdAt?.toISOString() || null,
       updatedAt: product.updatedAt?.toISOString() || null,
     }));
 
-    res.json({ success: true, products: safeProducts });
+    res.json({ 
+      success: true, 
+      products: safeProducts,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages
+    });
   } catch (error) {
-    
+    console.error('listProducts error:', error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -280,7 +302,7 @@ const removeProduct = async (req, res) => {
     await deleteProductById(Number(id));
     res.json({ success: true, message: 'Product Removed' });
   } catch (error) {
-    
+    console.error('removeProduct error:', error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -354,4 +376,183 @@ const searchProducts = async (req, res) => {
   }
 };
 
-export { listProducts, addProduct, removeProduct, singleProduct, searchProducts };
+// Updated controllers/productController.js - Add this at the end before the export
+// ✅ Update Product - Handles both text fields and image uploads
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Product ID is required' });
+    }
+
+    const productId = Number(id);
+    if (isNaN(productId) || productId <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+    }
+
+    // Fetch existing product to get current images and validate
+    const existingProduct = await getProductById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Parse form data fields
+    const {
+      name,
+      description,
+      price,
+      discountedPrice,
+      discountPercent,
+      ageGroupStart,
+      ageGroupEnd,
+      brand,
+      color,
+      sizes,
+      bestseller,
+      stock,
+      sku,
+      weight,
+      dimensions,
+      tags,
+      averageRating,
+      reviewsCount,
+      seoSlug,
+      compareAtPrice,
+      categoryId,
+      subcategoryId,
+    } = req.body;
+
+    // Validation
+    if (!name || !description || !price) {
+      return res.status(400).json({ success: false, message: 'Missing required fields: name, description, or price' });
+    }
+
+    // Handle subcategoryId and derive categoryId if provided
+    let finalCategoryId = existingProduct.categoryId;
+    let finalSubcategoryId = existingProduct.subcategoryId;
+    if (subcategoryId) {
+      const subIdNum = Number(subcategoryId);
+      if (!isNaN(subIdNum) && subIdNum > 0) {
+        const sub = await prisma.subcategory.findUnique({ 
+          where: { id: subIdNum },
+          select: { id: true, categoryId: true }
+        });
+        if (sub) {
+          finalSubcategoryId = subIdNum;
+          finalCategoryId = sub.categoryId;
+        } else {
+          return res.status(400).json({ success: false, message: 'Invalid subcategoryId' });
+        }
+      }
+    }
+
+    // Parse arrays
+    const parseMaybeJsonArray = (val) => {
+      if (!val) return [];
+      try {
+        return JSON.parse(val);
+      } catch (e) {
+        return val.split(',').map(s => s.trim()).filter(Boolean);
+      }
+    };
+
+    const parsedColor = parseMaybeJsonArray(color);
+    const parsedSizes = parseMaybeJsonArray(sizes);
+    const parsedTags = parseMaybeJsonArray(tags);
+
+    // Parse dimensions
+    let parsedDimensions = existingProduct.dimensions;
+    if (dimensions) {
+      try {
+        parsedDimensions = JSON.parse(dimensions);
+      } catch (e) {
+        console.error('Invalid dimensions JSON:', e);
+      }
+    }
+
+    // Prepare update data
+    const updateData = {
+      name,
+      description,
+      price: toPrismaDecimal(price),
+      brand,
+      color: parsedColor,
+      sizes: parsedSizes,
+      tags: parsedTags,
+      bestseller: bestseller === 'true',
+      stock: parseInt(stock) || 0,
+      sku: sku || existingProduct.sku,
+      seoSlug: seoSlug || existingProduct.seoSlug,
+      averageRating: parseFloat(averageRating) || 0,
+      reviewsCount: parseInt(reviewsCount) || 0,
+      subcategoryId: finalSubcategoryId,
+      categoryId: finalCategoryId,
+    };
+
+    // Optional fields
+    if (discountedPrice) updateData.discountedPrice = toPrismaDecimal(discountedPrice);
+    if (discountPercent) updateData.discountPercent = parseInt(discountPercent);
+    if (ageGroupStart) updateData.ageGroupStart = parseInt(ageGroupStart);
+    if (ageGroupEnd) updateData.ageGroupEnd = parseInt(ageGroupEnd);
+    if (weight) updateData.weight = toPrismaDecimal(weight);
+    if (parsedDimensions) updateData.dimensions = parsedDimensions;
+    if (compareAtPrice) updateData.compareAtPrice = toPrismaDecimal(compareAtPrice);
+
+    // Handle image updates
+    let currentImages = existingProduct.image || [];
+    const uploadedPublicIdsToDelete = []; // Track old images to delete if replaced
+
+    if (req.files && req.files.length > 0) {
+      const files = Array.isArray(req.files) ? req.files : [];
+      const uploadToCloudinary = (fileBuffer, fileName) => new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream({ resource_type: 'image', folder: 'products' }, (error, result) => {
+          if (error) return reject(error);
+          resolve({ secure_url: result.secure_url, public_id: result.public_id });
+        });
+        stream.end(fileBuffer);
+      });
+
+      const newUploadResults = [];
+      try {
+        for (const file of files.slice(0, 6 - currentImages.length)) { // Allow up to 6 total
+          if (!file || !file.buffer) throw new Error('Uploaded file buffer missing');
+          const r = await uploadToCloudinary(file.buffer, file.originalname);
+          newUploadResults.push(r.secure_url);
+        }
+      } catch (uploadErr) {
+        console.error('Image upload failed:', uploadErr);
+        return res.status(500).json({ success: false, message: 'Image upload failed', error: uploadErr.message });
+      }
+
+      // Append new images to existing
+      currentImages = [...currentImages, ...newUploadResults];
+      updateData.image = currentImages;
+    }
+
+    // Update the product
+    const updatedProduct = await prisma.product.update({
+      where: { id: productId },
+      data: updateData,
+      include: {
+        category: true,
+        subcategory: true,
+      },
+    });
+
+    // Serialize for response
+    const serializedProduct = convertBigIntFields({
+      ...updatedProduct,
+      date: updatedProduct.date?.toString() || null,
+      createdAt: updatedProduct.createdAt?.toISOString() || null,
+      updatedAt: updatedProduct.updatedAt?.toISOString() || null,
+    });
+
+    res.status(200).json({ success: true, message: 'Product Updated', product: serializedProduct });
+  } catch (error) {
+    console.error('updateProduct error:', { name: error?.name, message: error?.message, stack: error?.stack });
+    res.status(500).json({ success: false, message: 'Failed to update product', error: error?.message });
+  }
+};
+
+// Update the export at the end of controllers/productController.js
+export { listProducts, addProduct, removeProduct, singleProduct, searchProducts, updateProduct };
