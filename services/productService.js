@@ -1,3 +1,4 @@
+// services/productService.js
 import prisma from '../lib/prisma.js';
 import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
 import { generateProductSlug } from '../utils/seoUtils.js';
@@ -94,25 +95,88 @@ export const createProduct = async (data) => {
 };
 
 /**
- * Retrieves all products with their category and subcategory.
- * @returns {Promise<Array>} Array of products with related category and subcategory
+ * Retrieves products with filtering, pagination, and their category and subcategory.
+ * @param {Object} params - Query parameters
+ * @param {number} [params.page=1] - Page number
+ * @param {number} [params.limit=10] - Items per page
+ * @param {string} [params.search] - Search term
+ * @param {number} [params.categoryId] - Category ID filter
+ * @param {number} [params.subcategoryId] - Subcategory ID filter
+ * @param {string} [params.grouping] - Grouping filter
+ * @returns {Promise<Object>} Products with pagination info
  * @throws {Error} If database query fails
  */
-export const getAllProducts = async () => {
+export const getProducts = async (params = {}) => {
   try {
     // Check database connection
     if (!prisma) {
       throw new Error('Database connection not available');
     }
 
-    return await prisma.product.findMany({
-      include: {
-        category: true,
-        subcategory: true,
-      },
-    });
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      categoryId,
+      subcategoryId,
+      grouping,
+    } = params;
+
+    const skip = (page - 1) * limit;
+    const take = +limit;
+
+    let where = {
+      isActive: true,
+      stock: { gt: 0 }, // Optional: only in-stock products
+    };
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { brand: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (categoryId) {
+      where.categoryId = +categoryId;
+    }
+
+    if (subcategoryId) {
+      where.subcategoryId = +subcategoryId;
+    }
+
+    if (grouping) {
+      where.subcategory = {
+        grouping: { equals: grouping, mode: 'insensitive' },
+      };
+    }
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take,
+        include: {
+          category: true,
+          subcategory: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / take);
+
+    return {
+      products,
+      total,
+      page,
+      limit: take,
+      totalPages,
+    };
   } catch (error) {
-    console.error('Error fetching all products:', error);
+    console.error('Error fetching products:', error);
     throw new Error(`Failed to fetch products: ${error.message}`);
   }
 };
@@ -436,3 +500,49 @@ export const getProductStock = async (productIds) => {
     throw error;
   }
 };
+
+
+// Add this to services/productService.js - No new service needed for update, as it's handled directly in controller with Prisma update
+// The controller uses prisma.product.update directly, similar to how create uses the service.
+// If you want a dedicated service function, add this:
+
+// export const updateProduct = async (productId, data) => {
+//   try {
+//     // Validate id
+//     const idNum = Number(productId);
+//     if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+//       throw new Error('Invalid product ID');
+//     }
+
+//     // Check database connection
+//     if (!prisma) {
+//       throw new Error('Database connection not available');
+//     }
+
+//     // Resolve subcategory if provided
+//     if (data.subcategoryId) {
+//       const subIdNum = Number(data.subcategoryId);
+//       const sub = await prisma.subcategory.findUnique({
+//         where: { id: subIdNum },
+//         select: { id: true, categoryId: true },
+//       });
+//       if (sub) {
+//         data.categoryId = sub.categoryId;
+//       } else {
+//         throw new Error('Invalid subcategoryId provided');
+//       }
+//     }
+
+//     return await prisma.product.update({
+//       where: { id: idNum },
+//       data,
+//       include: {
+//         category: true,
+//         subcategory: true,
+//       },
+//     });
+//   } catch (error) {
+//     console.error('Error updating product:', error);
+//     throw new Error(`Failed to update product: ${error.message}`);
+//   }
+// };

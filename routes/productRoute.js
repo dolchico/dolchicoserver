@@ -5,6 +5,7 @@ import {
   addProduct,
   removeProduct,
   singleProduct,
+  updateProduct,
   searchProducts, // Add this new controller
 } from '../controllers/productController.js';
 import upload from '../middleware/multer.js';
@@ -31,6 +32,7 @@ adminRouter.post('/add', (req, res, next) => {
 }, addProduct);
 
 adminRouter.post('/remove', removeProduct);
+adminRouter.post('/update', upload.array('images', 6), updateProduct); // Define updateProduct controller similar to addProduct, but use prisma.product.update
 
 // Public routes (for users)
 publicRouter.get('/single/:productId', singleProduct);
