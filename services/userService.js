@@ -713,3 +713,16 @@ export const verifyUserEmailToken = async (token) => {
         };
     }
 };
+
+/**
+ * Get users with advanced filters (helper for getAllUsers)
+ * @param {object} filters - Filter params
+ * @returns {Promise<object>} Users and count
+ */
+export const getUsersWithFilters = async (filters) => {
+  // This can be called from controller if you refactor for reusability
+  // Implementation mirrors the controller's Prisma query above
+  const { search, role, status, sortBy, sortOrder, page, limit } = filters;
+  // ... (build where, orderBy, skip, take as in controller)
+  // Return { users, total }
+};

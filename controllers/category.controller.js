@@ -148,37 +148,101 @@ export const getSubcategoriesByGrouping = handleRequest(async (req, res) => {
 });
 
 // --- Offer Controllers ---
+// Updated addOffer in category.controller.js to always expect JSON (no FormData for offerRules)
 export const addOffer = handleRequest(async (req, res) => {
-  const payload = { ...req.body };
+  let payload = { ...req.body };
   const categoryIdNum = Number.parseInt(req.params.id, 10);
   if (Number.isNaN(categoryIdNum)) return res.status(400).json({ message: 'Invalid category id' });
 
-  if (req.file && req.file.buffer) {
-    console.log('Uploading offer to Cloudinary...');
-    const secureUrl = await uploadBuffer(req.file.buffer, { folder: 'offers' });
-    payload.iconUrl = secureUrl;
-    console.log('Offer upload success, iconUrl:', secureUrl);
+  console.log('📥 Controller received body:', JSON.stringify(payload, null, 2));  // See full input
+
+  // Handle base64 iconUrl upload (from JSON)
+  if (payload.iconUrl && typeof payload.iconUrl === 'string' && payload.iconUrl.startsWith('data:image')) {
+    try {
+      console.log('Uploading base64 offer icon to Cloudinary...');
+      const base64Data = payload.iconUrl.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const secureUrl = await uploadBuffer(buffer, { folder: 'offers' });
+      payload.iconUrl = secureUrl;
+      console.log('Base64 icon upload success, iconUrl:', secureUrl);
+    } catch (e) {
+      console.error('Failed to upload base64 icon:', e);
+      payload.iconUrl = null;
+    }
   } else {
-    console.warn('No valid offer file buffer found');
+    console.log('No offer icon provided - skipping upload');
   }
 
+  // Parse discountPercent
   if (payload.discountPercent !== undefined) {
     const f = parseFloat(payload.discountPercent);
     if (Number.isNaN(f)) return res.status(400).json({ message: 'Invalid discountPercent' });
     payload.discountPercent = f;
   }
-  if (payload.offerTypeId !== undefined) {
-    const oi = Number.parseInt(payload.offerTypeId, 10);
-    if (Number.isNaN(oi)) delete payload.offerTypeId; else payload.offerTypeId = oi;
-  }
-  if (payload.offerRules && typeof payload.offerRules === 'string') {
-    try { payload.offerRules = JSON.parse(payload.offerRules); } catch (e) {
-      return res.status(400).json({ message: 'Invalid offerRules JSON' });
+
+  // Handle offerRules (direct from JSON)
+  if (payload.offerRules) {
+    if (typeof payload.offerRules === 'string') {
+      try {
+        payload.offerRules = JSON.parse(payload.offerRules);
+      } catch (e) {
+        return res.status(400).json({ message: 'Invalid offerRules JSON' });
+      }
     }
-  }
-  if (payload.offerTypeId !== undefined) {
-    const ot = await OfferTypeService.getOfferType(payload.offerTypeId);
-    if (!ot) return res.status(400).json({ message: `offerTypeId ${payload.offerTypeId} not found` });
+    if (!Array.isArray(payload.offerRules)) {
+      return res.status(400).json({ message: 'offerRules must be an array after parsing' });
+    }
+    console.log(`📊 Controller processing ${payload.offerRules.length} rules`);
+    payload.offerRules.forEach((rule, idx) => {
+      console.log(`Controller rule ${idx}: subcategoryId=${rule.subcategoryId}`);
+    });
+    // Process rules: Ensure subcategoryId is number or null
+    payload.offerRules = payload.offerRules.map(rule => {
+      let subId = rule.subcategoryId;
+      if (subId !== undefined && subId !== null && subId !== '') {
+        const parsedId = parseInt(subId.toString(), 10);
+        if (isNaN(parsedId) || parsedId <= 0) {
+          console.warn(`Invalid subcategoryId '${subId}' in rule, setting to null`);
+          subId = null;
+        } else {
+          subId = parsedId;
+        }
+      } else {
+        subId = null;
+      }
+      rule.subcategoryId = subId;
+
+      // Parse numbers
+      rule.priceBelow = rule.priceBelow !== undefined ? parseFloat(rule.priceBelow) || null : undefined;
+      rule.priceAbove = rule.priceAbove !== undefined ? parseFloat(rule.priceAbove) || null : undefined;
+      rule.minDiscount = rule.minDiscount !== undefined ? parseInt(rule.minDiscount, 10) || 0 : 0;
+      rule.maxDiscount = rule.maxDiscount !== undefined ? parseInt(rule.maxDiscount, 10) || 100 : 100;
+      rule.ageGroupStart = rule.ageGroupStart !== undefined ? parseInt(rule.ageGroupStart, 10) || null : null;
+      rule.ageGroupEnd = rule.ageGroupEnd !== undefined ? parseInt(rule.ageGroupEnd, 10) || null : null;
+
+      // Tags array
+      rule.tags = Array.isArray(rule.tags) ? rule.tags : [];
+
+      console.log(`Processed rule: subcategoryId=${rule.subcategoryId}, minDiscount=${rule.minDiscount}`);
+      return rule;
+    });
+
+    if (payload.offerRules.length === 0) {
+      return res.status(400).json({ message: 'Offer must have at least one valid rule' });
+    }
+  } else {
+    console.warn('No offerRules in payload - falling back to single rule from top-level fields');
+    // Fallback: Create single rule from flat fields if no offerRules
+    const flatRule = {
+      priceBelow: payload.priceBelow !== undefined ? parseFloat(payload.priceBelow) || null : null,
+      priceAbove: payload.priceAbove !== undefined ? parseFloat(payload.priceAbove) || null : null,
+      minDiscount: payload.minDiscount !== undefined ? parseInt(payload.minDiscount, 10) || null : null,
+      maxDiscount: payload.maxDiscount !== undefined ? parseInt(payload.maxDiscount, 10) || null : null,
+      tags: Array.isArray(payload.tags) ? payload.tags : [],
+      subcategoryId: payload.subcategoryId !== undefined ? parseInt(payload.subcategoryId, 10) || null : null
+    };
+    payload.offerRules = [flatRule];
+    console.log('Fallback single rule:', JSON.stringify(flatRule, null, 2));
   }
 
   const offer = await CategoryService.addOffer(categoryIdNum, payload);

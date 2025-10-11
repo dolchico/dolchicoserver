@@ -1,5 +1,8 @@
 import prisma from '../lib/prisma.js';
 import { serializeBigInts } from '../utils/serializeBigInt.js';
+import { NotFoundError } from '../utils/errors.js'; // If not already imported
+
+const REVIEW_TYPE = { PRODUCT: 'PRODUCT', DELIVERY: 'DELIVERY' };
 
 /**
  * Creates an order with items and clears the user's cart.
@@ -520,3 +523,111 @@ export const getSingleOrder = async (orderId, userId = null) => {
     throw new Error(`Failed to fetch order: ${error.message}`);
   }
 };
+
+/**
+ * Get User's Delivered Order Items with Products and Reviews
+ */
+export const getUserDeliveredProductsService = async (userId) => {
+  try {
+    // Validate userId
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid user ID');
+    }
+
+    // Check database connection
+    if (!prisma) {
+      throw new Error('Database connection not available');
+    }
+
+    const orderItems = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          userId,
+          status: 'DELIVERED'
+        }
+      },
+      include: {
+        product: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            image: true,
+            sizes: true,
+            bestseller: true,
+            isActive: true,
+            stock: true,
+            date: true,
+            createdAt: true,
+            updatedAt: true,
+            category: {
+              select: { name: true }
+            },
+            subcategory: {
+              select: { name: true }
+            }
+          }
+        },
+        order: {
+          select: {
+            date: true
+          }
+        }
+      },
+      orderBy: [
+        { order: { date: 'desc' } }
+      ]
+    });
+
+    if (orderItems.length === 0) {
+      return [];
+    }
+
+    const productIds = orderItems.map(oi => oi.productId);
+    const reviews = await prisma.review.findMany({
+      where: {
+        userId,
+        type: 'PRODUCT',
+        isDeleted: false,
+        productId: { in: productIds }
+      }
+    });
+
+    const reviewMap = new Map(reviews.map(r => [r.productId, r]));
+
+    const products = orderItems.map(oi => ({
+      id: oi.id,
+      product: {
+        id: oi.product.id,
+        name: oi.product.name,
+        description: oi.product.description,
+        price: oi.product.price.toNumber(),
+        image: oi.product.image,
+        category: oi.product.category?.name,
+        subCategory: oi.product.subcategory?.name,
+        sizes: oi.product.sizes,
+        bestseller: oi.product.bestseller,
+        isActive: oi.product.isActive,
+        stock: oi.product.stock,
+        date: oi.product.date.toString(),
+        createdAt: oi.product.createdAt,
+        updatedAt: oi.product.updatedAt
+      },
+      orderedDate: new Date(Number(oi.order.date)).toISOString().split('T')[0],
+      size: oi.size,
+      quantity: oi.quantity,
+      review: reviewMap.get(oi.productId) || undefined
+    }));
+
+    return serializeBigInts(products);
+  } catch (error) {
+    console.error('Error fetching user delivered products:', error);
+    throw new Error(`Failed to fetch delivered products: ${error.message}`);
+  }
+};
+
+
+
+
+

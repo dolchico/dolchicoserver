@@ -1,3 +1,4 @@
+// Updated orderController.js - Fixed import
 import {
     createOrder,
     getAllOrders,
@@ -5,6 +6,7 @@ import {
     getSingleOrder,
     updateOrderStatus,
     addToCart,
+    getUserDeliveredProductsService  // Added import
 } from "../services/orderService.js";
 import { priceUtils, toPrismaDecimal } from '../utils/priceUtils.js';
 import { validate } from 'uuid';
@@ -58,7 +60,7 @@ export const placeOrder = async (req, res) => {
 export const addItemToCart = async (req, res) => {
   try {
     console.log('[OrderController] Received req.body:', req.body);
-console.log('[OrderController] productId type:', typeof req.body.productId, 'value:', req.body.productId);
+    console.log('[OrderController] productId type:', typeof req.body.productId, 'value:', req.body.productId);
     const userId = req.user?.id;
     if (!userId || !validate(userId)) {
       throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
@@ -189,4 +191,48 @@ export const getSingleOrderController = async (req, res) => {
             error: error.message,
         });
     }
+};
+
+/**
+ * Get User's Delivered Products for Reviews
+ */
+export const getUserDeliveredProducts = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId || !validate(userId)) {
+      throw new BadRequestError('Invalid or missing user ID.', 'INVALID_USER_ID');
+    }
+    const products = await getUserDeliveredProductsService(userId);
+    res.json({ success: true, data: { products } });
+  } catch (error) {
+    console.error("Get User Delivered Products Error:", error);
+    res.status(error.statusCode || 500).json({ success: false, message: error.message });
+  }
+};
+
+export const adminListOrders = async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      limit = 50, // Larger for admin
+      status, 
+      userId,
+      fromDate,
+      toDate
+    } = req.query;
+
+    const filters = {
+      status: status ? status.toString() : undefined,
+      userId: userId ? userId.toString() : undefined,
+      fromDate: fromDate ? new Date(fromDate) : undefined,
+      toDate: toDate ? new Date(toDate) : undefined
+    };
+
+    // Assuming getAllOrders supports pagination/filters; if not, update service
+    const orders = await getAllOrders({ page: +page, limit: +limit, ...filters });
+    res.json({ success: true, orders, pagination: { page: +page, limit: +limit, total: orders.length } });
+  } catch (error) {
+    console.error("Admin Get All Orders Error:", error);
+    res.status(error.statusCode || 500).json({ success: false, message: error.message });
+  }
 };

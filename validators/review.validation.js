@@ -1,67 +1,110 @@
-import { body, param, query, validationResult } from 'express-validator';
-import isURL from 'validator/lib/isURL.js';
+// Updated validators/review.validation.js - Accept CUID for IDs
+import Joi from 'joi';
 
-const REVIEW_TYPE = { PRODUCT: 'PRODUCT', DELIVERY: 'DELIVERY' };
-const MAX_IMAGES = 6;
-const TITLE_MAX = 100;
-const COMMENT_MAX = 2000;
+// CUID pattern (25 chars: lowercase letters, digits, underscore)
+const cuidPattern = /^[c][0-9a-z]{24}$/i;
 
-const baseValidators = [
-  body('type').exists().isIn([REVIEW_TYPE.PRODUCT, REVIEW_TYPE.DELIVERY]),
-  body('rating').exists().isInt({ min: 1, max: 5 }).withMessage('rating must be 1..5'),
-  body('title').optional().isString().isLength({ max: TITLE_MAX }),
-  body('comment').optional().isString().isLength({ max: COMMENT_MAX }),
-  body('images').optional().isArray({ max: MAX_IMAGES }).custom((arr) => {
-    for (const url of arr) {
-      if (!isURL(url, { require_protocol: true })) {
-        throw new Error('Each image must be a valid absolute URL');
-      }
-    }
-    return true;
+// User/public validators
+export const createValidators = {
+  body: Joi.object({
+    type: Joi.string().valid('PRODUCT', 'DELIVERY').required(),
+    productId: Joi.number().integer().positive().when('type', { is: 'PRODUCT', then: Joi.required() }),
+    orderId: Joi.number().integer().positive().when('type', { is: 'DELIVERY', then: Joi.required() }),
+    rating: Joi.number().integer().min(1).max(5).required(),
+    title: Joi.string().max(100).optional(),
+    comment: Joi.string().max(2000).optional(),
+    images: Joi.array().items(Joi.string()).max(5).optional(),
+    metadata: Joi.object().optional()
   })
-];
-
-const createValidators = [
-  ...baseValidators,
-  body('productId').if(body('type').equals(REVIEW_TYPE.PRODUCT)).exists().isInt(),
-  body('orderId').if(body('type').equals(REVIEW_TYPE.DELIVERY)).exists().isInt(),
-  // deliveryAgentId removed
-];
-
-const updateValidators = [
-  param('id').exists().isString(),
-  body('rating').optional().isInt({ min: 1, max: 5 }),
-  body('title').optional().isString().isLength({ max: TITLE_MAX }),
-  body('comment').optional().isString().isLength({ max: COMMENT_MAX }),
-  body('images').optional().isArray({ max: MAX_IMAGES }).custom((arr) => {
-    for (const url of arr) {
-      if (!isURL(url, { require_protocol: true })) throw new Error('Each image must be a valid absolute URL');
-    }
-    return true;
-  })
-];
-
-const listValidators = [
-  query('type').optional().isIn([REVIEW_TYPE.PRODUCT, REVIEW_TYPE.DELIVERY]),
-  query('productId').optional().isInt(),
-  query('orderId').optional().isInt(),
-  // deliveryAgentId query removed
-  query('userId').optional().isInt(),
-  query('rating').optional().isInt({ min: 1, max: 5 }),
-  query('minRating').optional().isInt({ min: 1, max: 5 }),
-  query('maxRating').optional().isInt({ min: 1, max: 5 }),
-  query('hasImages').optional().isBoolean(),
-  query('fromDate').optional().isISO8601(),
-  query('toDate').optional().isISO8601(),
-  query('page').optional().isInt({ min: 1 }),
-  query('pageSize').optional().isInt({ min: 1, max: 100 }),
-  query('sort').optional().isIn(['createdAt_desc', 'createdAt_asc', 'rating_desc', 'rating_asc'])
-];
-
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
-  next();
 };
 
-export { createValidators, updateValidators, listValidators, validate };
+export const updateValidators = {
+  params: Joi.object({
+    id: Joi.string().pattern(cuidPattern).required()
+  }),
+  body: Joi.object({
+    rating: Joi.number().integer().min(1).max(5).optional(),
+    title: Joi.string().max(100).optional(),
+    comment: Joi.string().max(2000).optional(),
+    images: Joi.array().items(Joi.string()).max(5).optional()
+  }).min(1)
+};
+
+export const listValidators = {
+  query: Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    pageSize: Joi.number().integer().min(1).max(50).default(20),
+    sort: Joi.string().pattern(/^(createdAt|rating)_(asc|desc)$/).default('createdAt_desc'),
+    type: Joi.string().valid('PRODUCT', 'DELIVERY'),
+    productId: Joi.number().integer().positive(),
+    orderId: Joi.number().integer().positive(),
+    userId: Joi.string().uuid(),
+    rating: Joi.number().integer().min(1).max(5),
+    minRating: Joi.number().integer().min(1).max(5),
+    maxRating: Joi.number().integer().min(1).max(5),
+    hasImages: Joi.boolean(),
+    fromDate: Joi.date(),
+    toDate: Joi.date(),
+    includeDeleted: Joi.boolean()
+  })
+};
+
+// Admin validators
+export const adminListValidators = {
+  query: Joi.object({
+    page: Joi.number().integer().min(1).default(1),
+    pageSize: Joi.number().integer().min(1).max(100).default(50),
+    sort: Joi.string().pattern(/^(createdAt|rating|status)_(asc|desc)$/).default('createdAt_desc'),
+    type: Joi.string().valid('all', 'product', 'delivery'),
+    status: Joi.string().valid('all', 'pending', 'approved', 'rejected'),
+    productId: Joi.number().integer().positive(),
+    orderId: Joi.number().integer().positive(),
+    userId: Joi.string().uuid()
+  })
+};
+
+export const adminUpdateValidators = {
+  params: Joi.object({
+    id: Joi.string().pattern(cuidPattern).required()
+  }),
+  body: Joi.object({
+    status: Joi.string().valid('approved', 'rejected'),
+    adminResponse: Joi.string().min(1).max(1000)
+  }).or('status', 'adminResponse')
+};
+
+// Fixed validate HOF - Validates specific parts (body, params, query)
+export const validate = (validators) => {
+  return (req, res, next) => {
+    let validationError = null;
+
+    // Validate body if present
+    if (validators.body) {
+      const { error } = validators.body.validate(req.body, { abortEarly: false });
+      if (error) validationError = error;
+    }
+
+    // Validate params if present
+    if (validators.params && !validationError) {
+      const { error } = validators.params.validate(req.params, { abortEarly: false });
+      if (error) validationError = error;
+    }
+
+    // Validate query if present
+    if (validators.query && !validationError) {
+      const { error } = validators.query.validate(req.query, { abortEarly: false });
+      if (error) validationError = error;
+    }
+
+    if (validationError) {
+      const messages = validationError.details.map(d => d.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Validation error', 
+        errors: messages 
+      });
+    }
+
+    next();
+  };
+};

@@ -1,4 +1,4 @@
-// routes/productRoute.js
+// Updated routes/productRoute.js - Add admin list route
 import express from 'express';
 import {
   listProducts,
@@ -6,7 +6,8 @@ import {
   removeProduct,
   singleProduct,
   updateProduct,
-  searchProducts, // Add this new controller
+  searchProducts,
+  adminListProducts // New import
 } from '../controllers/productController.js';
 import upload from '../middleware/multer.js';
 import { ensureAuthWithStatus, ensureRole } from '../middleware/authMiddleware.js';
@@ -16,29 +17,28 @@ const router = express.Router();
 const adminRouter = express.Router();
 const publicRouter = express.Router();
 
-// Apply admin middlewares (same as category.routes.js)
+// Apply admin middlewares
 adminRouter.use(ensureAuthWithStatus, ensureRole(['ADMIN']));
 
-// Admin routes (protected) - Overloaded /add for both single and bulk
+// Admin routes
 adminRouter.post('/add', (req, res, next) => {
-  // Check if request is multipart (single add with files) or JSON (bulk add)
   if (req.headers['content-type']?.includes('multipart/form-data')) {
-    // For single add: apply multer for file uploads
     upload.array('images', 6)(req, res, next);
   } else {
-    // For bulk add: skip multer and proceed directly
     next();
   }
 }, addProduct);
 
-adminRouter.post('/remove', removeProduct);
-adminRouter.post('/update', upload.array('images', 6), updateProduct); // Define updateProduct controller similar to addProduct, but use prisma.product.update
+adminRouter.get('/list', adminListProducts); // New admin list endpoint
 
-// Public routes (for users)
+adminRouter.post('/remove', removeProduct);
+adminRouter.post('/update', upload.array('images', 6), updateProduct);
+
+// Public routes
 publicRouter.get('/single/:productId', singleProduct);
 publicRouter.get('/list', listProducts);
 publicRouter.get('/search', searchProducts);
-// Product stock endpoint (protected)
+
 publicRouter.post('/stock', authUser, async (req, res) => {
   try {
     const { productIds } = req.body;
@@ -53,7 +53,6 @@ publicRouter.post('/stock', authUser, async (req, res) => {
   }
 });
 
-// Legacy single product route (keep for backward compatibility at /product/single/:id)
 publicRouter.get('/product/single/:id', async (req, res) => {
   try {
     const product = await getProductById(req.params.id);
