@@ -1154,7 +1154,7 @@ export const checkUserForAuth = async (req, res) => {
         const isPhone = /^\+?\d+$/.test(emailOrPhone.trim());
         const user = isPhone
             ? await findUserByPhone(emailOrPhone.trim())
-            : await findUserByEmail(emailOrPhone.trim());
+            : await findUserByEmail(emailOrPhone.trim().toLowerCase());
 
         if (!user) {
             return res.status(200).json({
@@ -1339,4 +1339,486 @@ export const getUserProfile = async (req, res) => {
             message: "Internal server error",
         });
     }
+};
+
+// ================================
+// ADMIN USER MANAGEMENT CONTROLLERS
+// ================================
+
+/**
+ * Get all users with filters, pagination, and stats (admin only)
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    const {
+      search = '',
+      role = '',
+      status = '',
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    // Build where clause
+    let where = {}; // Default to all users
+
+    // Search filter
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } }
+      ];
+    }
+
+    // Role filter (comma-separated) - Uppercase for enum matching
+    if (role) {
+      const roles = role.split(',').map(r => r.trim().toUpperCase());
+      where.role = { in: roles };
+    }
+
+    // Status filter (using existing fields) - Updated for blocked
+    if (status) {
+      const statuses = status.split(',').map(s => s.trim());
+      where.AND = []; // Reset AND for status
+
+      statuses.forEach(stat => {
+        if (stat === 'pending') {
+          where.AND.push({ emailVerified: false });
+        } else if (stat === 'active') {
+          where.AND.push({ 
+            emailVerified: true, 
+            isActive: true,
+            isBlocked: false // ← ADD: Exclude blocked
+          });
+        } else if (stat === 'inactive') {
+          where.AND.push({ 
+            emailVerified: true, 
+            isActive: false 
+          });
+        } else if (stat === 'blocked') { // ← ADD HANDLING
+          where.AND.push({ isBlocked: true });
+        }
+      });
+    }
+
+    // Fetch all users - Include blocking fields
+    const users = await prisma.user.findMany({
+      where,
+      orderBy: { [sortBy]: sortOrder },
+      select: {
+        id: true,
+        name: true,
+        fullName: true,
+        email: true,
+        role: true,
+        isActive: true,
+        emailVerified: true,
+        phoneVerified: true,
+        phoneNumber: true,
+        createdAt: true,
+        updatedAt: true,
+        isBlocked: true, // ← ADD
+        blockedAt: true, // ← ADD
+        blockedReason: true, // ← ADD
+        blockedBy: true, // ← ADD
+      }
+    });
+
+    // Map to include derived fields for frontend compatibility
+    const mappedUsers = users.map(user => ({
+      ...user,
+      role: user.role.toLowerCase(), // Lowercase for frontend
+      isBlocked: user.isBlocked || false, // ← FROM DB
+      isEmailVerified: user.emailVerified,
+      lastLoginAt: user.updatedAt // Use updatedAt as proxy for last login
+    }));
+
+    // Fetch total count for stats
+    const total = await prisma.user.count({ where });
+
+    // Compute stats (using DB fields) - Updated for blocked
+    const totalUsers = await prisma.user.count();
+    const activeCount = await prisma.user.count({ where: { emailVerified: true, isActive: true, isBlocked: false } }); // ← EXCLUDE BLOCKED
+    const blockedCount = await prisma.user.count({ where: { isBlocked: true } }); // ← FROM DB, NOT HARDCODED
+    const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+    const verifiedCount = await prisma.user.count({ where: { emailVerified: true } });
+
+    const stats = {
+      total: totalUsers,
+      active: activeCount,
+      blocked: blockedCount, // ← NOW DYNAMIC
+      admins: adminCount,
+      verified: verifiedCount
+    };
+
+    res.json({
+      success: true,
+      users: mappedUsers,
+      stats,
+      total
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to load users'
+    });
+  }
+};
+
+/**
+ * Sync users from dolchico website (placeholder - implement actual sync logic)
+ */
+export const syncUsersFromWebsite = async (req, res) => {
+  try {
+    const { action } = req.body;
+    if (action !== 'sync-from-website') {
+      return res.status(400).json({ success: false, message: 'Invalid action' });
+    }
+
+    // Placeholder: In a real implementation, fetch users from dolchico.com API or database.
+    // For example, if dolchico has a public API: await fetch('https://dolchico.com/api/users', { headers: { Authorization: process.env.DOLCHICO_API_KEY } });
+    // Then upsert into Prisma: await prisma.user.upsertMany(existingUsers);
+    // Here, mock syncing 5 dummy users for demo.
+    const dummyUsers = [
+      { email: 'user1@dolchico.com', name: 'Dolchico User 1', role: 'USER' },
+      { email: 'user2@dolchico.com', name: 'Dolchico User 2', role: 'USER' },
+      // Add more...
+    ];
+
+    let syncedCount = 0;
+    for (const userData of dummyUsers) {
+      try {
+        await createUser({
+          ...userData,
+          emailVerified: true,
+          phoneVerified: false,
+          isProfileComplete: true,
+          isActive: true,
+          isBlocked: false
+        });
+        syncedCount++;
+      } catch (err) {
+        // Skip duplicates
+        if (err.code !== 'P2002') console.error('Sync error:', err);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Synced ${syncedCount} users from dolchico website.`
+    });
+  } catch (error) {
+    console.error('Sync error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sync failed'
+    });
+  }
+};
+
+/**
+ * Block a user (admin only)
+ */
+export const blockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, duration } = req.body;
+
+    if (!reason || reason.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Blocking reason is required'
+      });
+    }
+
+    const blockedUntil = duration ? new Date(Date.now() + parseInt(duration) * 24 * 60 * 60 * 1000) : null;
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        isBlocked: true,
+        isActive: false,
+        blockedAt: new Date(),
+        blockedReason: reason.trim(),
+        blockedBy: req.user.id, // Assume req.user from auth middleware
+        blockedUntil
+      },
+      select: { id: true, isBlocked: true, isActive: true }
+    });
+
+    res.json({
+      success: true,
+      message: 'User blocked successfully',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Error blocking user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to block user'
+    });
+  }
+};
+
+/**
+ * Unblock a user (admin only)
+ */
+export const unblockUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        isBlocked: false,
+        isActive: true,
+        blockedAt: null,
+        blockedReason: null,
+        blockedBy: null,
+        blockedUntil: null
+      },
+      select: { id: true, isBlocked: true, isActive: true }
+    });
+
+    res.json({
+      success: true,
+      message: 'User unblocked successfully',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Error unblocking user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to unblock user'
+    });
+  }
+};
+
+/**
+ * Delete a user (admin only) - Hard delete; consider soft delete for production
+ */
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Optional: Delete related records (e.g., orders, reviews) in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Example: Delete related data
+      // await tx.order.deleteMany({ where: { userId: id } });
+      // await tx.review.deleteMany({ where: { userId: id } });
+      // await tx.wishlistItem.deleteMany({ where: { userId: id } });
+
+      await tx.user.delete({
+        where: { id }
+      });
+    });
+
+    res.json({
+      success: true,
+      message: 'User deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    if (error.code === 'P2025') { // Record not found
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete user'
+    });
+  }
+};
+
+/**
+ * Get single user by ID (admin only)
+ */
+export const getSingleUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        fullName: true,
+        email: true,
+        phoneNumber: true,
+        emailVerified: true,
+        phoneVerified: true,
+        isProfileComplete: true,
+        isActive: true,
+        isBlocked: true,
+        blockedAt: true,
+        blockedReason: true,
+        blockedBy: true,
+        blockedUntil: true,
+        country: true,
+        state: true,
+        zip: true,
+        dob: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        // Optional: Add computed stats if needed (e.g., orders count)
+        _count: {
+          select: {
+            orders: true,
+            reviews: true,
+          },
+        },
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Compute derived fields for frontend (e.g., totalSpent from orders if needed)
+    const totalOrders = user._count.orders || 0;
+    const totalReviews = user._count.reviews || 0;
+    // Add more computations as needed (e.g., sum orders for totalSpent)
+
+    const userData = {
+      ...user,
+      role: user.role.toLowerCase(), // Lowercase for frontend
+      isEmailVerified: user.emailVerified,
+      totalOrders,
+      totalReviews,
+      // Add placeholders for stats if not computed
+      totalSpent: 0, // Compute from orders if needed
+      loyaltyPoints: 0,
+      lastLoginAt: user.updatedAt, // Proxy
+      lastActiveAt: user.updatedAt,
+      tags: [], // If you have tags field
+      phone: user.phoneNumber, // Alias for frontend
+    };
+
+    res.json({
+      success: true,
+      user: userData
+    });
+  } catch (error) {
+    console.error('Error fetching single user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to load user'
+    });
+  }
+};
+
+/**
+ * Update single user by ID (admin only) - Partial updates
+ */
+export const updateSingleUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No update fields provided'
+      });
+    }
+
+    // Remove sensitive fields (handle via dedicated endpoints)
+    const {
+      password,  // Use separate password reset
+      email,     // Use email change flow
+      phoneNumber, // Use phone change flow
+      ...updateFields
+    } = req.body;
+
+    // Validate username if provided
+    if (updateFields.username !== undefined) {
+      if (updateFields.username && updateFields.username.length < 3) {
+        return res.status(400).json({
+          success: false,
+          message: 'Username must be at least 3 characters long'
+        });
+      }
+      if (updateFields.username) {
+        const existingUsername = await prisma.user.findFirst({
+          where: {
+            username: updateFields.username.trim().toLowerCase(),
+            NOT: { id }
+          }
+        });
+        if (existingUsername) {
+          return res.status(409).json({
+            success: false,
+            message: 'Username is already taken'
+          });
+        }
+      }
+    }
+
+    // DOB validation if provided
+    if (updateFields.dob !== undefined && updateFields.dob !== null && updateFields.dob !== '') {
+      const date = new Date(updateFields.dob);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date of birth format. Use YYYY-MM-DD'
+        });
+      }
+      updateFields.dob = date.toISOString();
+    }
+
+    // Clean data
+    if (updateFields.email) updateFields.email = updateFields.email.trim().toLowerCase();
+    if (updateFields.phoneNumber) updateFields.phoneNumber = updateFields.phoneNumber.trim();
+    if (updateFields.username) updateFields.username = updateFields.username.trim().toLowerCase();
+    if (updateFields.name) updateFields.name = updateFields.name.trim();
+    if (updateFields.fullName) updateFields.fullName = updateFields.fullName.trim();
+
+    // Uppercase role for enum
+    if (updateFields.role) updateFields.role = updateFields.role.toUpperCase();
+
+    // Update via service (handles allowed fields)
+    const updatedUser = await updateProfile(id, updateFields);
+
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('Error updating user:', err);
+    let msg = err.message || 'Failed to update user';
+
+    if (err.code === 'P2002') {
+      const target = err.meta?.target;
+      if (target?.includes('username')) msg = 'Username is already taken';
+      else if (target?.includes('email')) msg = 'Email already exists';
+      else if (target?.includes('phoneNumber')) msg = 'Phone number already exists';
+      else msg = 'Field already exists';
+    } else if (err.code === 'P2025') {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.status(400).json({ success: false, message: msg });
+  }
 };

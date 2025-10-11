@@ -1,203 +1,143 @@
-// middleware/authMiddleware.js
+// middleware/authMiddleware.js - Consolidated and enhanced version
+// This file combines your existing auth.js functionality with additional features
+// Use this as your main auth middleware file. Export ensureAuth for simple token verification
+// and other enhanced middlewares as needed.
 import jwt from 'jsonwebtoken';
-import { getUserAuthStatus } from '../services/userService.js';
-
-// Main authentication middleware (enhanced version of your existing one)
+import { getUserAuthStatus } from '../services/userService.js'; // Assuming this exists; remove if not needed
+// Simple ensureAuth - similar to your original auth.js but streamlined
 export const ensureAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
-    
-    try {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  // Use nullish coalescing so numeric id === 0 is accepted (0 is falsy with ||)
-      const userId = decoded.id ?? decoded.userId;
-
-      // Accept 0 as a valid id. Only reject when userId is null or undefined.
-      if (userId === undefined || userId === null) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid token payload.',
-          code: 'INVALID_TOKEN_PAYLOAD',
-        });
-      }
-
-      req.user = { ...decoded, id: userId, userId };
-      next();
-    } catch (err) {
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({
-          success: false,
-          message: 'Token expired. Login again.',
-          code: 'TOKEN_EXPIRED',
-        });
-      }
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token.',
-        code: 'INVALID_TOKEN',
-      });
-    }
-  } else {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
       success: false,
-      message: 'No token provided',
-      code: 'NO_TOKEN',
+      message: 'Not Authorized. Login again.',
+      code: 'NO_TOKEN'
+    });
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+   
+    // Handle both 'id' and 'userId' in token
+    const userId = decoded.id ?? decoded.userId;
+   
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token format',
+        code: 'INVALID_TOKEN_FORMAT'
+      });
+    }
+    req.user = { ...decoded, id: userId, userId }; // Ensure both keys are present
+    next();
+  } catch (error) {
+    console.error('Auth Error:', error.message);
+   
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired. Please login again.',
+        code: 'TOKEN_EXPIRED'
+      });
+    }
+   
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+    res.status(401).json({
+      success: false,
+      message: 'Authentication failed',
+      code: 'AUTH_FAILED'
     });
   }
 };
-
-// NEW: Enhanced auth middleware that also checks user account status
-// middleware/authMiddleware.js - Update ensureAuthWithStatus
+// Enhanced auth middleware that also checks user account status
 export const ensureAuthWithStatus = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
-    
+  await ensureAuth(req, res, async () => {
     try {
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      
-      // Debug the decoded token
-      console.log('Decoded JWT:', decoded);
-      
-  // Get user ID from token (handle both 'id' and 'userId').
-  // Use nullish coalescing to accept 0 as a valid id.
-      const userId = decoded.userId ?? decoded.id;
-      
-      // Accept 0 as valid id. Only treat null/undefined as missing.
-      if (userId === undefined || userId === null) {
-        return res.status(401).json({ 
-          success: false,
-          message: 'User ID not found in token.',
-          code: 'INVALID_TOKEN_PAYLOAD'
-        });
+      const userId = req.user.id;
+     
+      // Get current user status from database (if service exists)
+      let userStatus = { isActive: true, isLocked: false, isProfileComplete: true, phoneVerified: true };
+      if (typeof getUserAuthStatus === 'function') {
+        userStatus = await getUserAuthStatus(userId);
       }
-      
-      // Get current user status from database
-      const userStatus = await getUserAuthStatus(userId);
-      
-      // Check if user account is locked (using default values)
+     
+      // Check if user account is locked
       if (userStatus.isLocked) {
-        return res.status(423).json({ 
+        return res.status(423).json({
           success: false,
           message: 'Account is temporarily locked. Please try again later.',
           code: 'ACCOUNT_LOCKED',
           lockUntil: userStatus.lockedUntil
         });
       }
-      
+     
       // Check if user is active
       if (!userStatus.isActive) {
-        return res.status(403).json({ 
+        return res.status(403).json({
           success: false,
           message: 'Account is deactivated.',
           code: 'ACCOUNT_INACTIVE'
         });
       }
-      
-      // Attach both JWT data and current user status to request
-      // after you compute userId
-req.user = { ...decoded, id: userId, userId };   // guarantee both keys
-
+     
       req.userStatus = userStatus;
-      
-      return next();
-      
-    } catch (err) {
-      console.error('Enhanced auth failed:', err.message);
-      
-      if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ 
-          success: false,
-          message: 'Token has expired. Please login again.',
-          code: 'TOKEN_EXPIRED'
-        });
-      } else if (err.name === 'JsonWebTokenError') {
-        return res.status(401).json({ 
-          success: false,
-          message: 'Invalid token format.',
-          code: 'INVALID_TOKEN'
-        });
-      }
-      
-      return res.status(401).json({ 
+      next();
+    } catch (error) {
+      console.error('User status check failed:', error);
+      res.status(500).json({
         success: false,
-        message: 'Invalid or expired token',
-        code: 'TOKEN_INVALID'
+        message: 'Failed to verify user status',
+        code: 'STATUS_CHECK_FAILED'
       });
     }
-  }
-  
-  return res.status(401).json({ 
-    success: false,
-    message: 'Authentication required',
-    code: 'NO_TOKEN'
   });
 };
-
-
-// NEW: Middleware to ensure user has completed profile (for Myntra flow)
+// Middleware to ensure user has completed profile
 export const ensureProfileComplete = (req, res, next) => {
-  // This middleware should be used after ensureAuthWithStatus
-  if (!req.userStatus) {
-    return res.status(500).json({ 
-      success: false,
-      message: 'User status not available. Use ensureAuthWithStatus middleware first.',
-      code: 'MIDDLEWARE_ERROR'
-    });
-  }
-  
-  if (!req.userStatus.isProfileComplete) {
-    return res.status(403).json({ 
+  if (!req.userStatus || !req.userStatus.isProfileComplete) {
+    return res.status(403).json({
       success: false,
       message: 'Profile completion required to access this resource.',
       code: 'PROFILE_INCOMPLETE',
       nextStep: 'profile-completion'
     });
   }
-  
-  return next();
+  next();
 };
-
-// NEW: Middleware for phone verification requirement
+// Middleware for phone verification requirement
 export const ensurePhoneVerified = (req, res, next) => {
-  if (!req.userStatus) {
-    return res.status(500).json({ 
-      success: false,
-      message: 'User status not available. Use ensureAuthWithStatus middleware first.',
-      code: 'MIDDLEWARE_ERROR'
-    });
-  }
-  
-  if (!req.userStatus.phoneVerified) {
-    return res.status(403).json({ 
+  if (!req.userStatus || !req.userStatus.phoneVerified) {
+    return res.status(403).json({
       success: false,
       message: 'Phone verification required to access this resource.',
       code: 'PHONE_NOT_VERIFIED',
       nextStep: 'phone-verification'
     });
   }
-  
-  return next();
+  next();
 };
-
-// NEW: Role-based authorization middleware
+// Role-based authorization middleware
 export const ensureRole = (allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
         message: 'Authentication required',
         code: 'NO_AUTH'
       });
     }
-    
-    const userRole = req.user.role || 'USER';
-    
-    if (!allowedRoles.includes(userRole)) {
-      return res.status(403).json({ 
+   
+    const userRole = (req.user.role || '').toLowerCase();
+    const normalizedAllowedRoles = allowedRoles.map(role => (role || '').toLowerCase());
+   
+    if (!normalizedAllowedRoles.includes(userRole)) {
+      return res.status(403).json({
         success: false,
         message: 'Insufficient permissions to access this resource.',
         code: 'INSUFFICIENT_PERMISSIONS',
@@ -205,55 +145,61 @@ export const ensureRole = (allowedRoles) => {
         userRole: userRole
       });
     }
-    
-    return next();
+   
+    next();
   };
 };
-
-// NEW: Optional authentication middleware (for public endpoints that benefit from user context)
-export const optionalAuth = (req, res, next) => { // Fixed: added 'res' parameter
+// Admin-specific authorization middleware
+export const ensureAdmin = (req, res, next) => {
+  if (!req.user || (req.user.role || '').toLowerCase() !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Admin access required.'
+    });
+  }
+  next();
+};
+// Optional authentication middleware
+export const optionalAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  
+ 
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.split(' ')[1];
-    
+   
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded;
     } catch (err) {
-      // Silently fail for optional auth - don't block the request
-      console.log('Optional auth failed (expected for public endpoints):', err.message);
+      // Silently fail
+      console.log('Optional auth failed:', err.message);
     }
   }
-  
-  // Always proceed to next middleware, regardless of auth status
-  return next();
+ 
+  next();
 };
-
-// NEW: Rate limiting helper for OTP endpoints
+// Rate limiting helper for OTP endpoints
 export const otpRateLimit = (maxAttempts = 5, timeWindowMinutes = 15) => {
   const attempts = new Map();
-  
+ 
   return (req, res, next) => {
     const identifier = req.ip || req.connection.remoteAddress || 'unknown';
     const now = Date.now();
-    
+   
     // Clean up old entries
     for (const [key, data] of attempts.entries()) {
       if (now - data.firstAttempt > timeWindowMinutes * 60 * 1000) {
         attempts.delete(key);
       }
     }
-    
-    // Check current attempts
+   
     const userAttempts = attempts.get(identifier);
-    
+   
     if (userAttempts) {
       if (userAttempts.count >= maxAttempts) {
         const remainingTime = Math.ceil(
           (userAttempts.firstAttempt + timeWindowMinutes * 60 * 1000 - now) / 1000
         );
-        
+       
         return res.status(429).json({
           success: false,
           message: `Too many OTP requests. Please try again in ${Math.ceil(remainingTime / 60)} minutes.`,
@@ -261,74 +207,25 @@ export const otpRateLimit = (maxAttempts = 5, timeWindowMinutes = 15) => {
           retryAfter: remainingTime
         });
       }
-      
+     
       userAttempts.count++;
     } else {
       attempts.set(identifier, { count: 1, firstAttempt: now });
     }
-    
-    return next();
+   
+    next();
   };
 };
-
-export const authMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
-      success: false,
-      message: 'Authentication required. No token provided.',
-      code: 'NO_TOKEN',
-    });
-  }
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    // 1. Verify the token using your JWT_SECRET
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // 2. Get the user ID from the decoded token
-    const userId = decoded.id || decoded.userId;
-
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token payload.',
-        code: 'INVALID_TOKEN_PAYLOAD',
-      });
-    }
-
-    // 3. Attach a simplified user object to the request.
-    // This is crucial for your controllers to access the user's ID.
-    req.user = { id: userId };
-
-    // 4. Proceed to the next function (the route controller)
-    next();
-  } catch (err) {
-    if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Your session has expired. Please login again.',
-        code: 'TOKEN_EXPIRED',
-      });
-    }
-    // For any other JWT error (e.g., malformed token)
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or malformed token.',
-      code: 'TOKEN_INVALID',
-    });
-  }
-};
-
-// Export all middleware functions
+// Legacy authMiddleware for backward compatibility (simple version)
+export const authMiddleware = ensureAuth;
+// Default export for easy import (all middlewares)
 export default {
   ensureAuth,
-  ensureAuthWithStatus, // Added this line
+  ensureAuthWithStatus,
   ensureProfileComplete,
   ensurePhoneVerified,
   ensureRole,
+  ensureAdmin,
   optionalAuth,
   otpRateLimit,
   authMiddleware

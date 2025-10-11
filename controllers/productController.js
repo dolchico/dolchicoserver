@@ -553,6 +553,51 @@ const updateProduct = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update product', error: error?.message });
   }
 };
+const adminListProducts = async (req, res) => {
+  try {
+    const { 
+      page = 1, 
+      limit = 50, // Larger default for admin
+      search, 
+      categoryId, 
+      subcategoryId, 
+      grouping,
+      isActive, // Admin filter
+      stockMin, // Admin filter for low stock
+      stockMax
+    } = req.query;
 
+    const result = await getProducts({ 
+      page: +page, 
+      limit: +limit, 
+      search: search ? search.toString() : '', 
+      categoryId: categoryId ? +categoryId : undefined, 
+      subcategoryId: subcategoryId ? +subcategoryId : undefined, 
+      grouping: grouping ? grouping.toString() : undefined,
+      isActive: isActive ? isActive === 'true' : undefined,
+      stockMin: stockMin ? +stockMin : undefined,
+      stockMax: stockMax ? +stockMax : undefined
+    });
+
+    const safeProducts = result.products.map((product) => convertBigIntFields({
+      ...product,
+      date: product.date?.toString() || null,
+      createdAt: product.createdAt?.toISOString() || null,
+      updatedAt: product.updatedAt?.toISOString() || null,
+    }));
+
+    res.json({ 
+      success: true, 
+      products: safeProducts,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: result.totalPages
+    });
+  } catch (error) {
+    console.error('adminListProducts error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 // Update the export at the end of controllers/productController.js
-export { listProducts, addProduct, removeProduct, singleProduct, searchProducts, updateProduct };
+export { listProducts, addProduct, removeProduct, singleProduct, searchProducts, updateProduct,adminListProducts };

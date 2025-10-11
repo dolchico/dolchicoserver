@@ -105,6 +105,8 @@ export const getSubcategoriesByGrouping = async (grouping) => {
 };
 
 // --- Offer Services ---
+// Updated addOffer service to validate subcategory belongs to category
+// Updated addOffer in category.service.js for more debug
 export const addOffer = async (categoryId, offerData) => {
   try {
     const parsedCategoryId = parseInt(categoryId, 10);
@@ -112,7 +114,15 @@ export const addOffer = async (categoryId, offerData) => {
       throw new Error('Invalid category ID');
     }
 
-    // Explicitly select valid Offer fields
+    // Fetch category to validate
+    const category = await prisma.category.findUnique({ where: { id: parsedCategoryId } });
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    console.log('📥 Service received offerData:', JSON.stringify(offerData, null, 2));  // Full payload
+
+    // Destructure
     const {
       title,
       description,
@@ -122,30 +132,17 @@ export const addOffer = async (categoryId, offerData) => {
       startDate,
       endDate,
       offerRules,
-      // Rule-related fields that may be sent at top level
-      minDiscount,
-      maxDiscount,
-      priceAbove,
-      priceBelow,
-      tags,
-      subcategoryId,
-      subCategoriesName,
-      subcategoryName,
-      // Ignore invalid fields
-      grouping,
-      discountType,
+      // Ignore extras
       ...invalidFields
     } = offerData;
 
-    // Validate required Offer fields
-    if (!title || !discountPercent || !startDate || !endDate) {
+    if (!title || discountPercent === undefined || !startDate || !endDate) {
       throw new Error('Title, discountPercent, startDate, and endDate are required');
     }
 
-    // Prepare Offer data
     const data = {
       title,
-      description,
+      description: description || `${title} offer`,
       discountPercent: parseFloat(discountPercent),
       iconUrl: iconUrl || null,
       isActive: isActive ?? true,
@@ -154,81 +151,76 @@ export const addOffer = async (categoryId, offerData) => {
       categoryId: parsedCategoryId,
     };
 
-    // Handle offerRules
     let nestedRules = [];
-    if (Array.isArray(offerRules) && offerRules.length) {
+
+    // Primary: Handle nested offerRules
+    if (Array.isArray(offerRules) && offerRules.length > 0) {
+      console.log(`📊 Processing ${offerRules.length} rules`);
       for (const r of offerRules) {
-        const rule = { ...r };
-        if (r.subCategoriesName || r.subcategoryName) {
-          const name = r.subCategoriesName || r.subcategoryName;
-          const sub = await findSubcategoryByName(categoryId, name);
-          if (sub) rule.subcategoryId = sub.id;
-          delete rule.subCategoriesName;
-          delete rule.subcategoryName;
+        console.log('📥 Raw rule:', JSON.stringify(r, null, 2));  // See subcategoryId here
+        let resolvedSubcategoryId = r.subcategoryId ?? null;
+
+        // Validate subcategory under this category
+        if (resolvedSubcategoryId !== null) {
+          const subcat = await prisma.subcategory.findFirst({
+            where: { 
+              id: resolvedSubcategoryId,
+              categoryId: parsedCategoryId
+            }
+          });
+          if (!subcat) {
+            console.warn(`⚠️ subcategoryId ${resolvedSubcategoryId} not under category ${parsedCategoryId}—setting null`);
+            resolvedSubcategoryId = null;
+          } else {
+            console.log(`✅ Rule linked to subcategory ${subcat.name} (ID: ${subcat.id})`);
+          }
+        } else {
+          console.log('⚠️ Rule has no subcategoryId (category-wide)');
         }
-        nestedRules.push({
-          priceBelow: rule.priceBelow ?? rule.price_below ?? undefined,
-          priceAbove: rule.priceAbove ?? rule.price_above ?? undefined,
-          minDiscount: rule.minDiscount ?? rule.min_discount ?? undefined,
-          maxDiscount: rule.maxDiscount ?? rule.max_discount ?? undefined,
-          ageGroupStart: rule.ageGroupStart ?? undefined,
-          ageGroupEnd: rule.ageGroupEnd ?? undefined,
-          tags: rule.tags ?? [],
-          subcategoryId: rule.subcategoryId ?? undefined,
-        });
+
+        const rule = {
+          priceBelow: r.priceBelow ?? r.price_below ?? null,
+          priceAbove: r.priceAbove ?? r.price_above ?? null,
+          minDiscount: r.minDiscount ?? r.min_discount ?? null,
+          maxDiscount: r.maxDiscount ?? r.max_discount ?? null,
+          ageGroupStart: r.ageGroupStart ?? null,
+          ageGroupEnd: r.ageGroupEnd ?? null,
+          tags: Array.isArray(r.tags) ? r.tags : [],
+          subcategoryId: resolvedSubcategoryId  // Final value
+        };
+
+        console.log('📤 Final rule to create:', JSON.stringify(rule, null, 2));  // Confirm subcategoryId
+
+        // Add if meaningful
+        if (rule.minDiscount !== null || rule.maxDiscount !== null || rule.subcategoryId !== null || rule.tags.length > 0) {
+          nestedRules.push(rule);
+        }
       }
     }
 
-    // If rule-related fields are provided at top level, add them as a single rule
-    if (
-      minDiscount !== undefined ||
-      maxDiscount !== undefined ||
-      priceAbove !== undefined ||
-      priceBelow !== undefined ||
-      tags !== undefined ||
-      subcategoryId !== undefined ||
-      subCategoriesName ||
-      subcategoryName
-    ) {
-      const rule = {
-        minDiscount: minDiscount ? parseInt(minDiscount, 10) : undefined,
-        maxDiscount: maxDiscount ? parseInt(maxDiscount, 10) : undefined,
-        priceAbove: priceAbove ? parseFloat(priceAbove) : undefined,
-        priceBelow: priceBelow ? parseFloat(priceBelow) : undefined,
-        tags: Array.isArray(tags) ? tags : tags ? JSON.parse(tags) : [],
-        subcategoryId,
-      };
-
-      if (subCategoriesName || subcategoryName) {
-        const name = subCategoriesName || subcategoryName;
-        const sub = await findSubcategoryByName(categoryId, name);
-        if (sub) rule.subcategoryId = sub.id;
-      }
-
-      // Only add rule if it has meaningful data
-      if (
-        rule.minDiscount !== undefined ||
-        rule.maxDiscount !== undefined ||
-        rule.priceAbove !== undefined ||
-        rule.priceBelow !== undefined ||
-        rule.tags.length > 0 ||
-        rule.subcategoryId !== undefined
-      ) {
-        nestedRules.push(rule);
-      }
+    if (nestedRules.length === 0) {
+      throw new Error('Offer must have at least one valid rule');
     }
 
-    if (nestedRules.length > 0) {
-      data.offerRules = { create: nestedRules };
-    }
+    data.offerRules = { create: nestedRules };
 
-    // Log invalid fields for debugging
     if (Object.keys(invalidFields).length > 0) {
       console.warn('Ignoring invalid Offer fields:', Object.keys(invalidFields));
     }
 
-    return await prisma.offer.create({ data, include: { offerRules: true } });
+    const createdOffer = await prisma.offer.create({ 
+      data, 
+      include: { 
+        offerRules: { 
+          include: { subcategory: true }  // Resolve subcategory in response
+        } 
+      } 
+    });
+
+    console.log('✅ Offer created with rules:', JSON.stringify(createdOffer.offerRules, null, 2));
+    return createdOffer;
   } catch (error) {
+    console.error('❌ addOffer error:', error);
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw new Error('An offer with this title already exists for the selected category');
     }

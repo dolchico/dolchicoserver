@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,6 +23,13 @@ model User {
   phoneVerified Boolean @default(false)
   isProfileComplete Boolean @default(false)
   isActive Boolean @default(true)
+ 
+  // New blocking fields
+  isBlocked Boolean @default(false)
+  blockedAt DateTime?
+  blockedReason String?
+  blockedBy String? // e.g., admin user ID who blocked
+  blockedUntil DateTime?
   resetToken String? @db.VarChar(255)
   dob DateTime?
   country String? @db.VarChar(100)
@@ -49,11 +55,14 @@ model User {
   reviews Review[]
   couponAssignments CouponAssignment[]
   couponUsages CouponUsage[] // Added to complete the relation
+  tickets Ticket[]
   @@index([email])
   @@index([phoneNumber])
   @@index([username])
   @@index([role])
   @@index([isActive])
+  @@index([isBlocked]) // New index for blocking queries
+  @@index([blockedAt]) // New index for blocked date queries
   @@index([phoneVerified, isProfileComplete])
   @@index([emailVerified, isProfileComplete])
   @@index([resetToken])
@@ -118,6 +127,9 @@ model Review {
   metadata Json?
   isEdited Boolean @default(false)
   isDeleted Boolean @default(false)
+  // New fields for admin management
+  status ReviewStatus @default(PENDING)
+  adminResponse String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -130,6 +142,7 @@ model Review {
   @@index([userId, type])
   @@index([productId])
   @@index([orderId])
+  @@index([status]) // New index for status filtering
   @@map("reviews")
 }
 
@@ -154,6 +167,12 @@ model OfferRule {
 enum ReviewType {
   PRODUCT
   DELIVERY
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Wishlist {
@@ -289,6 +308,7 @@ model Order {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   paymentDetails Payment?
   reviews Review[]
+  tickets Ticket[]
   @@index([userId])
   @@index([status])
   @@index([payment])
@@ -541,4 +561,32 @@ model CouponAssignment {
 enum CouponType {
   PERCENTAGE
   FIXED_AMOUNT
+}
+
+model Ticket {
+  id String @id @default(cuid())
+  ticketId String @default(cuid()) @unique @db.VarChar(50)
+  userId String
+  orderId Int?
+  orderItemIds Int[]
+  subject String @db.VarChar(255)
+  message String?
+  products Json?
+  status TicketStatus @default(OPEN)
+  resolvedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+  @@index([orderItemIds])
+  @@map("tickets")
+}
+
+enum TicketStatus {
+  OPEN
+  RESOLVED
+  CLOSED
 }

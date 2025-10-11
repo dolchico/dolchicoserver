@@ -18,7 +18,14 @@ import {
   verifyEmailChange,
   requestPhoneChange,
   verifyPhoneChange,
-  getUserProfile 
+  getUserProfile,
+  getAllUsers,
+  syncUsersFromWebsite,
+  blockUser,
+  unblockUser,
+  deleteUser,
+  getSingleUser,
+  updateSingleUser,
 } from '../controllers/userController.js';
 
 import { verifyEmailByLink } from '../controllers/emailVerificationController.js';
@@ -34,7 +41,8 @@ import {
 import { 
   ensureAuth,
   ensureProfileComplete,
-  ensureAuthWithStatus
+  ensureAuthWithStatus,
+  ensureAdmin
 } from "../middleware/authMiddleware.js";
 
 // Import wishlist routes
@@ -275,6 +283,29 @@ router.post('/resend-verification', resendVerificationEmail);
 // Add this route to your auth routes
 router.post('/verify-email-token', verifyEmailToken);
 
+// ================================
+// ADMIN USER MANAGEMENT ROUTES
+// ================================
 
+// Get all users with filters (admin only)
+router.get('/users', ensureAuth, ensureAdmin, getAllUsers);
+
+// Get single user by ID (admin only) ← ADD THIS ENTIRE ROUTE
+router.get('/users/:id', ensureAuth, ensureAdmin, getSingleUser);
+
+// Sync users from dolchico website (admin only)
+router.post('/users/sync', ensureAuth, ensureAdmin, syncUsersFromWebsite);
+
+// Block user (admin only)
+router.post('/users/:id/block', ensureAuth, ensureAdmin, blockUser);
+
+// Unblock user (admin only)
+router.post('/users/:id/unblock', ensureAuth, ensureAdmin, unblockUser);
+
+// Delete user (admin only)
+router.delete('/users/:id', ensureAuth, ensureAdmin, deleteUser);
+
+// Update user (admin only)
+router.put('/users/:id', ensureAuth, ensureAdmin, updateSingleUser);
 
 export default router;

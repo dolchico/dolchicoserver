@@ -81,7 +81,7 @@ export const applyCouponToCart = async (req, res) => {
     if (!userId || !validate(userId)) {
       throw new BadRequestError("Invalid or missing user ID.", "INVALID_USER_ID");
     }
-    if (!cartId || !validate(cartId)) {
+    if (!cartId || isNaN(Number(cartId)) || Number(cartId) <= 0) {
       throw new BadRequestError("Invalid or missing cart ID.", "INVALID_CART_ID");
     }
     validateCouponCode(code);
@@ -107,7 +107,7 @@ export const removeCouponFromCart = async (req, res) => {
     if (!userId || !validate(userId)) {
       throw new BadRequestError("Invalid or missing user ID.", "INVALID_USER_ID");
     }
-    if (!cartId || !validate(cartId)) {
+    if (!cartId || isNaN(Number(cartId)) || Number(cartId) <= 0) {
       throw new BadRequestError("Invalid or missing cart ID.", "INVALID_CART_ID");
     }
 

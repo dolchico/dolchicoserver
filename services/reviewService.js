@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 const REVIEW_TYPE = { PRODUCT: 'PRODUCT', DELIVERY: 'DELIVERY' };
 
 /**
- * Recalculates product rating aggregates and updates the product.
+ * Recalculates product rating aggregates and updates the product (only APPROVED reviews).
  * @param {number} productId - The ID of the product
  * @param {Object} tx - Prisma transaction client
  * @returns {Promise<void>}
@@ -20,7 +20,7 @@ const recalcProductAggregates = async (productId, tx) => {
 
     // Use provided transaction client
     const agg = await tx.review.aggregate({
-      where: { productId: productIdNum, type: REVIEW_TYPE.PRODUCT, isDeleted: false },
+      where: { productId: productIdNum, type: REVIEW_TYPE.PRODUCT, isDeleted: false, status: 'APPROVED' },
       _avg: { rating: true },
       _count: { rating: true },
     });
@@ -45,6 +45,11 @@ const recalcProductAggregates = async (productId, tx) => {
  */
 const createReview = async (dto, userId) => {
   try {
+    // Parse numeric fields first
+    const productIdNum = dto.productId ? Number(dto.productId) : null;
+    const orderIdNum = dto.orderId ? Number(dto.orderId) : null;
+    const ratingNum = Number(dto.rating);
+
     // Validate inputs
     if (!dto || typeof dto !== 'object') {
       throw new Error('Invalid review data');
@@ -55,7 +60,7 @@ const createReview = async (dto, userId) => {
     if (!Object.values(REVIEW_TYPE).includes(dto.type)) {
       throw new Error(`Invalid review type. Must be one of: ${Object.values(REVIEW_TYPE).join(', ')}`);
     }
-    if (dto.rating === undefined || !Number.isInteger(dto.rating) || dto.rating < 1 || dto.rating > 5) {
+    if (isNaN(ratingNum) || !Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) {
       throw new Error('Invalid rating: must be an integer between 1 and 5');
     }
     if (dto.title && typeof dto.title !== 'string') {
@@ -75,8 +80,7 @@ const createReview = async (dto, userId) => {
 
     return await prisma.$transaction(async (tx) => {
       if (dto.type === REVIEW_TYPE.PRODUCT) {
-        const productIdNum = Number(dto.productId);
-        if (isNaN(productIdNum) || productIdNum <= 0 || !Number.isInteger(productIdNum)) {
+        if (!productIdNum || isNaN(productIdNum) || productIdNum <= 0 || !Number.isInteger(productIdNum)) {
           throw { status: 400, message: 'Invalid productId for PRODUCT reviews' };
         }
         const purchased = await tx.orderItem.findFirst({
@@ -87,8 +91,7 @@ const createReview = async (dto, userId) => {
         }
       }
       if (dto.type === REVIEW_TYPE.DELIVERY) {
-        const orderIdNum = Number(dto.orderId);
-        if (isNaN(orderIdNum) || orderIdNum <= 0 || !Number.isInteger(orderIdNum)) {
+        if (!orderIdNum || isNaN(orderIdNum) || orderIdNum <= 0 || !Number.isInteger(orderIdNum)) {
           throw { status: 400, message: 'Invalid orderId for DELIVERY reviews' };
         }
         const order = await tx.order.findUnique({ where: { id: orderIdNum } });
@@ -106,19 +109,20 @@ const createReview = async (dto, userId) => {
       const createData = {
         userId, // Use string userId
         type: dto.type,
-        productId: dto.productId ? Number(dto.productId) : null,
-        orderId: dto.orderId ? Number(dto.orderId) : null,
-        rating: Number(dto.rating),
+        productId: productIdNum,
+        orderId: orderIdNum,
+        rating: ratingNum,
         title: dto.title || null,
         comment: dto.comment || null,
         images: dto.images || [],
         metadata: dto.metadata || null,
+        status: 'PENDING',
       };
 
       try {
         const review = await tx.review.create({ data: createData });
-        if (dto.type === REVIEW_TYPE.PRODUCT && dto.productId) {
-          await recalcProductAggregates(dto.productId, tx);
+        if (dto.type === REVIEW_TYPE.PRODUCT && productIdNum) {
+          await recalcProductAggregates(productIdNum, tx);
         }
         return review;
       } catch (err) {
@@ -136,7 +140,7 @@ const createReview = async (dto, userId) => {
 
 /**
  * Updates a review.
- * @param {number} id - The ID of the review
+ * @param {string} id - The ID of the review (string)
  * @param {Object} dto - Update data
  * @param {Object} userCtx - User context with id and role
  * @returns {Promise<Object>} The updated review
@@ -144,18 +148,22 @@ const createReview = async (dto, userId) => {
  */
 const updateReview = async (id, dto, userCtx) => {
   try {
-    // Validate inputs
-    const idNum = Number(id);
-    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+    // Validate ID as string
+    if (typeof id !== 'string' || id.length === 0) {
       throw { status: 400, message: 'Invalid review ID' };
     }
+
+    // Normalize numeric fields
+    const ratingNum = dto.rating !== undefined ? Number(dto.rating) : undefined;
+
+    // Validate inputs
     if (!dto || typeof dto !== 'object') {
       throw { status: 400, message: 'Invalid update data' };
     }
     if (!userCtx || typeof userCtx !== 'object' || !userCtx.id || typeof userCtx.id !== 'string') {
       throw { status: 400, message: 'Invalid user context' };
     }
-    if (dto.rating !== undefined && (!Number.isInteger(dto.rating) || dto.rating < 1 || dto.rating > 5)) {
+    if (dto.rating !== undefined && (isNaN(ratingNum) || !Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5)) {
       throw { status: 400, message: 'Invalid rating: must be an integer between 1 and 5' };
     }
     if (dto.title !== undefined && typeof dto.title !== 'string') {
@@ -174,7 +182,7 @@ const updateReview = async (id, dto, userCtx) => {
     }
 
     return await prisma.$transaction(async (tx) => {
-      const existing = await tx.review.findUnique({ where: { id: idNum } });
+      const existing = await tx.review.findUnique({ where: { id } });
       if (!existing) {
         throw { status: 404, message: 'Review not found' };
       }
@@ -186,7 +194,7 @@ const updateReview = async (id, dto, userCtx) => {
       }
 
       const data = {};
-      if (dto.rating !== undefined) data.rating = Number(dto.rating);
+      if (dto.rating !== undefined) data.rating = ratingNum;
       if (dto.title !== undefined) data.title = dto.title;
       if (dto.comment !== undefined) data.comment = dto.comment;
       if (dto.images !== undefined) data.images = dto.images;
@@ -195,7 +203,7 @@ const updateReview = async (id, dto, userCtx) => {
       }
       data.isEdited = true;
 
-      const updated = await tx.review.update({ where: { id: idNum }, data });
+      const updated = await tx.review.update({ where: { id }, data });
       if (existing.type === REVIEW_TYPE.PRODUCT && existing.productId) {
         await recalcProductAggregates(existing.productId, tx);
       }
@@ -209,7 +217,7 @@ const updateReview = async (id, dto, userCtx) => {
 
 /**
  * Deletes a review (soft delete).
- * @param {number} id - The ID of the review
+ * @param {string} id - The ID of the review (string)
  * @param {Object} userCtx - User context with id and role
  * @returns {Promise<Object>} Success response
  * @throws {Error} If input is invalid or deletion fails
@@ -217,8 +225,7 @@ const updateReview = async (id, dto, userCtx) => {
 const deleteReview = async (id, userCtx) => {
   try {
     // Validate inputs
-    const idNum = Number(id);
-    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+    if (typeof id !== 'string' || id.length === 0) {
       throw { status: 400, message: 'Invalid review ID' };
     }
     if (!userCtx || typeof userCtx !== 'object' || !userCtx.id || typeof userCtx.id !== 'string') {
@@ -231,7 +238,7 @@ const deleteReview = async (id, userCtx) => {
     }
 
     return await prisma.$transaction(async (tx) => {
-      const existing = await tx.review.findUnique({ where: { id: idNum } });
+      const existing = await tx.review.findUnique({ where: { id } });
       if (!existing) {
         throw { status: 404, message: 'Review not found' };
       }
@@ -242,7 +249,7 @@ const deleteReview = async (id, userCtx) => {
         return { success: true };
       }
 
-      await tx.review.update({ where: { id: idNum }, data: { isDeleted: true } });
+      await tx.review.update({ where: { id }, data: { isDeleted: true } });
       if (existing.type === REVIEW_TYPE.PRODUCT && existing.productId) {
         await recalcProductAggregates(existing.productId, tx);
       }
@@ -256,7 +263,7 @@ const deleteReview = async (id, userCtx) => {
 
 /**
  * Retrieves a review by ID.
- * @param {number} id - The ID of the review
+ * @param {string} id - The ID of the review (string)
  * @param {Object} userCtx - User context with id and role
  * @returns {Promise<Object>} The review
  * @throws {Error} If input is invalid or review not found
@@ -264,8 +271,7 @@ const deleteReview = async (id, userCtx) => {
 const getReviewById = async (id, userCtx) => {
   try {
     // Validate inputs
-    const idNum = Number(id);
-    if (isNaN(idNum) || idNum <= 0 || !Number.isInteger(idNum)) {
+    if (typeof id !== 'string' || id.length === 0) {
       throw { status: 400, message: 'Invalid review ID' };
     }
     if (userCtx && (typeof userCtx !== 'object' || !userCtx.id || typeof userCtx.id !== 'string')) {
@@ -277,7 +283,7 @@ const getReviewById = async (id, userCtx) => {
       throw { status: 500, message: 'Database connection not available' };
     }
 
-    const review = await prisma.review.findUnique({ where: { id: idNum } });
+    const review = await prisma.review.findUnique({ where: { id } });
     if (!review) {
       throw { status: 404, message: 'Review not found' };
     }
@@ -424,7 +430,209 @@ const listReviews = async (filters, pagination) => {
 };
 
 /**
- * Gets rating summary for a product.
+ * Lists reviews with aggregated stats for admin dashboard.
+ * @param {Object} filters - Filter criteria (status, type, etc.)
+ * @param {Object} pagination - Pagination options
+ * @returns {Promise<Object>} Reviews, stats, and pagination info
+ */
+const listReviewsWithStats = async (filters, pagination) => {
+  try {
+    const where = { isDeleted: false };
+
+    if (filters.type && filters.type !== 'all') {
+      where.type = filters.type === 'product' ? REVIEW_TYPE.PRODUCT : REVIEW_TYPE.DELIVERY;
+    }
+    if (filters.status && filters.status !== 'all') {
+      where.status = filters.status.toUpperCase();
+    }
+    if (filters.productId) {
+      where.productId = Number(filters.productId);
+    }
+    if (filters.orderId) {
+      where.orderId = Number(filters.orderId);
+    }
+    if (filters.userId) {
+      where.userId = filters.userId;
+    }
+
+    const page = Number(pagination.page) || 1;
+    const pageSize = Number(pagination.pageSize) || 50;
+    const skip = (page - 1) * pageSize;
+
+    let orderBy = { createdAt: 'desc' };
+    if (pagination.sort) {
+      const [field, dir] = pagination.sort.split('_');
+      if (['createdAt', 'rating', 'status'].includes(field) && ['asc', 'desc'].includes(dir)) {
+        orderBy = { [field]: dir };
+      }
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.review.findMany({ 
+        where, 
+        skip, 
+        take: pageSize, 
+        orderBy,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          product: { select: { id: true, name: true } },
+          order: { 
+            select: { 
+              id: true, 
+              status: true, 
+              updatedAt: true 
+            } 
+          }
+        }
+      }),
+      prisma.review.count({ where })
+    ]);
+
+    const stats = await computeReviewStats();
+
+    const enrichedItems = items.map(review => ({
+      ...review,
+      id: review.id,
+      userId: review.userId,
+      type: review.type,
+      productId: review.productId,
+      orderId: review.orderId,
+      rating: review.rating,
+      title: review.title,
+      comment: review.comment,
+      images: review.images,
+      isEdited: review.isEdited,
+      isDeleted: review.isDeleted,
+      createdAt: review.createdAt.toISOString(),
+      updatedAt: review.updatedAt.toISOString(),
+      status: review.status ? review.status.toLowerCase() : 'approved',
+      customerName: review.user?.name || `User #${review.userId}`,
+      customerEmail: review.user?.email || null,
+      productName: review.product?.name || null,
+      isVerifiedPurchase: !!review.order && review.order.status === 'DELIVERED',
+      helpfulVotes: 0,
+      notHelpfulVotes: 0,
+      adminResponse: review.adminResponse || null,
+      deliveryDate: review.type === REVIEW_TYPE.DELIVERY && review.order ? review.order.updatedAt.toISOString() : null,
+      courierName: null,
+      courierRating: null
+    }));
+
+    return {
+      items: enrichedItems,
+      stats,
+      pageInfo: {
+        page,
+        pageSize,
+        total,
+        hasNextPage: page * pageSize < total,
+      },
+    };
+  } catch (error) {
+    console.error('Error in listReviewsWithStats:', error);
+    throw error.status ? error : { status: 500, message: `Failed to list reviews: ${error.message}` };
+  }
+};
+
+/**
+ * Computes global review statistics.
+ * @returns {Promise<Object>} Stats object
+ */
+const computeReviewStats = async () => {
+  const baseWhere = { isDeleted: false };
+  const [totalRes, productRes, deliveryRes, pendingRes, approvedRes, rejectedRes, avgRes] = await Promise.all([
+    prisma.review.count({ where: baseWhere }),
+    prisma.review.count({ where: { ...baseWhere, type: REVIEW_TYPE.PRODUCT } }),
+    prisma.review.count({ where: { ...baseWhere, type: REVIEW_TYPE.DELIVERY } }),
+    prisma.review.count({ where: { ...baseWhere, status: 'PENDING' } }),
+    prisma.review.count({ where: { ...baseWhere, status: 'APPROVED' } }),
+    prisma.review.count({ where: { ...baseWhere, status: 'REJECTED' } }),
+    prisma.review.aggregate({
+      where: baseWhere,
+      _avg: { rating: true }
+    })
+  ]);
+
+  return {
+    total: totalRes,
+    product: productRes,
+    delivery: deliveryRes,
+    pending: pendingRes,
+    approved: approvedRes,
+    rejected: rejectedRes,
+    averageRating: avgRes._avg.rating || 0
+  };
+};
+
+/**
+ * Updates review status (approve/reject).
+ * @param {string} id - Review ID
+ * @param {string} status - New status ('approved' | 'rejected')
+ * @param {Object} userCtx - Admin user context
+ * @returns {Promise<Object>} Updated review
+ */
+const updateReviewStatus = async (id, status, userCtx) => {
+  const statusMap = { approved: 'APPROVED', rejected: 'REJECTED' };
+  if (!statusMap[status]) {
+    throw { status: 400, message: 'Invalid status' };
+  }
+  if (!userCtx || !['ADMIN', 'MODERATOR'].includes(userCtx.role)) {
+    throw { status: 403, message: 'Forbidden' };
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    const review = await tx.review.findUnique({ where: { id } });
+    if (!review || review.isDeleted) {
+      throw { status: 404, message: 'Review not found' };
+    }
+
+    const updated = await tx.review.update({
+      where: { id },
+      data: { status: statusMap[status] }
+    });
+
+    if (review.type === REVIEW_TYPE.PRODUCT && review.productId) {
+      await recalcProductAggregates(review.productId, tx);
+    }
+
+    return {
+      ...updated,
+      status: status // Return lowercase for frontend
+    };
+  });
+};
+
+/**
+ * Updates or adds admin response to a review.
+ * @param {string} id - Review ID
+ * @param {string} adminResponse - Response text
+ * @param {Object} userCtx - Admin user context
+ * @returns {Promise<Object>} Updated review
+ */
+const updateAdminResponse = async (id, adminResponse, userCtx) => {
+  if (typeof adminResponse !== 'string' || !adminResponse.trim()) {
+    throw { status: 400, message: 'Invalid admin response' };
+  }
+  if (!userCtx || !['ADMIN', 'MODERATOR'].includes(userCtx.role)) {
+    throw { status: 403, message: 'Forbidden' };
+  }
+
+  const updated = await prisma.review.update({
+    where: { id },
+    data: { 
+      adminResponse: adminResponse.trim(),
+      updatedAt: new Date()
+    }
+  });
+
+  return {
+    ...updated,
+    adminResponse: updated.adminResponse
+  };
+};
+
+/**
+ * Gets rating summary for a product (only APPROVED reviews).
  * @param {number} productId - The ID of the product
  * @returns {Promise<Object>} Rating summary with average, count, and distribution
  * @throws {Error} If productId is invalid or query fails
@@ -443,7 +651,7 @@ const getProductSummary = async (productId) => {
     }
 
     const agg = await prisma.review.aggregate({
-      where: { productId: productIdNum, type: REVIEW_TYPE.PRODUCT, isDeleted: false },
+      where: { productId: productIdNum, type: REVIEW_TYPE.PRODUCT, isDeleted: false, status: 'APPROVED' },
       _avg: { rating: true },
       _count: { rating: true },
       _sum: { rating: true },
@@ -452,7 +660,7 @@ const getProductSummary = async (productId) => {
     const distributionRaw = await prisma.$queryRaw`
       SELECT rating, COUNT(*) as count
       FROM "Review"
-      WHERE "productId" = ${productIdNum} AND type = 'PRODUCT' AND "isDeleted" = false
+      WHERE "productId" = ${productIdNum} AND type = 'PRODUCT' AND "isDeleted" = false AND status = 'APPROVED'
       GROUP BY rating
     `;
     const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -479,4 +687,8 @@ export {
   getReviewById,
   listReviews,
   getProductSummary,
+  listReviewsWithStats,
+  updateReviewStatus,
+  updateAdminResponse,
+  computeReviewStats
 };
